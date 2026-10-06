@@ -3,13 +3,19 @@ import { heroDamage, heroHp, safeAmount, type PartyVitals } from './formulas';
 import { heroById } from './roster';
 import { HeroRole, type HeroStats, type PartyState, type Roster } from './types';
 
+export function renownPower(renown: number): number {
+  const { baseStage, exponent } = BALANCE.ascension;
+
+  return renown >= baseStage ? (renown / baseStage) ** exponent : 1;
+}
+
 export function partyMaxHp(party: PartyState, roster: Roster): number {
   const total = party.heroes.reduce(
     (sum, slot) => sum + heroHp(heroById(roster, slot.heroId), slot.level),
     0,
   );
 
-  return safeAmount(total);
+  return safeAmount(total * renownPower(party.renown ?? 0));
 }
 
 export function partyVitals(party: PartyState, roster: Roster): PartyVitals {
@@ -28,7 +34,7 @@ export function partyPower(party: PartyState, roster: Roster): number {
     return hero.role === HeroRole.Healer ? sum : sum + heroDamage(hero, slot.level);
   }, 0);
 
-  return safeAmount(total);
+  return safeAmount(total * renownPower(party.renown ?? 0));
 }
 
 export function strikeDamage(party: PartyState, roster: Roster): number {
@@ -45,6 +51,7 @@ export function heroLevel(party: PartyState, heroId: string): number | undefined
 
 export function levelUp(party: PartyState, heroId: string): PartyState {
   return {
+    ...party,
     heroes: party.heroes.map((slot) =>
       slot.heroId === heroId ? { heroId, level: slot.level + 1 } : slot,
     ),
@@ -54,7 +61,7 @@ export function levelUp(party: PartyState, heroId: string): PartyState {
 export function hire(party: PartyState, heroId: string): PartyState {
   if (heroLevel(party, heroId) !== undefined) return party;
 
-  return { heroes: [...party.heroes, { heroId, level: 1 }] };
+  return { ...party, heroes: [...party.heroes, { heroId, level: 1 }] };
 }
 
 export function isUnlocked(hero: HeroStats, lifetimeTokens: number): boolean {

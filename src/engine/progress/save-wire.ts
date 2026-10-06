@@ -40,6 +40,7 @@ const saveWire = object({
   battle: battleWire,
   party: object({
     heroes: array(object({ heroId: string(), level: number().int().positive() })).min(1),
+    renown: number().int().nonnegative().optional(),
   }),
   bestStage: number().int().positive(),
   savedAt: number().nonnegative(),

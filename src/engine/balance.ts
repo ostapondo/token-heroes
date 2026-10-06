@@ -51,6 +51,11 @@ export const BALANCE = {
   healShare: 0.02,
   healLevelFactor: { min: 0, max: 1.5 },
 
+  // Ascending sends the party back to stage 1 for good: its heroes grow by the deepest stage
+  // reached, as a power of it. A power law grows slower than the foes, so ascending again and
+  // again without new tokens converges instead of carrying the party on forever.
+  ascension: { minStage: 60, minGain: 5, baseStage: 50, exponent: 1 },
+
   offlineCapSeconds: 8 * 60 * 60,
   offlineStepSeconds: 1,
 } as const;

@@ -1,6 +1,6 @@
 import { BALANCE } from '../balance';
 import { heroDamage, heroHeal, safeAmount } from '../formulas';
-import { partyVitals } from '../party';
+import { partyVitals, renownPower } from '../party';
 import { nextRandom } from '../random';
 import { heroById } from '../roster';
 import {
@@ -78,6 +78,7 @@ function heroesAct(
   events: BattleEvent[],
 ): void {
   const vitals = partyVitals(party, roster);
+  const renown = renownPower(party.renown ?? 0);
 
   for (const slot of party.heroes) {
     const hero = heroById(roster, slot.heroId);
@@ -93,7 +94,7 @@ function heroesAct(
         const [roll, seed] = nextRandom(draft.seed);
 
         draft.seed = seed;
-        const power = heroDamage(hero, slot.level);
+        const power = safeAmount(heroDamage(hero, slot.level) * renown);
         const crit = roll < BALANCE.critChance;
         const amount = crit ? safeAmount(power * BALANCE.critMultiplier) : power;
 

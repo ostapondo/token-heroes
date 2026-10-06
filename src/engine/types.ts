@@ -67,6 +67,7 @@ interface HeroSlot {
 
 export interface PartyState {
   readonly heroes: readonly HeroSlot[];
+  readonly renown?: number | undefined;
 }
 
 export interface Foe {
