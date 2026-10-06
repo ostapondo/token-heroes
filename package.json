@@ -1,0 +1,48 @@
+{
+  "name": "token-heroes",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@10.31.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "pnpm typecheck && vite build",
+    "tauri": "tauri",
+    "test": "vitest run",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
+    "lint:rust": "cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings",
+    "format": "oxfmt && cargo fmt --manifest-path src-tauri/Cargo.toml",
+    "format:check": "oxfmt --check && cargo fmt --manifest-path src-tauri/Cargo.toml --check",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
+    "knip": "knip",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm knip"
+  },
+  "dependencies": {
+    "@fontsource/jersey-10": "5.3.0",
+    "@fontsource/pixelify-sans": "5.3.0",
+    "@tauri-apps/api": "2.12.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.12.1",
+    "@types/node": "24.12.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "knip": "6.39.0",
+    "lefthook": "2.1.17",
+    "oxfmt": "0.72.0",
+    "oxlint": "1.87.0",
+    "oxlint-tsgolint": "7.0.2003",
+    "typescript": "7.0.2",
+    "vite": "8.3.3",
+    "vitest": "5.0.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "lefthook"
+    ]
+  }
+}

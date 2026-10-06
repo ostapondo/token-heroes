@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 100,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "endOfLine": "lf",
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "node_modules/",
+    "dist/",
+    "src-tauri/target/",
+    "src-tauri/gen/",
+    "src-tauri/icons/",
+    "*.lock",
+    "pnpm-lock.yaml"
+  ]
+}

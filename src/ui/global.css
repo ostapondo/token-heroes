@@ -1,0 +1,29 @@
+@import '@fontsource/jersey-10/400.css';
+@import '@fontsource/pixelify-sans/400.css';
+@import '@fontsource/pixelify-sans/600.css';
+
+:root {
+  --ground: #0d0b09;
+  --panel: #1a1612;
+  --edge: #3b3128;
+  --ink: #efe6d4;
+  --ink-dim: #a89a84;
+  --coin: #e8b23a;
+  --coin-shade: #8a5e14;
+  --font-display: 'Jersey 10', monospace;
+  --font-body: 'Pixelify Sans', sans-serif;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  user-select: none;
+  overflow: hidden;
+}

@@ -1,0 +1,14 @@
+pre-commit:
+  parallel: true
+  commands:
+    format:
+      run: pnpm format:check
+    lint:
+      run: pnpm lint
+    typecheck:
+      run: pnpm typecheck
+    test:
+      run: pnpm test
+    clippy:
+      glob: 'src-tauri/**/*.rs'
+      run: pnpm lint:rust

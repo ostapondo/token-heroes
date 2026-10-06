@@ -1,0 +1,6 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["src/main.tsx", "src/**/*.test.ts", "scripts/**/*.ts"],
+  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.ts"],
+  "ignoreDependencies": ["@tauri-apps/cli", "lefthook", "oxlint-tsgolint"]
+}

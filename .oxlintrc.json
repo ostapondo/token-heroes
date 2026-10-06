@@ -1,0 +1,166 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "oxc", "unicorn", "react", "jsx-a11y", "import"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error"
+  },
+  "options": {
+    "typeAware": true,
+    "reportUnusedDisableDirectives": "error"
+  },
+  "rules": {
+    "eslint/max-lines": [
+      "error",
+      {
+        "max": 200,
+        "skipBlankLines": true,
+        "skipComments": true
+      }
+    ],
+    "eslint/no-console": "error",
+    "eslint/eqeqeq": "error",
+    "eslint/no-param-reassign": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-non-null-assertion": "error",
+    "typescript/consistent-type-imports": "error",
+    "typescript/no-floating-promises": "error",
+    "typescript/switch-exhaustiveness-check": "error",
+    "unicorn/filename-case": [
+      "error",
+      {
+        "case": "kebabCase"
+      }
+    ],
+    "import/no-cycle": "error",
+    "import/no-default-export": "off",
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "error",
+    "react/jsx-key": "error",
+    "react/button-has-type": "error",
+    "react/no-array-index-key": "error",
+    "react/react-in-jsx-scope": "off",
+    "import/no-unassigned-import": [
+      "error",
+      {
+        "allow": ["**/*.css"]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/engine/**"],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@content",
+                  "@render",
+                  "@platform",
+                  "react",
+                  "react-dom",
+                  "@tauri-apps/*"
+                ],
+                "message": "engine holds pure game rules and imports no other layer"
+              },
+              {
+                "group": ["**/content/**", "**/render/**", "**/platform/**", "**/ui/**"],
+                "message": "engine holds pure game rules and imports no other layer"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/content/**"],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@render", "@platform", "react", "react-dom", "@tauri-apps/*"],
+                "message": "content is data and may import only @engine"
+              },
+              {
+                "group": ["**/engine/**", "**/render/**", "**/platform/**", "**/ui/**"],
+                "message": "reach another layer through its alias, never a path behind it"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/render/**"],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@platform", "react", "react-dom", "@tauri-apps/*"],
+                "message": "render draws to canvas and knows nothing of React or the host"
+              },
+              {
+                "group": ["**/engine/**", "**/content/**", "**/platform/**", "**/ui/**"],
+                "message": "reach another layer through its alias, never a path behind it"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/platform/**"],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@content", "@render", "react", "react-dom"],
+                "message": "platform only talks to the Tauri host"
+              },
+              {
+                "group": ["**/engine/**", "**/content/**", "**/render/**", "**/ui/**"],
+                "message": "reach another layer through its alias, never a path behind it"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/ui/**"],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@tauri-apps/*"],
+                "message": "talk to the host through @platform"
+              },
+              {
+                "group": ["**/engine/**", "**/content/**", "**/render/**", "**/platform/**"],
+                "message": "reach another layer through its alias, never a path behind it"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["scripts/**"],
+      "rules": {
+        "eslint/no-console": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["node_modules/**", "dist/**", "src-tauri/target/**", "src-tauri/gen/**"]
+}
