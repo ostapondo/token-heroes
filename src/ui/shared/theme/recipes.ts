@@ -65,6 +65,7 @@ export const meter = defineSlotRecipe({
     tone: {
       coin: { track: { '--meter-color': '{colors.coin}' } },
       ultimate: { track: { '--meter-color': '{colors.ultimate}' } },
+      heal: { track: { '--meter-color': '{colors.heal}' } },
       accent: {},
     },
     size: {

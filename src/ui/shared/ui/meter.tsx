@@ -1,7 +1,7 @@
 import { meter } from '@styled/recipes';
 import type { CSSProperties } from 'react';
 
-type MeterTone = 'coin' | 'ultimate' | 'accent';
+type MeterTone = 'coin' | 'ultimate' | 'heal' | 'accent';
 type MeterSize = 'thin' | 'framed';
 type AccentStyle = CSSProperties & Record<'--meter-color', string>;
 
