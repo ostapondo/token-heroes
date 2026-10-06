@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Heroes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&amp;family=Pixelify+Sans:wght@400;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#e8b23a}a:hover{color:#ffd27a}
+.idle{animation:idle 1.2s steps(2) infinite}
+@keyframes idle{0%{transform:translateY(0)}100%{transform:translateY(-3px)}}
+.flick{animation:flick .6s steps(2) infinite}
+@keyframes flick{0%{opacity:.55;transform:scale(.85)}100%{opacity:1;transform:scale(1.1)}}
+.halo{animation:halo 1.8s ease-in-out infinite}
+@keyframes halo{0%,100%{opacity:.35}50%{opacity:.9}}
+.wisp{position:absolute;width:3px;height:3px;animation:wisp 2.2s linear infinite}
+@keyframes wisp{0%{transform:translate(0,0);opacity:0}15%{opacity:1}100%{transform:translate(-6px,-60px);opacity:0}}
+.locked{filter:brightness(0) invert(1) opacity(.22)}
+</style>
+</helmet>
+<div style="width: 940px; height: 560px; box-sizing: border-box; padding: 24px; background: #0d0b09; color: #efe6d4; font-family: 'Pixelify Sans', sans-serif; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h1 style="margin: 0; font-family: 'Jersey 10', monospace; font-weight: 400; font-size: 40px; line-height: 1">HEROES</h1>
+<span style="font-size: 14px; color: #a89a84">Coins are burned tokens. Spend them to hire; rare heroes unlock as lifetime tokens grow.</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+<sc-for list="{{heroes}}" as="h" hint-placeholder-count="10">
+<div style="background: #1a1612; border: 2px solid {{h.border}}; display: flex; flex-direction: column">
+<div style="position: relative; height: 118px; background: {{h.bg}}; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px; box-sizing: border-box; overflow: hidden">
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 14px; background: #000; opacity: .35"></div>
+<sc-if value="{{h.fx.halo}}" hint-placeholder-val="{{ false }}">
+<div class="halo" style="position: absolute; left: 50%; top: 14px; width: 80px; height: 80px; margin-left: -40px; background: radial-gradient(circle, rgba(255,243,196,.55), rgba(255,243,196,0) 65%)"></div>
+</sc-if>
+<sc-if value="{{h.fx.wisps}}" hint-placeholder-val="{{ false }}">
+<span class="wisp" style="left: 42%; bottom: 20px; background: {{h.fxColor}}"></span>
+<span class="wisp" style="left: 58%; bottom: 30px; background: {{h.fxColor}}; animation-delay: -.8s"></span>
+<span class="wisp" style="left: 50%; bottom: 14px; background: {{h.fxColor}}; animation-delay: -1.5s"></span>
+</sc-if>
+<div class="idle" style="position: relative">
+<div class="{{h.spriteCls}}">
+<sc-if value="{{h.is.wanderer}}" hint-placeholder-val="{{ false }}">
+<svg width="64" height="80" viewBox="0 0 8 10" shape-rendering="crispEdges"><path fill="#c9ced6" d="M2 0h4v3h-4z"></path><path fill="#1a1a22" d="M3 1h2v1h-2z"></path><path fill="#e8b23a" d="M2 3h4v4h-4z"></path><path fill="#e7b48f" d="M1 4h1v2h-1zM6 4h1v2h-1z"></path><path fill="#e8e8f0" d="M7 0h1v6h-1z"></path><path fill="#6b4a2e" d="M2 7h1v3h-1zM5 7h1v3h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{h.is.archer}}" hint-placeholder-val="{{ false }}">
+<svg width="64" height="80" viewBox="0 0 8 10" shape-rendering="crispEdges"><path fill="#4f9a4c" d="M2 0h4v3h-4zM1 2h1v2h-1z"></path><path fill="#e7b48f" d="M3 1h2v2h-2z"></path><path fill="#3d7a3a" d="M2 3h4v4h-4z"></path><path fill="#c08a4a" d="M0 2h1v6h-1z"></path><path fill="#5a4632" d="M2 7h1v3h-1zM5 7h1v3h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{h.is.shield}}" hint-placeholder-val="{{ false }}">
+<svg width="64" height="80" viewBox="0 0 8 10" shape-rendering="crispEdges"><path fill="#8d95a3" d="M2 0h4v3h-4z"></path><path fill="#1a1a22" d="M2 1h4v1h-4z"></path><path fill="#5e6675" d="M2 3h4v4h-4z"></path><path fill="#b9842f" d="M0 3h3v5h-3z"></path><path fill="#e8b23a" d="M1 4h1v2h-1z"></path><path fill="#3a3f4a" d="M2 7h1v3h-1zM5 7h1v3h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{h.is.cleric}}" hint-placeholder-val="{{ false }}">
+<svg width="64" height="80" viewBox="0 0 8 10" shape-rendering="crispEdges"><path fill="#efe6d4" d="M2 0h4v3h-4zM1 3h5v7h-5z"></path><path fill="#e7b48f" d="M3 1h2v2h-2z"></path><path fill="#e8b23a" d="M3 4h1v4h-1zM2 5h3v1h-3z"></path><path fill="#c08a4a" d="M7 2h1v8h-1z"></path><path fill="#fff3c4" d="M6 0h2v2h-2z"></path></svg>
+</sc-if>
+<sc-if value="{{h.is.mage}}" hint-placeholder-val="{{ false }}">
+<svg width="64" height="80" viewBox="0 0 8 10" shape-rendering="crispEdges"><path fill="#c2361a" d="M3 0h1v1h-1zM2 1h3v2h-3zM1 3h6v1h-6zM2 5h4v5h-4z"></path><path fill="#e7b48f" d="M2 4h3v1h-3z"></path><path fill="#efe6d4" d="M3 5h2v2h-2z"></path><path fill="#7a1d0c" d="M2 9h4v1h-4z"></path><path class="flick" fill="#ffb02e" d="M6 5h2v2h-2z"></path><path fill="#ff5a1f" d="M7 5h1v1h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{h.is.rogue}}" hint-placeholder-val="{{ false }}">
+<svg width="64" height="80" viewBox="0 0 8 10" shape-rendering="crispEdges"><path fill="#2b2f2a" d="M2 0h4v3h-4z"></path><path fill="#e7b48f" d="M3 1h2v1h-2z"></path><path fill="#3a3f36" d="M2 3h4v4h-4z"></path><path fill="#c2361a" d="M2 3h4v1h-4z"></path><path fill="#c9d1d9" d="M0 4h1v3h-1zM7 4h1v3h-1z"></path><path fill="#1f221e" d="M2 7h1v3h-1zM5 7h1v3h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{h.is.barbarian}}" hint-placeholder-val="{{ false }}">
+<svg width="64" height="80" viewBox="0 0 8 10" shape-rendering="crispEdges"><path fill="#c06a2a" d="M1 0h5v2h-5z"></path><path fill="#e7b48f" d="M1 2h5v2h-5zM0 4h7v3h-7z"></path><path fill="#c06a2a" d="M2 3h3v2h-3z"></path><path fill="#8a6a4a" d="M0 6h7v1h-7z"></path><path fill="#6b4a2e" d="M6 1h1v8h-1z"></path><path fill="#c9d1d9" d="M7 0h1v4h-1z"></path><path fill="#5a4632" d="M1 7h2v3h-2zM4 7h2v3h-2z"></path></svg>
+</sc-if>
+<sc-if value="{{h.is.witch}}" hint-placeholder-val="{{ false }}">
+<svg width="64" height="80" viewBox="0 0 8 10" shape-rendering="crispEdges"><path fill="#1f4f7a" d="M4 0h1v1h-1zM3 1h2v2h-2zM1 3h6v1h-6zM2 6h4v4h-4z"></path><path fill="#e8f7ff" d="M2 4h1v3h-1zM5 4h1v3h-1z"></path><path fill="#e7b48f" d="M3 4h2v2h-2z"></path><path fill="#2a6f9e" d="M3 7h2v3h-2z"></path><path class="flick" fill="#bfeaff" d="M7 4h1v2h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{h.is.necro}}" hint-placeholder-val="{{ false }}">
+<svg width="64" height="80" viewBox="0 0 8 10" shape-rendering="crispEdges"><path fill="#1a1a1a" d="M2 0h4v3h-4z"></path><path fill="#d9d1b8" d="M3 1h2v2h-2z"></path><path fill="#52e0c4" d="M3 1h1v1h-1zM4 1h1v1h-1z"></path><path fill="#1f2a28" d="M1 3h6v7h-6z"></path><path fill="#52e0c4" d="M1 9h6v1h-6z"></path><path fill="#6b4a2e" d="M7 2h1v8h-1z"></path><path fill="#e9e2cc" d="M6 0h2v2h-2z"></path></svg>
+</sc-if>
+<sc-if value="{{h.is.paladin}}" hint-placeholder-val="{{ false }}">
+<svg width="64" height="80" viewBox="0 0 8 10" shape-rendering="crispEdges"><path fill="#e8b23a" d="M2 0h4v3h-4z"></path><path fill="#1a1a22" d="M3 1h2v1h-2z"></path><path fill="#c9ced6" d="M2 3h4v4h-4z"></path><path fill="#2a6f9e" d="M3 3h2v4h-2z"></path><path fill="#8d95a3" d="M6 0h2v2h-2zM2 7h1v3h-1zM5 7h1v3h-1z"></path><path fill="#6b4a2e" d="M7 2h1v5h-1z"></path></svg>
+</sc-if>
+</div>
+</div>
+</div>
+<div style="padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 3px">
+<div style="font-family: 'Jersey 10', monospace; font-size: 22px; line-height: 1">{{h.name}}</div>
+<div style="font-size: 12px; color: #a89a84">{{h.role}}</div>
+<div style="margin-top: 4px; font-size: 13px; font-weight: 600; color: {{h.statusColor}}">{{h.status}}</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":940,"height":560}}'>
+class Component extends DCLogic {
+renderVals() {
+const OWNED = { border: '#e8b23a', statusColor: '#e8b23a', spriteCls: '' };
+const HIRE = { border: '#3b3128', statusColor: '#efe6d4', spriteCls: '' };
+const LOCKED = { border: '#2a231c', statusColor: '#a89a84', spriteCls: 'locked' };
+const list = [
+{ key: 'wanderer', name: 'Wanderer', role: 'You · sword · damage', bg: '#241d14', status: 'Lv 87', state: OWNED },
+{ key: 'archer', name: 'Archer', role: 'Bow · fast damage', bg: '#16200f', status: 'Lv 63', state: OWNED },
+{ key: 'shield', name: 'Shieldbearer', role: 'Tank · takes boss hits', bg: '#1a1d22', status: 'Lv 12', state: OWNED },
+{ key: 'cleric', name: 'Cleric', role: 'Healer · keeps party up', bg: '#241f14', status: 'Hire · 25K coins', state: HIRE, fx: 'halo' },
+{ key: 'mage', name: 'Fire Mage', role: 'Burst · hits all enemies', bg: '#260d06', status: 'Hire · 140K coins', state: HIRE },
+{ key: 'rogue', name: 'Rogue', role: 'Crits · double daggers', bg: '#121512', status: 'Unlocks at 50M tokens', state: LOCKED },
+{ key: 'barbarian', name: 'Barbarian', role: 'Rage · stronger when hurt', bg: '#20140b', status: 'Unlocks at 100M tokens', state: LOCKED },
+{ key: 'witch', name: 'Frost Witch', role: 'Slows the boss timer', bg: '#0a1b28', status: 'Unlocks at 250M tokens', state: LOCKED, fx: 'wisps', fxColor: '#bfeaff' },
+{ key: 'necro', name: 'Necromancer', role: 'Raises fallen heroes', bg: '#071110', status: 'Unlocks at 500M tokens', state: LOCKED, fx: 'wisps', fxColor: '#52e0c4' },
+{ key: 'paladin', name: 'Paladin', role: 'Tank + heal', bg: '#1b1a12', status: 'Unlocks at 1B tokens', state: LOCKED, fx: 'halo' }
+];
+const heroes = list.map((h) => {
+const is = {};
+is[h.key] = true;
+return {
+name: h.name,
+role: h.role,
+bg: h.bg,
+status: h.status,
+border: h.state.border,
+statusColor: h.state.statusColor,
+spriteCls: h.state.spriteCls,
+is: is,
+fx: { halo: h.fx === 'halo' && h.state !== LOCKED, wisps: h.fx === 'wisps' },
+fxColor: h.fxColor || '#ffffff'
+};
+});
+return { heroes: heroes };
+}
+}
+</script>
+</body>
+</html>

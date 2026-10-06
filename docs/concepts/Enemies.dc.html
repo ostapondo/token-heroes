@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Enemies</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&amp;family=Pixelify+Sans:wght@400;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#e8b23a}a:hover{color:#ffd27a}
+.hop{animation:hop .8s steps(2) infinite}
+@keyframes hop{0%{transform:translateY(0)}100%{transform:translateY(-4px)}}
+.p-rise{position:absolute;bottom:-8px;animation-name:rise;animation-iteration-count:infinite;animation-timing-function:linear}
+@keyframes rise{0%{transform:translate(0,0);opacity:0}10%{opacity:1}100%{transform:translate(-10px,-120px);opacity:0}}
+.p-fall{position:absolute;top:-14px;animation-name:fall;animation-iteration-count:infinite;animation-timing-function:linear}
+@keyframes fall{0%{transform:translate(0,0);opacity:0}8%{opacity:1}100%{transform:translate(-8px,130px);opacity:.8}}
+.p-slant{position:absolute;top:-14px;animation-name:slant;animation-iteration-count:infinite;animation-timing-function:linear}
+@keyframes slant{0%{transform:translate(0,0);opacity:0}8%{opacity:1}100%{transform:translate(-50px,130px);opacity:.8}}
+</style>
+</helmet>
+<div style="width: 1000px; height: 680px; box-sizing: border-box; padding: 24px; background: #0d0b09; color: #efe6d4; font-family: 'Pixelify Sans', sans-serif; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h1 style="margin: 0; font-family: 'Jersey 10', monospace; font-weight: 400; font-size: 40px; line-height: 1">ENEMIES</h1>
+<span style="font-size: 14px; color: #a89a84">Four stages of packs, then a boss. Packs take the color of the boss ahead.</span>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{stages}}" as="st" hint-placeholder-count="5">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: {{st.bg}}; border: 2px solid {{st.border}}">
+<span style="font-family: 'Jersey 10', monospace; font-size: 22px; line-height: 1">STAGE {{st.n}}</span>
+<span style="font-size: 13px; color: {{st.color}}">{{st.label}}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{enemies}}" as="m" hint-placeholder-count="12">
+<div style="background: #1a1612; border: 2px solid #3b3128; display: flex; flex-direction: column">
+<div style="position: relative; height: 100px; overflow: hidden; background: {{m.el.sky}}; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 14px; box-sizing: border-box">
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 18px; background: {{m.el.floor}}; border-top: 2px solid #000"></div>
+<sc-for list="{{m.parts}}" as="p" hint-placeholder-count="6">
+<span class="{{p.cls}}" style="{{p.style}}"></span>
+</sc-for>
+<div class="hop" style="position: relative; filter: drop-shadow(0 0 3px {{m.el.edge}}); animation-delay: {{m.delay}}">
+<sc-if value="{{m.is.bat}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="{{m.el.p.b}}" d="M0 2h3v1h-3zM0 3h1v2h-1zM1 3h2v1h-2zM7 2h3v1h-3zM9 3h1v2h-1zM7 3h2v1h-2z"></path><path fill="{{m.el.p.a}}" d="M3 1h1v1h-1zM6 1h1v1h-1zM3 2h4v4h-4z"></path><path fill="{{m.el.p.e}}" d="M3 3h1v1h-1zM6 3h1v1h-1z"></path><path fill="{{m.el.p.x}}" d="M4 5h2v1h-2z"></path></svg></sc-if>
+<sc-if value="{{m.is.rat}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="{{m.el.p.a}}" d="M0 5h3v3h-3zM3 5h5v3h-5z"></path><path fill="{{m.el.p.b}}" d="M2 4h1v1h-1zM3 8h1v1h-1zM6 8h1v1h-1z"></path><path fill="{{m.el.p.e}}" d="M1 6h1v1h-1z"></path><path fill="{{m.el.p.x}}" d="M0 7h1v1h-1z"></path><path fill="{{m.el.p.c}}" d="M8 6h2v1h-2zM9 5h1v1h-1z"></path></svg></sc-if>
+<sc-if value="{{m.is.goblin}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="{{m.el.p.a}}" d="M3 0h4v3h-4zM2 1h1v1h-1zM7 1h1v1h-1zM2 4h1v2h-1zM7 4h1v2h-1z"></path><path fill="{{m.el.p.e}}" d="M3 1h1v1h-1zM5 1h1v1h-1z"></path><path fill="{{m.el.p.b}}" d="M3 3h4v4h-4z"></path><path fill="#c9d1d9" d="M1 3h1v3h-1z"></path><path fill="{{m.el.p.x}}" d="M3 7h1v3h-1zM6 7h1v3h-1z"></path></svg></sc-if>
+<sc-if value="{{m.is.imp}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="{{m.el.p.a}}" d="M3 3h5v4h-5z"></path><path fill="{{m.el.p.h}}" d="M3 1h1v2h-1zM7 1h1v2h-1z"></path><path fill="{{m.el.p.b}}" d="M1 3h2v2h-2zM8 3h2v2h-2zM4 7h1v2h-1zM6 7h1v2h-1z"></path><path fill="{{m.el.p.e}}" d="M4 4h1v1h-1zM6 4h1v1h-1z"></path><path fill="{{m.el.p.c}}" d="M8 6h1v1h-1zM9 7h1v1h-1z"></path></svg></sc-if>
+<sc-if value="{{m.is.blob}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="{{m.el.p.a}}" d="M3 3h4v1h-4zM2 4h6v1h-6zM1 5h8v4h-8z"></path><path fill="{{m.el.p.b}}" d="M1 8h8v1h-8z"></path><path fill="{{m.el.p.c}}" d="M3 4h1v1h-1z"></path><path fill="{{m.el.p.x}}" d="M3 6h1v1h-1zM6 6h1v1h-1z"></path></svg></sc-if>
+<sc-if value="{{m.is.skeleton}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="{{m.el.p.c}}" d="M2 0h5v3h-5zM4 3h1v4h-1zM3 4h3v1h-3zM3 6h3v1h-3zM3 7h1v3h-1zM5 7h1v3h-1z"></path><path fill="{{m.el.p.x}}" d="M3 1h1v1h-1zM5 1h1v1h-1z"></path><path fill="{{m.el.p.e}}" d="M3 1h1v1h-1z"></path><path fill="{{m.el.p.b}}" d="M1 2h1v5h-1z"></path></svg></sc-if>
+<sc-if value="{{m.is.ghost}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="{{m.el.p.c}}" d="M3 1h4v1h-4zM2 2h6v6h-6zM2 8h1v1h-1zM4 8h2v1h-2zM7 8h1v1h-1z"></path><path fill="{{m.el.p.x}}" d="M3 4h1v2h-1zM6 4h1v2h-1z"></path><path fill="{{m.el.p.a}}" d="M4 6h2v1h-2z"></path></svg></sc-if>
+<sc-if value="{{m.is.wolf}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="{{m.el.p.a}}" d="M3 4h6v3h-6zM0 3h4v3h-4z"></path><path fill="{{m.el.p.b}}" d="M2 2h2v1h-2zM3 7h1v3h-1zM7 7h1v3h-1zM9 3h1v2h-1z"></path><path fill="{{m.el.p.c}}" d="M0 5h2v1h-2z"></path><path fill="{{m.el.p.e}}" d="M1 4h1v1h-1z"></path></svg></sc-if>
+<sc-if value="{{m.is.mushroom}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="{{m.el.p.a}}" d="M2 1h6v1h-6zM1 2h8v2h-8z"></path><path fill="{{m.el.p.c}}" d="M3 2h1v1h-1zM6 2h1v1h-1z"></path><path fill="{{m.el.p.h}}" d="M3 4h4v4h-4z"></path><path fill="{{m.el.p.x}}" d="M3 5h1v1h-1zM5 5h1v1h-1z"></path><path fill="{{m.el.p.b}}" d="M3 8h1v1h-1zM6 8h1v1h-1z"></path></svg></sc-if>
+<sc-if value="{{m.is.eye}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="{{m.el.p.h}}" d="M3 1h4v1h-4zM2 2h6v5h-6zM3 7h4v1h-4z"></path><path fill="{{m.el.p.a}}" d="M4 3h3v3h-3z"></path><path fill="{{m.el.p.x}}" d="M5 4h1v1h-1z"></path><path fill="{{m.el.p.e}}" d="M2 3h1v1h-1zM7 6h1v1h-1z"></path><path fill="{{m.el.p.b}}" d="M3 8h1v2h-1zM5 8h1v1h-1zM7 8h1v2h-1z"></path></svg></sc-if>
+<sc-if value="{{m.is.beetle}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="{{m.el.p.a}}" d="M2 2h6v5h-6z"></path><path fill="{{m.el.p.x}}" d="M5 2h1v5h-1z"></path><path fill="{{m.el.p.b}}" d="M3 1h4v1h-4zM1 3h1v1h-1zM8 3h1v1h-1zM1 5h1v1h-1zM8 5h1v1h-1zM2 7h1v1h-1zM7 7h1v1h-1z"></path><path fill="{{m.el.p.c}}" d="M3 3h1v1h-1z"></path><path fill="{{m.el.p.e}}" d="M3 1h1v1h-1zM6 1h1v1h-1z"></path></svg></sc-if>
+<sc-if value="{{m.is.crow}}" hint-placeholder-val="{{ false }}"><svg width="60" height="60" viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="{{m.el.p.a}}" d="M3 3h5v3h-5zM2 2h3v2h-3z"></path><path fill="{{m.el.p.c}}" d="M0 3h2v1h-2z"></path><path fill="{{m.el.p.e}}" d="M3 2h1v1h-1z"></path><path fill="{{m.el.p.b}}" d="M5 2h3v2h-3zM8 4h2v1h-2z"></path><path fill="{{m.el.p.h}}" d="M4 6h1v2h-1zM6 6h1v2h-1z"></path></svg></sc-if>
+</div>
+<span style="position: absolute; left: 4px; top: 4px; font-family: 'Jersey 10', monospace; font-size: 14px; line-height: 1; padding: 1px 4px; background: #000; color: {{m.el.edge}}">{{m.el.tag}}</span>
+</div>
+<div style="padding: 6px 8px 8px; display: flex; flex-direction: column; gap: 1px">
+<span style="font-family: 'Jersey 10', monospace; font-size: 19px; line-height: 1">{{m.name}}</span>
+<span style="font-size: 11px; color: #a89a84">{{m.trait}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<span style="font-family: 'Jersey 10', monospace; font-size: 24px; line-height: 1">SAME BAT, EVERY ELEMENT</span>
+<span style="font-size: 13px; color: #a89a84">12 enemies × 9 elements = 108 looks from one sprite set</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{bats}}" as="el" hint-placeholder-count="9">
+<div style="height: 84px; background: {{el.sky}}; border: 2px solid #3b3128; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px">
+<svg width="48" height="48" viewBox="0 0 10 10" shape-rendering="crispEdges" style="filter: drop-shadow(0 0 3px {{el.edge}})"><path fill="{{el.p.b}}" d="M0 2h3v1h-3zM0 3h1v2h-1zM1 3h2v1h-2zM7 2h3v1h-3zM9 3h1v2h-1zM7 3h2v1h-2z"></path><path fill="{{el.p.a}}" d="M3 1h1v1h-1zM6 1h1v1h-1zM3 2h4v4h-4z"></path><path fill="{{el.p.e}}" d="M3 3h1v1h-1zM6 3h1v1h-1z"></path><path fill="{{el.p.x}}" d="M4 5h2v1h-2z"></path></svg>
+<span style="font-family: 'Jersey 10', monospace; font-size: 14px; line-height: 1; color: {{el.edge}}">{{el.tag}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1000,"height":680}}'>
+class Component extends DCLogic {
+renderVals() {
+const EL = {
+fire: { tag: 'FIRE', sky: '#240b05', floor: '#e0451a', edge: '#ff6a2b', parts: 'embers', p: { a: '#c2361a', b: '#7a1d0c', c: '#ffb02e', e: '#ffd36a', h: '#e8d9c0', x: '#2a0a04' } },
+ice: { tag: 'ICE', sky: '#0a1b28', floor: '#dff3ff', edge: '#8fd8ff', parts: 'snow', p: { a: '#4f9fd1', b: '#2a6f9e', c: '#bfeaff', e: '#f2fbff', h: '#e8f7ff', x: '#0b2233' } },
+earth: { tag: 'EARTH', sky: '#16120c', floor: '#3a2c18', edge: '#c9a05a', parts: 'rocks', p: { a: '#8a6a3a', b: '#5a4428', c: '#a8b85a', e: '#ffb02e', h: '#c9c3b4', x: '#2a1f12' } },
+storm: { tag: 'STORM', sky: '#0b111d', floor: '#182436', edge: '#ffe94a', parts: 'rain', p: { a: '#2f4c6e', b: '#1b2d44', c: '#c9d6e3', e: '#ffe94a', h: '#e9eef5', x: '#0c1220' } },
+venom: { tag: 'VENOM', sky: '#0b1006', floor: '#18200d', edge: '#a6d83d', parts: 'drips', p: { a: '#5b8a24', b: '#33521a', c: '#c7d94a', e: '#e2e86a', h: '#e9e2cc', x: '#142008' } },
+bone: { tag: 'BONE', sky: '#071110', floor: '#11201d', edge: '#52e0c4', parts: 'wisps', p: { a: '#9aa38f', b: '#5c6457', c: '#e9e2cc', e: '#52e0c4', h: '#e9e2cc', x: '#0c1614' } },
+blood: { tag: 'BLOOD', sky: '#140305', floor: '#2a070a', edge: '#e0252f', parts: 'ash', p: { a: '#8e0f1a', b: '#4a060c', c: '#ff7a3d', e: '#ffd23f', h: '#e8d9c0', x: '#120406' } },
+gold: { tag: 'GOLD', sky: '#1a1406', floor: '#2c220c', edge: '#ffd36a', parts: 'coins', p: { a: '#e8a23a', b: '#a8661a', c: '#fff3c4', e: '#ffffff', h: '#dfe3e8', x: '#1a1206' } },
+shadow: { tag: 'SHADOW', sky: '#050608', floor: '#0e1014', edge: '#d8dde6', parts: 'motes', p: { a: '#2c303a', b: '#16181d', c: '#5a6070', e: '#f2f2f2', h: '#8a90a0', x: '#000000' } }
+};
+const LIST = [
+['bat', 'shadow', 'Cave Bat', 'Fast, swarms in packs of 5'],
+['rat', 'earth', 'Sewer Rat', 'Weak, comes in numbers'],
+['goblin', 'venom', 'Goblin', 'Stabs the front hero'],
+['imp', 'fire', 'Fire Imp', 'Throws small fireballs'],
+['blob', 'ice', 'Ice Blob', 'Splits in two when hit'],
+['skeleton', 'bone', 'Skeleton', 'Gets back up once'],
+['ghost', 'ice', 'Frost Spirit', 'Dodges every third hit'],
+['wolf', 'blood', 'Blood Wolf', 'Bites the weakest hero'],
+['mushroom', 'earth', 'Sporeling', 'Leaves spores when killed'],
+['eye', 'storm', 'Storm Eye', 'Zaps the healer'],
+['beetle', 'gold', 'Gold Beetle', 'Thick shell, slow'],
+['crow', 'shadow', 'Night Crow', 'Flies over the tank']
+];
+const particle = (kind, i) => {
+const x = (i * 41 + 7) % 100;
+const spread = ((i * 53) % 17) / 10;
+const delay = -((i * 29) % 30) / 10;
+const kinds = {
+embers: { cls: 'p-rise', dur: 1.8 + spread, look: 'width: 3px; height: 3px; background: ' + (i % 2 ? '#ffb02e' : '#ff5a1f') },
+snow: { cls: 'p-slant', dur: 1.6 + spread, look: 'width: 2px; height: 2px; background: #ffffff' },
+rocks: { cls: 'p-fall', dur: 1.4 + spread, look: 'width: 2px; height: 2px; background: #c9a05a' },
+rain: { cls: 'p-slant', dur: 0.4 + spread / 6, look: 'width: 1px; height: 10px; background: #b9cff0' },
+drips: { cls: 'p-fall', dur: 1.8 + spread, look: 'width: 2px; height: 5px; background: #a6d83d' },
+wisps: { cls: 'p-rise', dur: 2.4 + spread, look: 'width: 3px; height: 3px; background: #52e0c4' },
+ash: { cls: 'p-rise', dur: 2 + spread, look: 'width: 2px; height: 2px; background: #ff4a3d' },
+coins: { cls: 'p-fall', dur: 2 + spread, look: 'width: 3px; height: 3px; background: #ffd36a' },
+motes: { cls: 'p-rise', dur: 3 + spread, look: 'width: 2px; height: 2px; background: #d8dde6' }
+};
+const k = kinds[kind];
+return { cls: k.cls, style: 'left: ' + x + '%; ' + k.look + '; animation-duration: ' + k.dur.toFixed(2) + 's; animation-delay: ' + delay + 's' };
+};
+const enemies = LIST.map((row, n) => {
+const el = EL[row[1]];
+const parts = [];
+for (let i = 0; i < (el.parts === 'rain' ? 10 : 6); i++) parts.push(particle(el.parts, i + n));
+const is = {};
+is[row[0]] = true;
+return { name: row[2], trait: row[3], el: el, is: is, parts: parts, delay: '-' + ((n * 0.29) % 0.8).toFixed(2) + 's' };
+});
+const stages = [41, 42, 43, 44, 45].map((n) => ({
+n: n,
+label: n === 45 ? 'BOSS · Rime Dragon' : 'pack of 10 · ICE',
+bg: n === 45 ? '#0a1b28' : '#1a1612',
+border: n === 45 ? '#8fd8ff' : '#3b3128',
+color: n === 45 ? '#8fd8ff' : '#a89a84'
+}));
+const bats = Object.keys(EL).map((k) => EL[k]);
+return { enemies: enemies, stages: stages, bats: bats };
+}
+}
+</script>
+</body>
+</html>

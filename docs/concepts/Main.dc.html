@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fight</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&amp;family=Pixelify+Sans:wght@400;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#e8b23a}a:hover{color:#ffd27a}
+.bob{animation:bob 1s steps(2) infinite}
+@keyframes bob{0%{transform:translateY(0)}100%{transform:translateY(-4px)}}
+.p-rise{position:absolute;bottom:-8px;animation-name:rise;animation-iteration-count:infinite;animation-timing-function:linear}
+@keyframes rise{0%{transform:translate(0,0);opacity:0}10%{opacity:1}100%{transform:translate(-12px,-320px);opacity:0}}
+.p-fall{position:absolute;top:-14px;animation-name:fall;animation-iteration-count:infinite;animation-timing-function:linear}
+@keyframes fall{0%{transform:translate(0,0);opacity:0}8%{opacity:1}100%{transform:translate(-10px,340px);opacity:.8}}
+.p-slant{position:absolute;top:-14px;animation-name:slant;animation-iteration-count:infinite;animation-timing-function:linear}
+@keyframes slant{0%{transform:translate(0,0);opacity:0}8%{opacity:1}100%{transform:translate(-120px,340px);opacity:.8}}
+.flick{animation:flick 1.4s ease-in-out infinite}
+@keyframes flick{0%,100%{opacity:.7}50%{opacity:1}}
+.spin{animation:spin 10s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pulse{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:inset 0 0 24px rgba(224,37,47,.25)}50%{box-shadow:inset 0 0 64px rgba(224,37,47,.65)}}
+.bolt{animation:bolt 3.2s steps(1) infinite}
+@keyframes bolt{0%,84%{opacity:0}85%{opacity:1}87%{opacity:0}89%{opacity:1}93%,100%{opacity:0}}
+.drift{animation:drift 5s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translateX(-20px)}to{transform:translateX(20px)}}
+.ghost{animation:ghost .5s steps(2) infinite;transform-origin:50% 100%}
+@keyframes ghost{0%{transform:scaleY(1)}100%{transform:scaleY(1.3)}}
+.bub{position:absolute;width:6px;height:6px;background:#ffd36a;animation:bub 1.6s steps(4) infinite}
+@keyframes bub{0%{transform:scale(0);opacity:0}40%{transform:scale(1);opacity:1}70%{transform:scale(1.5) translateY(-4px);opacity:0}100%{opacity:0}}
+.breath{transform-origin:100% 50%;animation:breath 3s steps(6) infinite}
+@keyframes breath{0%,55%{opacity:0;transform:scaleX(0)}62%{opacity:1;transform:scaleX(1)}85%{opacity:1;transform:scaleX(1.06)}92%,100%{opacity:0;transform:scaleX(1)}}
+.twinkle{position:absolute;width:4px;height:4px;background:#fff3c4;animation:twinkle 1.8s steps(3) infinite}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1.2)}}
+
+.flash-a{animation:flashA .4s steps(5)}.flash-b{animation:flashB .4s steps(5)}
+@keyframes flashA{0%,30%{filter:brightness(6) saturate(0);transform:translateX(10px)}60%{filter:brightness(1.6);transform:translateX(4px)}100%{filter:none;transform:translateX(0)}}
+@keyframes flashB{0%,30%{filter:brightness(6) saturate(0);transform:translateX(10px)}60%{filter:brightness(1.6);transform:translateX(4px)}100%{filter:none;transform:translateX(0)}}
+.spark{position:absolute;left:0;top:0;opacity:0}
+.burst-a .spark{animation:burstA .5s ease-out forwards}.burst-b .spark{animation:burstB .5s ease-out forwards}
+@keyframes burstA{0%{transform:translate(0,0) rotate(var(--r));opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+@keyframes burstB{0%{transform:translate(0,0) rotate(var(--r));opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+.ring{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;box-sizing:border-box;border:3px solid #ffffff;opacity:0}
+.ring-a{animation:ringA .45s steps(5) forwards}.ring-b{animation:ringB .45s steps(5) forwards}
+@keyframes ringA{0%{transform:scale(1);opacity:1}100%{transform:scale(7);opacity:0}}
+@keyframes ringB{0%{transform:scale(1);opacity:1}100%{transform:scale(7);opacity:0}}
+.slash{position:absolute;opacity:0}
+.slash-a{animation:slashA .4s steps(5) forwards}.slash-b{animation:slashB .4s steps(5) forwards}
+@keyframes slashA{0%{opacity:0;transform:scale(.3) rotate(-30deg)}20%{opacity:1;transform:scale(1.1) rotate(0)}60%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1) translate(6px,-6px)}}
+@keyframes slashB{0%{opacity:0;transform:scale(.3) rotate(-30deg)}20%{opacity:1;transform:scale(1.1) rotate(0)}60%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1) translate(6px,-6px)}}
+.arrow{position:absolute;opacity:0}
+.arrow-a{animation:arrowA .28s linear forwards}.arrow-b{animation:arrowB .28s linear forwards}
+@keyframes arrowA{0%{transform:translateX(0);opacity:1}90%{transform:translateX(112px);opacity:1}100%{transform:translateX(116px);opacity:0}}
+@keyframes arrowB{0%{transform:translateX(0);opacity:1}90%{transform:translateX(112px);opacity:1}100%{transform:translateX(116px);opacity:0}}
+.dash-a{animation:dashA .45s steps(6)}.dash-b{animation:dashB .45s steps(6)}
+@keyframes dashA{0%{transform:translateX(0)}35%,55%{transform:translateX(150px)}100%{transform:translateX(0)}}
+@keyframes dashB{0%{transform:translateX(0)}35%,55%{transform:translateX(150px)}100%{transform:translateX(0)}}
+.num{position:absolute;font-family:'Jersey 10',monospace;text-shadow:2px 2px 0 #000;white-space:nowrap;opacity:0;pointer-events:none}
+.float-a{animation:floatA .9s ease-out forwards}.float-b{animation:floatB .9s ease-out forwards}
+@keyframes floatA{0%{opacity:0;transform:translateY(8px) scale(.5)}15%{opacity:1;transform:translateY(-4px) scale(1.3)}30%{transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-38px) scale(1)}}
+@keyframes floatB{0%{opacity:0;transform:translateY(8px) scale(.5)}15%{opacity:1;transform:translateY(-4px) scale(1.3)}30%{transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-38px) scale(1)}}
+.shake-a{animation:shakeA .4s steps(8)}.shake-b{animation:shakeB .4s steps(8)}
+@keyframes shakeA{0%{transform:translate(0,0) scale(1.02)}20%{transform:translate(-7px,3px)}40%{transform:translate(6px,-4px)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-1px)}100%{transform:translate(0,0) scale(1)}}
+@keyframes shakeB{0%{transform:translate(0,0) scale(1.02)}20%{transform:translate(-7px,3px)}40%{transform:translate(6px,-4px)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-1px)}100%{transform:translate(0,0) scale(1)}}
+.xslash{position:absolute;opacity:0}
+.xslash-a{animation:xA .5s steps(6) forwards}.xslash-b{animation:xB .5s steps(6) forwards}
+@keyframes xA{0%{opacity:1;transform:scale(.2)}25%{opacity:1;transform:scale(1.25)}60%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.1)}}
+@keyframes xB{0%{opacity:1;transform:scale(.2)}25%{opacity:1;transform:scale(1.25)}60%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.1)}}
+.white{position:absolute;inset:0;background:#fff6d6;opacity:0;pointer-events:none}
+.white-a{animation:whiteA .6s ease-out forwards}.white-b{animation:whiteB .6s ease-out forwards}
+@keyframes whiteA{0%{opacity:.9}100%{opacity:0}}
+@keyframes whiteB{0%{opacity:.9}100%{opacity:0}}
+.beam{position:absolute;opacity:0;transform-origin:left center}
+.beam-a{animation:beamA .55s ease-out forwards}.beam-b{animation:beamB .55s ease-out forwards}
+@keyframes beamA{0%{transform:scaleX(0);opacity:1}50%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1) scaleY(3);opacity:0}}
+@keyframes beamB{0%{transform:scaleX(0);opacity:1}50%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1) scaleY(3);opacity:0}}
+.lunge-a{animation:lungeA .5s steps(6)}.lunge-b{animation:lungeB .5s steps(6)}
+@keyframes lungeA{0%{transform:translateX(0)}35%{transform:translateX(-140px)}100%{transform:translateX(0)}}
+@keyframes lungeB{0%{transform:translateX(0)}35%{transform:translateX(-140px)}100%{transform:translateX(0)}}
+.hurt-a{animation:hurtA .5s steps(4)}.hurt-b{animation:hurtB .5s steps(4)}
+@keyframes hurtA{0%,50%,100%{filter:none;transform:translateX(0)}25%,75%{filter:brightness(2.4) sepia(1) saturate(5) hue-rotate(-40deg);transform:translateX(-5px)}}
+@keyframes hurtB{0%,50%,100%{filter:none;transform:translateX(0)}25%,75%{filter:brightness(2.4) sepia(1) saturate(5) hue-rotate(-40deg);transform:translateX(-5px)}}
+.vig{position:absolute;inset:0;opacity:0;pointer-events:none}
+.vig-a{animation:vigA .7s ease-out forwards}.vig-b{animation:vigB .7s ease-out forwards}
+@keyframes vigA{0%{opacity:1}100%{opacity:0}}
+@keyframes vigB{0%{opacity:1}100%{opacity:0}}
+.pillar{position:absolute;bottom:26px;width:40px;height:150px;opacity:0;transform-origin:50% 100%;background:linear-gradient(to top, rgba(255,211,106,.85), rgba(255,211,106,0));pointer-events:none}
+.pillar-a{animation:pillarA 1.1s ease-out forwards}.pillar-b{animation:pillarB 1.1s ease-out forwards}
+@keyframes pillarA{0%{opacity:1;transform:scaleY(0)}25%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1)}}
+@keyframes pillarB{0%{opacity:1;transform:scaleY(0)}25%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1)}}
+.lvl{position:absolute;bottom:96px;width:90px;margin-left:-25px;text-align:center;font-family:'Jersey 10',monospace;font-size:18px;color:#ffd36a;text-shadow:2px 2px 0 #000;opacity:0;pointer-events:none}
+.lvl-a{animation:lvlA 1.3s ease-out forwards}.lvl-b{animation:lvlB 1.3s ease-out forwards}
+@keyframes lvlA{0%{opacity:0;transform:translateY(10px) scale(.5)}15%{opacity:1;transform:translateY(0) scale(1.3)}30%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-30px)}}
+@keyframes lvlB{0%{opacity:0;transform:translateY(10px) scale(.5)}15%{opacity:1;transform:translateY(0) scale(1.3)}30%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-30px)}}
+.gold-a{animation:goldA .6s steps(3)}.gold-b{animation:goldB .6s steps(3)}
+@keyframes goldA{0%,100%{filter:none}33%,66%{filter:brightness(2.2) sepia(1) saturate(4) hue-rotate(5deg)}}
+@keyframes goldB{0%,100%{filter:none}33%,66%{filter:brightness(2.2) sepia(1) saturate(4) hue-rotate(5deg)}}
+.row-a{animation:rowA .8s steps(4)}.row-b{animation:rowB .8s steps(4)}
+@keyframes rowA{0%,50%{background:#3a2c10}100%{background:#1a1612}}
+@keyframes rowB{0%,50%{background:#3a2c10}100%{background:#1a1612}}
+.ready{animation:ready 1.2s steps(2) infinite}
+@keyframes ready{0%{box-shadow:inset 0 -3px 0 #8a5e14, 0 0 0 0 rgba(232,178,58,0)}100%{box-shadow:inset 0 -3px 0 #8a5e14, 0 0 0 3px rgba(232,178,58,.45)}}
+.die{animation:die 1.2s steps(8) forwards}
+@keyframes die{0%{filter:brightness(6) saturate(0);transform:scale(1)}25%{filter:brightness(6) saturate(0);transform:scale(1.12)}100%{filter:brightness(3);transform:scale(.1) translateY(60px);opacity:0}}
+.enter-a{animation:enterA .5s steps(5)}.enter-b{animation:enterB .5s steps(5)}
+@keyframes enterA{0%{transform:translateY(-260px)}80%{transform:translateY(6px)}100%{transform:translateY(0)}}
+@keyframes enterB{0%{transform:translateY(-260px)}80%{transform:translateY(6px)}100%{transform:translateY(0)}}
+.pop{animation:pop 1.2s ease-out forwards}
+@keyframes pop{0%{opacity:0;transform:scale(2)}20%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-20px)}}
+.inc-a{animation:incA 1.6s ease-out forwards}.inc-b{animation:incB 1.6s ease-out forwards}
+@keyframes incA{0%{opacity:0;transform:translateY(8px)}15%{opacity:1;transform:translateY(0)}75%{opacity:1}100%{opacity:0;transform:translateY(-6px)}}
+@keyframes incB{0%{opacity:0;transform:translateY(8px)}15%{opacity:1;transform:translateY(0)}75%{opacity:1}100%{opacity:0;transform:translateY(-6px)}}
+.tap{position:absolute;inset:0;background:transparent;border:0;padding:0;cursor:crosshair}
+</style>
+</helmet>
+<div style="width: 400px; height: 720px; box-sizing: border-box; background: #0d0b09; color: #efe6d4; font-family: 'Pixelify Sans', sans-serif; display: flex; flex-direction: column; overflow: hidden">
+
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px">
+<span style="font-family: 'Jersey 10', monospace; font-size: 26px; line-height: 1">STAGE {{stage}}</span>
+<div style="display: flex; gap: 14px; font-size: 14px">
+<span style="display: flex; gap: 5px; align-items: center"><svg width="14" height="14" viewBox="0 0 7 7" shape-rendering="crispEdges"><path fill="#e8b23a" d="M2 0h3v1h-3zM1 1h5v5h-5zM2 6h3v1h-3zM0 2h1v3h-1zM6 2h1v3h-1z"></path><path fill="#8a5e14" d="M3 2h1v3h-1z"></path></svg>{{goldText}} coins</span>
+<sc-if value="{{incomeShown}}" hint-placeholder-val="{{ false }}"><span class="{{incomeCls}}" style="color: #ffd36a; font-family: 'Jersey 10', monospace; font-size: 18px">+{{incomeText}} tokens</span></sc-if>
+</div>
+</div>
+
+<div class="{{shakeCls}}" style="position: relative; height: 340px; margin: 0 12px; overflow: hidden; background: {{cur.sky}}; border: 2px solid #3b3128">
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: {{cur.floor}}; border-top: 2px solid #000"></div>
+
+<sc-if value="{{is.dragon}}" hint-placeholder-val="{{ true }}">
+<div class="flick" style="position: absolute; inset: 0; background: radial-gradient(ellipse at 75% 100%, rgba(255,90,31,.6), rgba(255,90,31,0) 65%)"></div>
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: #e0451a; border-top: 2px solid #ffb02e"></div>
+<div style="position: absolute; left: 10px; bottom: 34px; width: 50px; height: 10px; background: #3a1408"></div>
+<div style="position: absolute; left: 150px; bottom: 12px; width: 70px; height: 12px; background: #3a1408"></div>
+<div style="position: absolute; right: 16px; bottom: 30px; width: 40px; height: 10px; background: #3a1408"></div>
+<span class="bub" style="left: 18%; bottom: 14px"></span>
+<span class="bub" style="left: 46%; bottom: 36px; animation-delay: -.6s"></span>
+<span class="bub" style="left: 70%; bottom: 8px; animation-delay: -1.1s"></span>
+<span class="bub" style="left: 34%; bottom: 40px; animation-delay: -.3s"></span>
+<span class="bub" style="left: 88%; bottom: 20px; animation-delay: -.9s"></span>
+</sc-if>
+<sc-if value="{{is.demon}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; right: 12px; bottom: 6px; width: 150px; height: 150px; transform: scaleY(.28); transform-origin: 50% 100%">
+<svg class="spin" width="150" height="150" viewBox="0 0 150 150"><circle cx="75" cy="75" r="68" fill="none" stroke="#e0252f" stroke-width="5" stroke-dasharray="14 8"></circle><circle cx="75" cy="75" r="52" fill="none" stroke="#ff7a3d" stroke-width="3" stroke-dasharray="4 10"></circle></svg>
+</div>
+<div class="pulse" style="position: absolute; inset: 0"></div>
+</sc-if>
+<sc-if value="{{is.zombie}}" hint-placeholder-val="{{ false }}">
+<svg style="position: absolute; left: 170px; bottom: 56px" width="24" height="30" viewBox="0 0 4 5" shape-rendering="crispEdges"><path fill="#4a5048" d="M1 0h2v1h-2zM0 1h4v4h-4z"></path><path fill="#2a2e28" d="M1 2h2v1h-2z"></path></svg>
+<svg style="position: absolute; left: 200px; bottom: 56px" width="18" height="24" viewBox="0 0 3 4" shape-rendering="crispEdges"><path fill="#4a5048" d="M0 0h3v4h-3z"></path><path fill="#2a2e28" d="M1 1h1v2h-1zM0 1h3v1h-3z"></path></svg>
+<div class="drift" style="position: absolute; left: -40px; right: -40px; bottom: 0; height: 80px; background: rgba(160,180,150,.16)"></div>
+</sc-if>
+<sc-if value="{{is.skeleton}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 170px; top: 26px; width: 30px; height: 30px; background: #d6e4dc; box-shadow: 0 0 24px rgba(214,228,220,.5)"></div>
+<div style="position: absolute; right: 0; bottom: 0; width: 200px; height: 50px; background: radial-gradient(ellipse at 60% 100%, rgba(82,224,196,.4), rgba(82,224,196,0) 70%)"></div>
+<svg class="ghost" style="position: absolute; right: 160px; bottom: 60px" width="20" height="30" viewBox="0 0 4 6" shape-rendering="crispEdges"><path fill="#52e0c4" d="M1 0h1v1h-1zM1 1h2v2h-2zM0 3h4v3h-4z"></path><path fill="#d6fff5" d="M1 4h2v2h-2z"></path></svg>
+<svg class="ghost" style="position: absolute; right: 6px; bottom: 70px; animation-delay: -.25s" width="20" height="30" viewBox="0 0 4 6" shape-rendering="crispEdges"><path fill="#52e0c4" d="M2 0h1v1h-1zM1 1h2v2h-2zM0 3h4v3h-4z"></path><path fill="#d6fff5" d="M1 4h2v2h-2z"></path></svg>
+</sc-if>
+<sc-if value="{{is.golem}}" hint-placeholder-val="{{ false }}">
+<svg style="position: absolute; left: 0; top: 0" width="70" height="56" viewBox="0 0 14 11" shape-rendering="crispEdges"><path fill="#bfeaff" d="M0 0h14v1h-14zM0 1h1v8h-1zM2 1h1v4h-1zM5 1h1v6h-1zM8 1h1v3h-1zM11 1h1v2h-1z"></path></svg>
+<svg style="position: absolute; right: 0; top: 0" width="70" height="56" viewBox="0 0 14 11" shape-rendering="crispEdges"><path fill="#bfeaff" d="M0 0h14v1h-14zM13 1h1v8h-1zM11 1h1v4h-1zM8 1h1v6h-1zM5 1h1v3h-1zM2 1h1v2h-1z"></path></svg>
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: #dff3ff; border-top: 2px solid #ffffff"></div>
+<div class="drift" style="position: absolute; left: -40px; right: -40px; bottom: 44px; height: 36px; background: rgba(223,243,255,.16)"></div>
+</sc-if>
+<sc-if value="{{is.spider}}" hint-placeholder-val="{{ false }}">
+<svg style="position: absolute; left: 0; top: 0" width="80" height="80" viewBox="0 0 80 80" shape-rendering="crispEdges"><path d="M0 0L80 80M0 0L40 80M0 0L80 40M0 24L24 0M0 48L48 0M0 72L72 0" stroke="rgba(220,230,210,.4)" stroke-width="1" fill="none"></path></svg>
+<svg style="position: absolute; right: 0; top: 0; transform: scaleX(-1)" width="80" height="80" viewBox="0 0 80 80" shape-rendering="crispEdges"><path d="M0 0L80 80M0 0L40 80M0 0L80 40M0 24L24 0M0 48L48 0" stroke="rgba(220,230,210,.4)" stroke-width="1" fill="none"></path></svg>
+<div class="drift" style="position: absolute; left: -40px; right: -40px; bottom: 0; height: 70px; background: rgba(166,216,61,.14)"></div>
+</sc-if>
+<sc-if value="{{is.wraith}}" hint-placeholder-val="{{ false }}">
+<div class="bolt" style="position: absolute; inset: 0; background: rgba(230,240,255,.3)"></div>
+<svg class="bolt" style="position: absolute; left: 180px; top: 0" width="56" height="170" viewBox="0 0 12 35" shape-rendering="crispEdges"><path fill="#fff7b0" d="M6 0h2v6h-2zM4 6h3v6h-3zM6 12h3v6h-3zM3 18h4v6h-4zM5 24h2v6h-2zM4 30h2v5h-2z"></path></svg>
+</sc-if>
+<sc-if value="{{is.slime}}" hint-placeholder-val="{{ false }}">
+<div class="flick" style="position: absolute; inset: 0; background: radial-gradient(ellipse at 75% 80%, rgba(255,211,106,.35), rgba(255,211,106,0) 60%)"></div>
+<span class="twinkle" style="left: 14%; top: 30%"></span>
+<span class="twinkle" style="left: 78%; top: 22%; animation-delay: -.6s"></span>
+<span class="twinkle" style="left: 54%; top: 48%; animation-delay: -1.2s"></span>
+<span class="twinkle" style="left: 30%; top: 14%; animation-delay: -.9s"></span>
+</sc-if>
+
+<sc-for list="{{parts}}" as="p" hint-placeholder-count="14">
+<span class="{{p.cls}}" style="{{p.style}}"></span>
+</sc-for>
+
+<div style="position: absolute; left: 10px; top: 10px; right: 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px">
+<span style="font-family: 'Jersey 10', monospace; font-size: 18px; line-height: 1; padding: 2px 6px; background: #000; color: {{cur.edge}}">{{cur.tag}}</span>
+<div style="width: 210px; display: flex; flex-direction: column; gap: 4px; text-align: right">
+<div style="font-family: 'Jersey 10', monospace; font-size: 22px; line-height: 1; text-shadow: 2px 2px 0 #000">{{cur.name}}</div>
+<div style="height: 10px; background: #000; border: 2px solid #000"><div style="width: {{hp}}%; height: 100%; background: {{cur.edge}}"></div></div>
+<div style="font-size: 12px; text-shadow: 1px 1px 0 #000">{{hpText}}</div>
+</div>
+</div>
+
+<div class="{{lungeCls}}" style="position: absolute; right: 22px; bottom: 24px">
+<div class="{{bossCls}}">
+<div class="{{flashCls}}">
+<div class="bob" style="position: relative; filter: drop-shadow(0 0 5px {{cur.edge}})">
+<sc-if value="{{is.dragon}}" hint-placeholder-val="{{ true }}">
+<svg class="breath" style="position: absolute; left: -84px; top: 30px" width="88" height="40" viewBox="0 0 11 5" shape-rendering="crispEdges"><path fill="#ff5a1f" d="M0 1h3v3h-3zM3 0h4v5h-4zM7 1h4v3h-4z"></path><path fill="#ffb02e" d="M1 2h2v1h-2zM3 1h5v3h-5zM8 2h3v1h-3z"></path><path fill="#fff1a8" d="M5 2h6v1h-6z"></path></svg>
+<svg width="150" height="120" viewBox="0 0 20 16" shape-rendering="crispEdges"><path fill="#7a1d0c" d="M13 1h2v1h-2zM12 2h4v1h-4zM11 3h5v1h-5zM10 4h6v1h-6zM9 5h7v1h-7zM9 6h6v1h-6z"></path><path fill="#c2361a" d="M1 3h4v4h-4zM0 5h1v2h-1zM5 5h2v4h-2zM7 7h8v5h-8zM15 10h2v2h-2zM17 11h2v1h-2z"></path><path fill="#ffb02e" d="M8 11h6v1h-6zM5 8h2v1h-2z"></path><path fill="#e8d9c0" d="M4 1h1v2h-1zM2 2h1v1h-1z"></path><path fill="#ffd36a" d="M2 4h1v1h-1z"></path><path fill="#2a0a04" d="M0 6h3v1h-3z"></path><path fill="#7a1d0c" d="M8 12h2v3h-2zM13 12h2v3h-2zM7 15h3v1h-3zM12 15h3v1h-3zM19 12h1v1h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{is.demon}}" hint-placeholder-val="{{ false }}">
+<svg width="128" height="128" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#2a0408" d="M0 5h3v6h-3zM13 5h3v6h-3z"></path><path fill="#5a0a12" d="M1 6h1v4h-1zM14 6h1v4h-1z"></path><path fill="#e8d9c0" d="M1 1h2v2h-2zM2 3h2v2h-2zM13 1h2v2h-2zM12 3h2v2h-2z"></path><path fill="#8e0f1a" d="M3 5h10v8h-10z"></path><path fill="#4a060c" d="M3 11h10v2h-10zM4 13h3v3h-3zM9 13h3v3h-3zM4 6h3v1h-3zM9 6h3v1h-3z"></path><path fill="#ffd23f" d="M5 7h2v1h-2zM9 7h2v1h-2z"></path><path fill="#120406" d="M5 9h6v3h-6z"></path><path fill="#e8d9c0" d="M5 9h1v2h-1zM10 9h1v2h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{is.zombie}}" hint-placeholder-val="{{ false }}">
+<svg width="128" height="128" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#7fa65a" d="M5 1h5v5h-5zM1 7h4v1h-4zM1 9h4v1h-4z"></path><path fill="#5d8040" d="M0 7h1v1h-1zM0 9h1v1h-1z"></path><path fill="#3b2a1a" d="M5 1h5v1h-5zM5 2h1v1h-1z"></path><path fill="#e8e86a" d="M6 3h1v1h-1zM8 3h1v1h-1z"></path><path fill="#2a1a10" d="M6 5h3v1h-3z"></path><path fill="#5a6b7a" d="M5 6h5v5h-5z"></path><path fill="#7fa65a" d="M6 8h1v1h-1zM8 9h1v1h-1z"></path><path fill="#3d3a2e" d="M5 11h5v2h-5zM5 13h2v2h-2zM8 13h2v2h-2z"></path><path fill="#2a1a10" d="M4 15h3v1h-3zM8 15h3v1h-3z"></path></svg>
+</sc-if>
+<sc-if value="{{is.skeleton}}" hint-placeholder-val="{{ false }}">
+<svg width="128" height="128" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#e9e2cc" d="M5 1h6v5h-6zM7 6h2v6h-2zM5 7h6v1h-6zM5 9h6v1h-6zM6 11h4v1h-4zM4 7h1v4h-1zM11 7h1v4h-1zM6 12h1v3h-1zM9 12h1v3h-1zM5 15h2v1h-2zM9 15h2v1h-2z"></path><path fill="#0c1614" d="M6 3h2v1h-2zM9 3h2v1h-2zM7 5h1v1h-1zM9 5h1v1h-1z"></path><path fill="#52e0c4" d="M6 3h1v1h-1zM10 3h1v1h-1z"></path><path fill="#a9b3bf" d="M3 2h1v8h-1z"></path><path fill="#6b4a2e" d="M2 9h3v1h-3zM12 7h3v5h-3z"></path><path fill="#c9a13a" d="M13 9h1v1h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{is.golem}}" hint-placeholder-val="{{ false }}">
+<svg width="128" height="128" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#6e7a86" d="M5 1h6v3h-6zM2 4h12v8h-12zM0 5h2v7h-2zM14 5h2v7h-2zM3 12h4v4h-4zM9 12h4v4h-4z"></path><path fill="#4a535c" d="M2 10h12v2h-12zM0 10h2v2h-2zM14 10h2v2h-2z"></path><path fill="#bfeaff" d="M1 3h2v2h-2zM13 3h2v2h-2zM2 2h1v1h-1zM13 2h1v1h-1zM7 0h2v1h-2z"></path><path fill="#8fd8ff" d="M6 2h1v1h-1zM9 2h1v1h-1zM7 6h2v1h-2zM6 7h1v2h-1zM9 8h1v2h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{is.spider}}" hint-placeholder-val="{{ false }}">
+<svg width="128" height="128" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#2a2f22" d="M2 4h3v1h-3zM1 5h1v6h-1zM3 10h2v1h-2zM2 11h1v4h-1zM8 10h1v1h-1zM7 11h1v4h-1zM12 10h1v1h-1zM12 11h1v4h-1zM14 10h1v1h-1zM15 11h1v4h-1z"></path><path fill="#3a4728" d="M8 3h7v7h-7zM4 6h4v4h-4z"></path><path fill="#a6d83d" d="M10 5h3v1h-3zM11 6h1v2h-1zM10 8h3v1h-3z"></path><path fill="#e2e86a" d="M4 7h1v1h-1zM6 7h1v1h-1zM5 6h1v1h-1z"></path><path fill="#e9e2cc" d="M4 10h1v1h-1zM6 10h1v1h-1z"></path><path fill="#a6d83d" d="M4 11h1v2h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{is.wraith}}" hint-placeholder-val="{{ false }}">
+<svg width="128" height="128" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#6b4a2e" d="M1 2h1v13h-1z"></path><path fill="#c9d1d9" d="M1 1h6v1h-6zM5 2h2v1h-2zM6 3h1v1h-1z"></path><path fill="#1c2a3a" d="M5 1h6v2h-6zM4 3h8v9h-8zM3 6h10v6h-10zM3 12h2v2h-2zM6 12h2v3h-2zM9 12h2v2h-2zM12 12h1v3h-1z"></path><path fill="#2f4c6e" d="M4 3h1v9h-1zM3 6h1v6h-1z"></path><path fill="#050808" d="M6 3h4v3h-4z"></path><path fill="#ffe94a" d="M6 4h1v1h-1zM9 4h1v1h-1z"></path><path fill="#cfc7ae" d="M2 7h2v1h-2z"></path></svg>
+</sc-if>
+<sc-if value="{{is.slime}}" hint-placeholder-val="{{ false }}">
+<svg width="128" height="128" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#e8a23a" d="M5 4h6v1h-6zM4 5h8v1h-8zM3 6h10v3h-10zM2 9h12v5h-12z"></path><path fill="#a8661a" d="M2 13h12v1h-12zM2 11h1v2h-1z"></path><path fill="#fff3c4" d="M5 6h2v1h-2zM4 7h1v1h-1z"></path><path fill="#1a1206" d="M5 9h2v2h-2zM9 9h2v2h-2zM7 12h2v1h-2z"></path><path fill="#ffffff" d="M5 9h1v1h-1zM9 9h1v1h-1z"></path><path fill="#dfe3e8" d="M5 2h6v2h-6zM5 1h1v1h-1zM7 1h2v1h-2zM10 1h1v1h-1z"></path><path fill="#c2361a" d="M7 2h2v1h-2z"></path></svg>
+</sc-if>
+</div>
+</div>
+</div>
+</div>
+
+<div class="{{partyCls}}" style="position: absolute; left: 14px; bottom: 28px; display: flex; gap: 6px; align-items: flex-end">
+<div class="{{h0.glowCls}}">
+<svg width="40" height="50" viewBox="0 0 8 10" shape-rendering="crispEdges"><path fill="#8d95a3" d="M2 0h4v3h-4z"></path><path fill="#1a1a22" d="M2 1h4v1h-4z"></path><path fill="#5e6675" d="M2 3h4v4h-4z"></path><path fill="#b9842f" d="M0 3h3v5h-3z"></path><path fill="#e8b23a" d="M1 4h1v2h-1z"></path><path fill="#3a3f4a" d="M2 7h1v3h-1zM5 7h1v3h-1z"></path></svg>
+</div>
+<div class="{{dashCls}}">
+<div class="{{h1.glowCls}}">
+<svg width="40" height="50" viewBox="0 0 8 10" shape-rendering="crispEdges"><path fill="#c9ced6" d="M2 0h4v3h-4z"></path><path fill="#1a1a22" d="M3 1h2v1h-2z"></path><path fill="#e8b23a" d="M2 3h4v4h-4z"></path><path fill="#e7b48f" d="M1 4h1v2h-1zM6 4h1v2h-1z"></path><path fill="#e8e8f0" d="M7 0h1v6h-1z"></path><path fill="#6b4a2e" d="M2 7h1v3h-1zM5 7h1v3h-1z"></path></svg>
+</div>
+</div>
+<div class="{{h2.glowCls}}">
+<svg width="40" height="50" viewBox="0 0 8 10" shape-rendering="crispEdges"><path fill="#4f9a4c" d="M2 0h4v3h-4zM1 2h1v2h-1z"></path><path fill="#e7b48f" d="M3 1h2v2h-2z"></path><path fill="#3d7a3a" d="M2 3h4v4h-4z"></path><path fill="#c08a4a" d="M0 2h1v6h-1z"></path><path fill="#5a4632" d="M2 7h1v3h-1zM5 7h1v3h-1z"></path></svg>
+</div>
+</div>
+<div style="position: absolute; left: 14px; bottom: 8px; width: 132px; height: 8px; background: #000; border: 2px solid #000"><div style="width: {{partyHp}}%; height: 100%; background: #7cc35b"></div></div>
+
+<sc-if value="{{h0.shown}}" hint-placeholder-val="{{ false }}">
+<div class="{{h0.pillarCls}}" style="left: 14px"></div>
+<div class="{{h0.lvlCls}}" style="left: 14px">LV {{h0.lv}}!</div>
+</sc-if>
+<sc-if value="{{h1.shown}}" hint-placeholder-val="{{ false }}">
+<div class="{{h1.pillarCls}}" style="left: 60px"></div>
+<div class="{{h1.lvlCls}}" style="left: 60px">LV {{h1.lv}}!</div>
+</sc-if>
+<sc-if value="{{h2.shown}}" hint-placeholder-val="{{ false }}">
+<div class="{{h2.pillarCls}}" style="left: 106px"></div>
+<div class="{{h2.lvlCls}}" style="left: 106px">LV {{h2.lv}}!</div>
+</sc-if>
+
+<div class="{{arrowCls}}" style="left: 140px; top: 262px; width: 22px; height: 4px; background: #e8d9c0; box-shadow: 4px 0 0 #c9d1d9, -4px 0 0 #a6d83d"></div>
+<div class="{{ringCls}}" style="left: 270px; top: 240px"></div>
+<svg class="{{slashCls}}" style="left: 236px; top: 196px" width="72" height="72" viewBox="0 0 12 12" shape-rendering="crispEdges"><path fill="#ffffff" d="M11 0h1v1h-1zM10 1h1v1h-1zM9 2h1v1h-1zM8 3h1v1h-1zM7 4h1v1h-1zM6 5h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1zM3 8h1v1h-1zM2 9h1v1h-1zM1 10h1v1h-1z"></path><path fill="{{cur.edge}}" d="M11 1h1v1h-1zM10 2h1v1h-1zM9 3h1v1h-1zM8 4h1v1h-1zM7 5h1v1h-1zM6 6h1v1h-1zM5 7h1v1h-1zM4 8h1v1h-1zM3 9h1v1h-1zM2 10h1v1h-1z"></path></svg>
+
+<sc-if value="{{showBurst}}" hint-placeholder-val="{{ false }}">
+<div class="{{burstCls}}" style="position: absolute; left: 268px; top: 236px">
+<sc-for list="{{sparks}}" as="sp" hint-placeholder-count="10">
+<span class="spark" style="{{sp.style}}"></span>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-for list="{{nums}}" as="n" hint-placeholder-count="3">
+<sc-if value="{{n.shown}}" hint-placeholder-val="{{ false }}">
+<span class="{{n.cls}}" style="{{n.style}}">{{n.text}}</span>
+</sc-if>
+</sc-for>
+
+<sc-if value="{{tapShown}}" hint-placeholder-val="{{ false }}">
+<svg class="{{xCls}}" style="left: 222px; top: 170px" width="110" height="110" viewBox="0 0 11 11" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h2v1h-2zM1 1h2v1h-2zM2 2h2v1h-2zM3 3h2v1h-2zM4 4h3v3h-3zM6 7h2v1h-2zM7 8h2v1h-2zM8 9h2v1h-2zM9 10h2v1h-2zM9 0h2v1h-2zM8 1h2v1h-2zM7 2h2v1h-2zM6 3h2v1h-2zM3 7h2v1h-2zM2 8h2v1h-2zM1 9h2v1h-2zM0 10h2v1h-2z"></path><path fill="#ffe066" d="M5 5h1v1h-1z"></path></svg>
+<span class="{{tapNumCls}}" style="left: 196px; top: 120px; font-size: 34px; color: #ffe066">-31.0K CRIT!</span>
+</sc-if>
+
+<sc-if value="{{ultShown}}" hint-placeholder-val="{{ false }}">
+<div class="{{beamCls}}" style="left: 140px; top: 250px; width: 150px; height: 12px; background: #fff6d6; box-shadow: 0 0 14px #ffd36a"></div>
+<div class="{{whiteCls}}"></div>
+<span class="{{ultNumCls}}" style="left: 220px; top: 116px; font-size: 38px; color: #fff6d6">-148K</span>
+</sc-if>
+
+<sc-if value="{{bossAtkShown}}" hint-placeholder-val="{{ false }}">
+<div class="{{vigCls}}" style="box-shadow: inset 0 0 80px {{cur.edge}}"></div>
+<span class="{{hurtNumCls}}" style="left: 50px; top: 196px; font-size: 24px; color: #ff5b4a">-2.1K</span>
+<span class="{{statusCls}}" style="left: 14px; top: 226px; font-size: 18px; color: {{cur.edge}}">{{cur.status}}</span>
+</sc-if>
+
+<sc-if value="{{dying}}" hint-placeholder-val="{{ false }}">
+<div class="pop" style="position: absolute; left: 0; right: 0; top: 100px; text-align: center; pointer-events: none">
+<div style="font-family: 'Jersey 10', monospace; font-size: 48px; line-height: 1; color: {{cur.edge}}; text-shadow: 3px 3px 0 #000">DEFEATED</div>
+<div style="font-family: 'Jersey 10', monospace; font-size: 24px; color: #ffd36a; text-shadow: 2px 2px 0 #000">stage {{nextStage}} · next boss</div>
+</div>
+</sc-if>
+
+<button class="tap" onClick="{{tap}}" aria-label="Attack the boss"></button>
+</div>
+
+<div style="display: flex; gap: 8px; align-items: center; padding: 10px 12px 0">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: #a89a84"><span>Tap the arena to strike</span><span>ult {{ult}}%</span></div>
+<div style="height: 8px; background: #1a1612; border: 2px solid #000"><div style="width: {{ult}}%; height: 100%; background: #9fd6ff"></div></div>
+</div>
+<button class="{{ultBtnCls}}" onClick="{{fireUlt}}" style="{{ultBtnStyle}}">ULT</button>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 10px 12px 0">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="3">
+<div class="{{r.rowCls}}" style="display: flex; align-items: center; gap: 10px; padding: 6px 8px; background: #1a1612; border: 2px solid #3b3128">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span style="font-weight: 600">{{r.name}}</span><span style="color: #e8b23a">Lv {{r.lv}}</span></div>
+<div style="height: 6px; background: #000"><div style="width: {{r.xp}}%; height: 100%; background: #e8b23a"></div></div>
+</div>
+<button class="{{r.btnCls}}" onClick="{{r.buy}}" style="{{r.btnStyle}}">+1 · {{r.cost}}</button>
+</div>
+</sc-for>
+</div>
+
+<div style="margin-top: auto; display: flex; gap: 8px; align-items: center; padding: 10px 14px; border-top: 2px solid #1f1a15; font-size: 12px; color: #a89a84">
+<svg width="10" height="12" viewBox="0 0 6 7" shape-rendering="crispEdges"><path fill="#ff6a2b" d="M2 0h1v1h-1zM1 1h3v1h-3zM1 2h4v4h-4zM2 6h2v1h-2z"></path><path fill="#ffd36a" d="M2 4h2v2h-2z"></path></svg>
+<span>1 burned token = 1 coin. Stuck on a boss? Burn more tokens.</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":400,"height":720}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = {
+tick: 0, kind: 0, stage: 45, hp: 100, gold: 84200, income: 0, incomeAmt: 0, ult: 64,
+heroes: [{ lv: 12, xp: 40, ups: 0 }, { lv: 87, xp: 10, ups: 0 }, { lv: 63, xp: 70, ups: 0 }],
+atk: [0, 0, 0], hits: 0, taps: 0, ults: 0, bossHits: 0, dying: 0, kills: 0, partyHp: 72
+};
+}
+componentDidMount() {
+this.timer = setInterval(() => this.step(), 600);
+}
+componentWillUnmount() {
+clearInterval(this.timer);
+}
+step() {
+const s = this.state;
+const tick = s.tick + 1;
+const gains = [9, 6, 8];
+const heroes = s.heroes.map((h, i) => {
+const xp = h.xp + gains[i];
+return xp >= 100 ? { lv: h.lv + 1, xp: xp - 100, ups: h.ups + 1 } : { lv: h.lv, xp: xp, ups: h.ups };
+});
+const base = { tick: tick, heroes: heroes, ult: Math.min(100, s.ult + 3) };
+if (tick % 5 === 0) {
+const burned = 1800 + ((tick * 3733) % 9000);
+base.gold = s.gold + burned;
+base.income = s.income + 1;
+base.incomeAmt = burned;
+}
+if (s.dying > 0) {
+if (s.dying === 1) {
+this.setState(Object.assign(base, { dying: 0, kind: (s.kind + 1) % 8, stage: s.stage + 1, hp: 100, kills: s.kills + 1 }));
+} else {
+this.setState(Object.assign(base, { dying: s.dying - 1 }));
+}
+return;
+}
+const who = tick % 3;
+const atk = s.atk.slice();
+atk[who] += 1;
+const hp = s.hp - [3, 6, 4][who];
+const bossTurn = tick % 7 === 0;
+const next = Object.assign(base, {
+atk: atk, hits: s.hits + 1,
+bossHits: bossTurn ? s.bossHits + 1 : s.bossHits,
+partyHp: bossTurn ? Math.max(20, s.partyHp - 12) : Math.min(100, s.partyHp + 2)
+});
+if (hp <= 0) {
+next.hp = 0;
+next.dying = 2;
+} else {
+next.hp = hp;
+}
+this.setState(next);
+}
+renderVals() {
+const KINDS = [
+{ key: 'dragon', tag: 'FIRE', name: 'Cinder Dragon', sky: '#240b05', floor: '#3a1408', edge: '#ff6a2b', status: 'BURNING', parts: 'embers' },
+{ key: 'demon', tag: 'HELL', name: 'Archfiend', sky: '#140305', floor: '#2a070a', edge: '#e0252f', status: 'CURSED', parts: 'ash' },
+{ key: 'zombie', tag: 'GRAVE', name: 'Grave Brute', sky: '#0f1412', floor: '#1e241c', edge: '#a3c47a', status: 'ROTTING', parts: 'drizzle' },
+{ key: 'skeleton', tag: 'BONE', name: 'Bone Knight', sky: '#071110', floor: '#11201d', edge: '#52e0c4', status: 'HAUNTED', parts: 'wisps' },
+{ key: 'golem', tag: 'ICE', name: 'Frost Golem', sky: '#0a1b28', floor: '#14344a', edge: '#8fd8ff', status: 'FROZEN', parts: 'snow' },
+{ key: 'spider', tag: 'VENOM', name: 'Broodmother', sky: '#0b1006', floor: '#18200d', edge: '#a6d83d', status: 'POISONED', parts: 'drips' },
+{ key: 'wraith', tag: 'STORM', name: 'Storm Wraith', sky: '#0b111d', floor: '#182436', edge: '#ffe94a', status: 'SHOCKED', parts: 'rain' },
+{ key: 'slime', tag: 'GOLD', name: 'Slime King', sky: '#1a1406', floor: '#2c220c', edge: '#ffd36a', status: 'GREEDY', parts: 'coins' }
+];
+const s = this.state;
+const cur = KINDS[s.kind];
+const ab = (n) => (n % 2 ? 'a' : 'b');
+const fmt = (v) => (v >= 1e6 ? (v / 1e6).toFixed(2) + 'M' : v >= 1e3 ? (v / 1e3).toFixed(1) + 'K' : String(v));
+const fighting = s.dying === 0;
+
+const particle = (kind, i) => {
+const x = (i * 41 + 7) % 100;
+const spread = ((i * 53) % 17) / 10;
+const delay = -((i * 29) % 30) / 10;
+const kinds = {
+embers: { cls: 'p-rise', dur: 2.4 + spread, look: 'width: ' + (i % 3 === 0 ? 5 : 3) + 'px; height: ' + (i % 3 === 0 ? 5 : 3) + 'px; background: ' + (i % 2 ? '#ffb02e' : '#ff5a1f') },
+ash: { cls: 'p-rise', dur: 2.6 + spread, look: 'width: 3px; height: 3px; background: ' + (i % 2 ? '#ff4a3d' : '#ff9a3d') },
+drizzle: { cls: 'p-fall', dur: 0.9 + spread / 3, look: 'width: 1px; height: 8px; background: #8fa59a' },
+wisps: { cls: 'p-rise', dur: 3 + spread, look: 'width: 3px; height: 3px; background: #52e0c4' },
+snow: { cls: 'p-slant', dur: 2 + spread, look: 'width: ' + (i % 4 === 0 ? 4 : 2) + 'px; height: ' + (i % 4 === 0 ? 4 : 2) + 'px; background: #ffffff' },
+drips: { cls: 'p-fall', dur: 2.2 + spread, look: 'width: 2px; height: 6px; background: #a6d83d' },
+rain: { cls: 'p-slant', dur: 0.45 + spread / 6, look: 'width: 1px; height: 16px; background: #b9cff0' },
+coins: { cls: 'p-fall', dur: 2.4 + spread, look: 'width: 4px; height: 4px; background: #ffd36a; box-shadow: 1px 1px 0 #a8661a' }
+};
+const k = kinds[kind];
+return { cls: k.cls, style: 'left: ' + x + '%; ' + k.look + '; animation-duration: ' + k.dur.toFixed(2) + 's; animation-delay: ' + delay + 's' };
+};
+const count = cur.parts === 'rain' || cur.parts === 'drizzle' ? 30 : 16;
+const parts = [];
+for (let i = 0; i < count; i++) parts.push(particle(cur.parts, i));
+
+const who = s.tick % 3;
+const sparkColors = ['#c9ced6', '#ffffff', '#c7e05a'];
+const sparks = [[40, -14, 0], [30, -36, 30], [0, -44, 90], [-30, -36, -30], [-40, -10, 0], [-30, 22, 30], [0, 30, 90], [30, 22, -30], [48, 4, 0], [-48, 4, 0]].map((v, i) => ({
+style: '--dx: ' + v[0] + 'px; --dy: ' + v[1] + 'px; --r: ' + v[2] + 'deg; width: ' + (i % 2 ? 8 : 4) + 'px; height: ' + (i % 2 ? 3 : 4) + 'px; background: ' + (i % 3 === 0 ? cur.edge : sparkColors[who])
+}));
+const dmg = [4.1, 12.4, 9.8];
+const numPos = ['left: 236px; top: 168px; font-size: 20px; color: #c9ced6', 'left: 262px; top: 132px; font-size: 26px; color: #ffffff', 'left: 296px; top: 176px; font-size: 22px; color: #c7e05a'];
+const nums = [0, 1, 2].map((i) => ({
+shown: s.atk[i] > 0,
+cls: 'num float-' + ab(s.atk[i]),
+style: numPos[i],
+text: '-' + (dmg[i] + ((s.atk[i] * 7) % 9) / 10).toFixed(1) + 'K'
+}));
+
+const costs = [60, 40, 50].map((b, i) => Math.round(b * Math.pow(1.07, s.heroes[i].lv)));
+const names = ['Shieldbearer', 'Wanderer', 'Archer'];
+const hero = (i) => {
+const h = s.heroes[i];
+return {
+lv: h.lv,
+shown: h.ups > 0,
+glowCls: h.ups > 0 ? 'gold-' + ab(h.ups) : '',
+pillarCls: 'pillar pillar-' + ab(h.ups),
+lvlCls: 'lvl lvl-' + ab(h.ups)
+};
+};
+const rows = [1, 2, 0].map((i) => {
+const h = s.heroes[i];
+const can = s.gold >= costs[i];
+return {
+name: names[i],
+lv: h.lv,
+xp: h.xp,
+cost: fmt(costs[i]),
+rowCls: h.ups > 0 ? 'row-' + ab(h.ups) : '',
+btnCls: can ? 'ready' : '',
+btnStyle: 'height: 40px; min-width: 84px; border: 0; font-family: \'Pixelify Sans\', sans-serif; font-weight: 600; font-size: 13px; ' + (can ? 'background: #e8b23a; color: #1a1206; box-shadow: inset 0 -3px 0 #8a5e14' : 'background: #2a231c; color: #a89a84; box-shadow: inset 0 -3px 0 #000'),
+buy: () => {
+const st = this.state;
+if (st.gold < costs[i]) return;
+const hs = st.heroes.slice();
+hs[i] = { lv: hs[i].lv + 1, xp: hs[i].xp, ups: hs[i].ups + 1 };
+this.setState({ heroes: hs, gold: st.gold - costs[i] });
+}
+};
+});
+
+const totalHp = 2.96 * Math.pow(1.15, s.stage - 45);
+const ultReady = s.ult >= 100;
+return {
+cur: cur,
+is: { dragon: cur.key === 'dragon', demon: cur.key === 'demon', zombie: cur.key === 'zombie', skeleton: cur.key === 'skeleton', golem: cur.key === 'golem', spider: cur.key === 'spider', wraith: cur.key === 'wraith', slime: cur.key === 'slime' },
+parts: parts,
+stage: s.stage,
+goldText: fmt(s.gold),
+incomeShown: s.income > 0,
+incomeCls: 'inc-' + ab(s.income),
+incomeText: fmt(s.incomeAmt),
+nextStage: s.stage + 1,
+hp: s.hp,
+hpText: (totalHp * s.hp / 100).toFixed(2) + 'M / ' + totalHp.toFixed(2) + 'M',
+shakeCls: s.taps + s.ults > 0 ? 'shake-' + ab(s.taps + s.ults) : '',
+lungeCls: s.bossHits > 0 ? 'lunge-' + ab(s.bossHits) : '',
+bossCls: s.dying > 0 ? 'die' : 'enter-' + ab(s.kills),
+flashCls: s.hits + s.taps + s.ults > 0 ? 'flash-' + ab(s.hits + s.taps + s.ults) : '',
+partyCls: s.bossHits > 0 ? 'hurt-' + ab(s.bossHits) : '',
+dashCls: s.atk[1] > 0 ? 'dash-' + ab(s.atk[1]) : '',
+arrowCls: 'arrow' + (s.atk[2] > 0 ? ' arrow-' + ab(s.atk[2]) : ''),
+ringCls: 'ring' + (s.atk[0] > 0 ? ' ring-' + ab(s.atk[0]) : ''),
+slashCls: 'slash' + (s.atk[1] > 0 ? ' slash-' + ab(s.atk[1]) : ''),
+showBurst: s.hits > 0 && fighting,
+burstCls: 'burst-' + ab(s.hits),
+sparks: sparks,
+nums: nums,
+h0: hero(0),
+h1: hero(1),
+h2: hero(2),
+partyHp: s.partyHp,
+tapShown: s.taps > 0,
+xCls: 'xslash xslash-' + ab(s.taps),
+tapNumCls: 'num float-' + ab(s.taps),
+ultShown: s.ults > 0,
+beamCls: 'beam beam-' + ab(s.ults),
+whiteCls: 'white white-' + ab(s.ults),
+ultNumCls: 'num float-' + ab(s.ults),
+bossAtkShown: s.bossHits > 0,
+vigCls: 'vig vig-' + ab(s.bossHits),
+hurtNumCls: 'num float-' + ab(s.bossHits),
+statusCls: 'num float-' + ab(s.bossHits),
+dying: s.dying > 0,
+ult: s.ult,
+ultBtnCls: ultReady ? 'ready' : '',
+ultBtnStyle: 'height: 44px; width: 72px; border: 0; font-family: \'Jersey 10\', monospace; font-size: 22px; ' + (ultReady ? 'background: #9fd6ff; color: #08131c; box-shadow: inset 0 -3px 0 #4f8fb8' : 'background: #2a231c; color: #a89a84; box-shadow: inset 0 -3px 0 #000'),
+rows: rows,
+tap: () => {
+const st = this.state;
+if (st.dying > 0) return;
+const hp = st.hp - 7;
+this.setState(hp <= 0 ? { taps: st.taps + 1, hp: 0, dying: 2 } : { taps: st.taps + 1, hp: hp });
+},
+fireUlt: () => {
+const st = this.state;
+if (st.ult < 100 || st.dying > 0) return;
+const hp = st.hp - 30;
+this.setState(hp <= 0 ? { ults: st.ults + 1, ult: 0, hp: 0, dying: 2 } : { ults: st.ults + 1, ult: 0, hp: hp });
+}
+};
+}
+}
+</script>
+</body>
+</html>

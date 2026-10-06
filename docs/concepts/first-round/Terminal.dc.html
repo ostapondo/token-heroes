@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Термінал — смерть і перезапуск</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#7ee08a}a:hover{color:#a8f0b0}
+</style>
+</helmet>
+<div style="width: 400px; height: 680px; box-sizing: border-box; background: #0b0f0c; color: #cfe8d2; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.5; display: flex; flex-direction: column; overflow: hidden">
+
+<div style="display: flex; justify-content: space-between; padding: 10px 14px; background: #111813; border-bottom: 1px solid #1f2b22; color: #8fa894">
+<span><span style="color: #7ee08a; font-weight: 700">token-heroes</span> · стадія 45</span>
+<span>⛁ 84.2K · ▲ 4:58:12</span>
+</div>
+
+<pre style="margin: 0; padding: 14px 14px 4px; color: #ff7a6b; font-family: inherit; font-size: 12px; line-height: 1.25">     /\              /\
+    /  \____________/  \
+    |    (o)    (o)    |
+    |     ________     |
+    |    |_|_|_|_|_|   |
+     \________________/</pre>
+<div style="padding: 0 14px 10px; display: flex; flex-direction: column; gap: 2px">
+<div><span style="color: #ff7a6b; font-weight: 700">ПОЖИРАЧ КОНТЕКСТУ</span> <span style="color: #8fa894">бос · 30 с</span></div>
+<div>HP <span style="color: #ff7a6b">██████████████</span><span style="color: #3a4a3e">████████</span> 2.96M</div>
+</div>
+
+<div style="margin: 0 14px; padding: 10px 12px; border: 1px solid #6b2a24; background: #1a0f0e; display: flex; flex-direction: column; gap: 2px">
+<div style="color: #ff7a6b; font-weight: 700">✗ ЗАГІН ЗАГИНУВ на 24-й секунді</div>
+<div style="color: #e6c9c4">стадія 45 починається спочатку</div>
+<div style="color: #7ee08a">✓ рівні, золото й герої збережені</div>
+<div style="color: #e6c9c4">бракувало: ~8K шкоди/с або ще 1 удар щита</div>
+</div>
+
+<div style="padding: 12px 14px 0; color: #8fa894">ЖУРНАЛ</div>
+<div style="flex: 1; min-height: 0; overflow: hidden; padding: 4px 14px 0; display: flex; flex-direction: column; gap: 1px">
+<div><span style="color: #8fa894">14:02:11</span> <span style="color: #f0b44c">claude</span> +12.4K ток. → +12 с бою</div>
+<div><span style="color: #8fa894">14:02:19</span> <span style="color: #f0b44c">claude</span> +8.1K think → ульта 80%</div>
+<div><span style="color: #8fa894">14:02:23</span> Мандрівник ⟶ <span style="color: #ff7a6b">-42.1K</span></div>
+<div><span style="color: #8fa894">14:02:24</span> бос ⟶ Щитоносець <span style="color: #ff7a6b">-2.1K</span></div>
+<div><span style="color: #8fa894">14:02:31</span> бос ⟶ Щитоносець <span style="color: #ff7a6b">-2.1K</span> ✗</div>
+<div><span style="color: #8fa894">14:02:35</span> бос ⟶ Лучниця <span style="color: #ff7a6b">-2.1K</span> ✗</div>
+<div><span style="color: #8fa894">14:02:41</span> <span style="color: #ff7a6b">загін загинув · стадія 45 з нуля</span></div>
+<div><span style="color: #8fa894">14:03:05</span> Щитоносець 12 → 13 <span style="color: #f0b44c">-1.4K ⛁</span></div>
+</div>
+
+<div style="padding: 12px 14px 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button style="height: 44px; background: #7ee08a; color: #0b0f0c; border: 0; font-family: inherit; font-size: 12px; font-weight: 700; text-align: left; padding: 0 12px">[1] качати щит</button>
+<button style="height: 44px; background: #111813; color: #cfe8d2; border: 1px solid #2f4a35; font-family: inherit; font-size: 12px; text-align: left; padding: 0 12px">[2] найняти</button>
+<button style="height: 44px; background: #111813; color: #cfe8d2; border: 1px solid #2f4a35; font-family: inherit; font-size: 12px; text-align: left; padding: 0 12px">[B] бос ще раз</button>
+<button style="height: 44px; background: #111813; color: #cfe8d2; border: 1px solid #2f4a35; font-family: inherit; font-size: 12px; text-align: left; padding: 0 12px">[P] престиж</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":400,"height":680}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

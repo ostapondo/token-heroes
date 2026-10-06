@@ -12,6 +12,7 @@
     "src-tauri/gen/",
     "src-tauri/icons/",
     "*.lock",
-    "pnpm-lock.yaml"
+    "pnpm-lock.yaml",
+    "docs/concepts/"
   ]
 }

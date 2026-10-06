@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bosses</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&amp;family=Pixelify+Sans:wght@400;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#e8b23a}a:hover{color:#ffd27a}
+.bob{animation:bob 1s steps(2) infinite}
+@keyframes bob{0%{transform:translateY(0)}100%{transform:translateY(-3px)}}
+.p-rise{position:absolute;bottom:-8px;animation-name:rise;animation-iteration-count:infinite;animation-timing-function:linear}
+@keyframes rise{0%{transform:translate(0,0);opacity:0}10%{opacity:1}100%{transform:translate(-10px,-140px);opacity:0}}
+.p-fall{position:absolute;top:-14px;animation-name:fall;animation-iteration-count:infinite;animation-timing-function:linear}
+@keyframes fall{0%{transform:translate(0,0);opacity:0}8%{opacity:1}100%{transform:translate(-8px,150px);opacity:.8}}
+.p-slant{position:absolute;top:-14px;animation-name:slant;animation-iteration-count:infinite;animation-timing-function:linear}
+@keyframes slant{0%{transform:translate(0,0);opacity:0}8%{opacity:1}100%{transform:translate(-60px,150px);opacity:.8}}
+.bolt{animation:bolt 3.2s steps(1) infinite}
+@keyframes bolt{0%,84%{opacity:0}85%{opacity:1}87%{opacity:0}89%{opacity:1}93%,100%{opacity:0}}
+.pulse{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+</style>
+</helmet>
+<div style="width: 1000px; height: 1010px; box-sizing: border-box; padding: 24px; background: #0d0b09; color: #efe6d4; font-family: 'Pixelify Sans', sans-serif; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h1 style="margin: 0; font-family: 'Jersey 10', monospace; font-weight: 400; font-size: 40px; line-height: 1">30 BOSSES</h1>
+<span style="font-size: 14px; color: #a89a84">8 creatures × 9 elements. Every element recolors the boss and brings its weather.</span>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{elements}}" as="el" hint-placeholder-count="9">
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 6px; background: #1a1612; border: 2px solid #3b3128">
+<span style="font-family: 'Jersey 10', monospace; font-size: 18px; line-height: 1; color: {{el.edge}}">{{el.tag}}</span>
+<span style="display: flex; gap: 2px">
+<span style="width: 12px; height: 12px; background: {{el.p.x}}; border: 1px solid #000"></span>
+<span style="width: 12px; height: 12px; background: {{el.p.b}}; border: 1px solid #000"></span>
+<span style="width: 12px; height: 12px; background: {{el.p.a}}; border: 1px solid #000"></span>
+<span style="width: 12px; height: 12px; background: {{el.p.c}}; border: 1px solid #000"></span>
+</span>
+<span style="font-size: 11px; color: #a89a84">{{el.weather}}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{bosses}}" as="b" hint-placeholder-count="30">
+<div style="background: #1a1612; border: 2px solid #3b3128; display: flex; flex-direction: column">
+<div style="position: relative; height: 112px; overflow: hidden; background: {{b.el.sky}}">
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 22px; background: {{b.el.floor}}; border-top: 2px solid #000"></div>
+<sc-if value="{{b.el.storm}}" hint-placeholder-val="{{ false }}">
+<div class="bolt" style="position: absolute; inset: 0; background: rgba(230,240,255,.3); animation-delay: {{b.delay}}"></div>
+</sc-if>
+<sc-if value="{{b.el.blood}}" hint-placeholder-val="{{ false }}">
+<div class="pulse" style="position: absolute; inset: 0; box-shadow: inset 0 0 40px rgba(224,37,47,.6)"></div>
+</sc-if>
+<sc-for list="{{b.parts}}" as="p" hint-placeholder-count="8">
+<span class="{{p.cls}}" style="{{p.style}}"></span>
+</sc-for>
+<div class="bob" style="position: absolute; left: 50%; bottom: 10px; margin-left: {{b.offset}}; filter: drop-shadow(0 0 4px {{b.el.edge}}); animation-delay: {{b.delay}}">
+<sc-if value="{{b.is.dragon}}" hint-placeholder-val="{{ false }}">
+<svg width="100" height="80" viewBox="0 0 20 16" shape-rendering="crispEdges"><path fill="{{b.el.p.b}}" d="M13 1h2v1h-2zM12 2h4v1h-4zM11 3h5v1h-5zM10 4h6v1h-6zM9 5h7v1h-7zM9 6h6v1h-6zM8 12h2v3h-2zM13 12h2v3h-2zM7 15h3v1h-3zM12 15h3v1h-3zM19 12h1v1h-1z"></path><path fill="{{b.el.p.a}}" d="M1 3h4v4h-4zM0 5h1v2h-1zM5 5h2v4h-2zM7 7h8v5h-8zM15 10h2v2h-2zM17 11h2v1h-2z"></path><path fill="{{b.el.p.c}}" d="M8 11h6v1h-6zM5 8h2v1h-2z"></path><path fill="{{b.el.p.h}}" d="M4 1h1v2h-1zM2 2h1v1h-1z"></path><path fill="{{b.el.p.e}}" d="M2 4h1v1h-1z"></path><path fill="{{b.el.p.x}}" d="M0 6h3v1h-3z"></path></svg>
+</sc-if>
+<sc-if value="{{b.is.demon}}" hint-placeholder-val="{{ false }}">
+<svg width="80" height="80" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="{{b.el.p.x}}" d="M0 5h3v6h-3zM13 5h3v6h-3z"></path><path fill="{{b.el.p.b}}" d="M1 6h1v4h-1zM14 6h1v4h-1z"></path><path fill="{{b.el.p.a}}" d="M3 5h10v8h-10z"></path><path fill="{{b.el.p.b}}" d="M3 11h10v2h-10zM4 13h3v3h-3zM9 13h3v3h-3zM4 6h3v1h-3zM9 6h3v1h-3z"></path><path fill="{{b.el.p.e}}" d="M5 7h2v1h-2zM9 7h2v1h-2z"></path><path fill="{{b.el.p.x}}" d="M5 9h6v3h-6z"></path><path fill="{{b.el.p.h}}" d="M1 1h2v2h-2zM2 3h2v2h-2zM13 1h2v2h-2zM12 3h2v2h-2zM5 9h1v2h-1zM10 9h1v2h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{b.is.golem}}" hint-placeholder-val="{{ false }}">
+<svg width="80" height="80" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="{{b.el.p.a}}" d="M5 1h6v3h-6zM2 4h12v8h-12zM0 5h2v7h-2zM14 5h2v7h-2zM3 12h4v4h-4zM9 12h4v4h-4z"></path><path fill="{{b.el.p.b}}" d="M2 10h12v2h-12zM0 10h2v2h-2zM14 10h2v2h-2z"></path><path fill="{{b.el.p.c}}" d="M1 3h2v2h-2zM13 3h2v2h-2zM2 2h1v1h-1zM13 2h1v1h-1zM7 0h2v1h-2z"></path><path fill="{{b.el.p.e}}" d="M6 2h1v1h-1zM9 2h1v1h-1zM7 6h2v1h-2zM6 7h1v2h-1zM9 8h1v2h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{b.is.knight}}" hint-placeholder-val="{{ false }}">
+<svg width="80" height="80" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="{{b.el.p.c}}" d="M5 1h6v5h-6zM7 6h2v6h-2zM5 7h6v1h-6zM5 9h6v1h-6zM6 11h4v1h-4zM4 7h1v4h-1zM11 7h1v4h-1zM6 12h1v3h-1zM9 12h1v3h-1zM5 15h2v1h-2zM9 15h2v1h-2z"></path><path fill="{{b.el.p.x}}" d="M6 3h2v1h-2zM9 3h2v1h-2zM7 5h1v1h-1zM9 5h1v1h-1z"></path><path fill="{{b.el.p.e}}" d="M6 3h1v1h-1zM10 3h1v1h-1z"></path><path fill="#a9b3bf" d="M3 2h1v8h-1z"></path><path fill="{{b.el.p.b}}" d="M2 9h3v1h-3zM12 7h3v5h-3z"></path><path fill="{{b.el.p.a}}" d="M13 9h1v1h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{b.is.zombie}}" hint-placeholder-val="{{ false }}">
+<svg width="80" height="80" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="{{b.el.p.a}}" d="M5 1h5v5h-5zM1 7h4v1h-4zM1 9h4v1h-4zM6 8h1v1h-1z"></path><path fill="{{b.el.p.b}}" d="M0 7h1v1h-1zM0 9h1v1h-1z"></path><path fill="{{b.el.p.x}}" d="M5 1h5v1h-5zM5 2h1v1h-1zM6 5h3v1h-3z"></path><path fill="{{b.el.p.e}}" d="M6 3h1v1h-1zM8 3h1v1h-1z"></path><path fill="#5a6b7a" d="M5 6h5v2h-5zM7 8h3v3h-3zM5 9h2v2h-2z"></path><path fill="#3d3a2e" d="M5 11h5v2h-5zM5 13h2v2h-2zM8 13h2v2h-2z"></path><path fill="{{b.el.p.x}}" d="M4 15h3v1h-3zM8 15h3v1h-3z"></path></svg>
+</sc-if>
+<sc-if value="{{b.is.spider}}" hint-placeholder-val="{{ false }}">
+<svg width="80" height="80" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="{{b.el.p.x}}" d="M2 4h3v1h-3zM1 5h1v6h-1zM3 10h2v1h-2zM2 11h1v4h-1zM8 10h1v1h-1zM7 11h1v4h-1zM12 10h1v1h-1zM12 11h1v4h-1zM14 10h1v1h-1zM15 11h1v4h-1z"></path><path fill="{{b.el.p.b}}" d="M8 3h7v7h-7zM4 6h4v4h-4z"></path><path fill="{{b.el.p.c}}" d="M10 5h3v1h-3zM11 6h1v2h-1zM10 8h3v1h-3z"></path><path fill="{{b.el.p.e}}" d="M4 7h1v1h-1zM6 7h1v1h-1zM5 6h1v1h-1z"></path><path fill="{{b.el.p.h}}" d="M4 10h1v1h-1zM6 10h1v1h-1z"></path></svg>
+</sc-if>
+<sc-if value="{{b.is.wraith}}" hint-placeholder-val="{{ false }}">
+<svg width="80" height="80" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#6b4a2e" d="M1 2h1v13h-1z"></path><path fill="#c9d1d9" d="M1 1h6v1h-6zM5 2h2v1h-2zM6 3h1v1h-1z"></path><path fill="{{b.el.p.b}}" d="M5 1h6v2h-6zM4 3h8v9h-8zM3 6h10v6h-10zM3 12h2v2h-2zM6 12h2v3h-2zM9 12h2v2h-2zM12 12h1v3h-1z"></path><path fill="{{b.el.p.a}}" d="M4 3h1v9h-1zM3 6h1v6h-1z"></path><path fill="#050808" d="M6 3h4v3h-4z"></path><path fill="{{b.el.p.e}}" d="M6 4h1v1h-1zM9 4h1v1h-1z"></path><path fill="{{b.el.p.h}}" d="M2 7h2v1h-2z"></path></svg>
+</sc-if>
+<sc-if value="{{b.is.slime}}" hint-placeholder-val="{{ false }}">
+<svg width="80" height="80" viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="{{b.el.p.a}}" d="M5 4h6v1h-6zM4 5h8v1h-8zM3 6h10v3h-10zM2 9h12v5h-12z"></path><path fill="{{b.el.p.b}}" d="M2 13h12v1h-12zM2 11h1v2h-1z"></path><path fill="{{b.el.p.c}}" d="M5 6h2v1h-2zM4 7h1v1h-1z"></path><path fill="{{b.el.p.x}}" d="M5 9h2v2h-2zM9 9h2v2h-2zM7 12h2v1h-2z"></path><path fill="#ffffff" d="M5 9h1v1h-1zM9 9h1v1h-1z"></path><path fill="#dfe3e8" d="M5 2h6v2h-6zM5 1h1v1h-1zM7 1h2v1h-2zM10 1h1v1h-1z"></path><path fill="#c2361a" d="M7 2h2v1h-2z"></path></svg>
+</sc-if>
+</div>
+<span style="position: absolute; left: 4px; top: 4px; font-family: 'Jersey 10', monospace; font-size: 14px; line-height: 1; padding: 1px 4px; background: #000; color: {{b.el.edge}}">{{b.el.tag}}</span>
+</div>
+<div style="padding: 6px 8px 8px; display: flex; flex-direction: column; gap: 1px">
+<span style="font-family: 'Jersey 10', monospace; font-size: 19px; line-height: 1">{{b.name}}</span>
+<span style="font-size: 11px; color: #a89a84">{{b.kindLabel}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1000,"height":1010}}'>
+class Component extends DCLogic {
+renderVals() {
+const EL = {
+fire: { tag: 'FIRE', weather: 'lava, embers', sky: '#240b05', floor: '#e0451a', edge: '#ff6a2b', parts: 'embers', p: { a: '#c2361a', b: '#7a1d0c', c: '#ffb02e', e: '#ffd36a', h: '#e8d9c0', x: '#2a0a04' } },
+ice: { tag: 'ICE', weather: 'blizzard', sky: '#0a1b28', floor: '#dff3ff', edge: '#8fd8ff', parts: 'snow', p: { a: '#4f9fd1', b: '#2a6f9e', c: '#bfeaff', e: '#f2fbff', h: '#e8f7ff', x: '#0b2233' } },
+earth: { tag: 'EARTH', weather: 'falling rocks, dust', sky: '#16120c', floor: '#3a2c18', edge: '#c9a05a', parts: 'rocks', p: { a: '#8a6a3a', b: '#5a4428', c: '#a8b85a', e: '#ffb02e', h: '#c9c3b4', x: '#2a1f12' } },
+storm: { tag: 'STORM', weather: 'rain, lightning', sky: '#0b111d', floor: '#182436', edge: '#ffe94a', parts: 'rain', storm: true, p: { a: '#2f4c6e', b: '#1b2d44', c: '#c9d6e3', e: '#ffe94a', h: '#e9eef5', x: '#0c1220' } },
+venom: { tag: 'VENOM', weather: 'acid drips, fog', sky: '#0b1006', floor: '#18200d', edge: '#a6d83d', parts: 'drips', p: { a: '#5b8a24', b: '#33521a', c: '#c7d94a', e: '#e2e86a', h: '#e9e2cc', x: '#142008' } },
+bone: { tag: 'BONE', weather: 'ghost wisps', sky: '#071110', floor: '#11201d', edge: '#52e0c4', parts: 'wisps', p: { a: '#9aa38f', b: '#5c6457', c: '#e9e2cc', e: '#52e0c4', h: '#e9e2cc', x: '#0c1614' } },
+blood: { tag: 'BLOOD', weather: 'red pulse, ash', sky: '#140305', floor: '#2a070a', edge: '#e0252f', parts: 'ash', blood: true, p: { a: '#8e0f1a', b: '#4a060c', c: '#ff7a3d', e: '#ffd23f', h: '#e8d9c0', x: '#120406' } },
+gold: { tag: 'GOLD', weather: 'coin shower', sky: '#1a1406', floor: '#2c220c', edge: '#ffd36a', parts: 'coins', p: { a: '#e8a23a', b: '#a8661a', c: '#fff3c4', e: '#ffffff', h: '#dfe3e8', x: '#1a1206' } },
+shadow: { tag: 'SHADOW', weather: 'dark motes', sky: '#050608', floor: '#0e1014', edge: '#d8dde6', parts: 'motes', p: { a: '#2c303a', b: '#16181d', c: '#5a6070', e: '#f2f2f2', h: '#8a90a0', x: '#000000' } }
+};
+const KIND = { dragon: 'Dragon', demon: 'Demon', golem: 'Golem', knight: 'Skeleton knight', zombie: 'Zombie brute', spider: 'Giant spider', wraith: 'Wraith', slime: 'Slime' };
+const LIST = [
+['dragon', 'fire', 'Cinder Dragon'], ['dragon', 'ice', 'Rime Dragon'], ['dragon', 'earth', 'Stone Wyrm'], ['dragon', 'storm', 'Thunder Dragon'], ['dragon', 'venom', 'Venom Drake'], ['dragon', 'bone', 'Bone Dragon'],
+['demon', 'blood', 'Archfiend'], ['demon', 'fire', 'Pit Lord'], ['demon', 'shadow', 'Night Fiend'], ['demon', 'ice', 'Frost Devil'],
+['golem', 'earth', 'Earth Golem'], ['golem', 'ice', 'Frost Golem'], ['golem', 'fire', 'Magma Golem'], ['golem', 'gold', 'Gilded Colossus'],
+['knight', 'bone', 'Bone Knight'], ['knight', 'fire', 'Burning Knight'], ['knight', 'shadow', 'Black Knight'],
+['zombie', 'venom', 'Plague Brute'], ['zombie', 'ice', 'Frozen Corpse'], ['zombie', 'earth', 'Bog Brute'],
+['spider', 'venom', 'Broodmother'], ['spider', 'shadow', 'Night Weaver'], ['spider', 'fire', 'Ember Spider'],
+['wraith', 'storm', 'Storm Wraith'], ['wraith', 'bone', 'Grave Wraith'], ['wraith', 'ice', 'Blizzard Wraith'], ['wraith', 'blood', 'Blood Reaper'],
+['slime', 'gold', 'Slime King'], ['slime', 'venom', 'Ooze Queen'], ['slime', 'ice', 'Glacier Slime']
+];
+const particle = (kind, i) => {
+const x = (i * 41 + 7) % 100;
+const spread = ((i * 53) % 17) / 10;
+const delay = -((i * 29) % 30) / 10;
+const kinds = {
+embers: { cls: 'p-rise', dur: 1.8 + spread, look: 'width: 3px; height: 3px; background: ' + (i % 2 ? '#ffb02e' : '#ff5a1f') },
+snow: { cls: 'p-slant', dur: 1.6 + spread, look: 'width: ' + (i % 3 === 0 ? 3 : 2) + 'px; height: ' + (i % 3 === 0 ? 3 : 2) + 'px; background: #ffffff' },
+rocks: { cls: 'p-fall', dur: 1.4 + spread, look: 'width: ' + (i % 3 === 0 ? 4 : 2) + 'px; height: ' + (i % 3 === 0 ? 4 : 2) + 'px; background: ' + (i % 2 ? '#8a6a3a' : '#c9a05a') },
+rain: { cls: 'p-slant', dur: 0.4 + spread / 6, look: 'width: 1px; height: 12px; background: #b9cff0' },
+drips: { cls: 'p-fall', dur: 1.8 + spread, look: 'width: 2px; height: 5px; background: #a6d83d' },
+wisps: { cls: 'p-rise', dur: 2.4 + spread, look: 'width: 3px; height: 3px; background: #52e0c4' },
+ash: { cls: 'p-rise', dur: 2 + spread, look: 'width: 2px; height: 2px; background: ' + (i % 2 ? '#ff4a3d' : '#ff9a3d') },
+coins: { cls: 'p-fall', dur: 2 + spread, look: 'width: 3px; height: 3px; background: #ffd36a' },
+motes: { cls: 'p-rise', dur: 3 + spread, look: 'width: 2px; height: 2px; background: #d8dde6' }
+};
+const k = kinds[kind];
+return { cls: k.cls, style: 'left: ' + x + '%; ' + k.look + '; animation-duration: ' + k.dur.toFixed(2) + 's; animation-delay: ' + delay + 's' };
+};
+const bosses = LIST.map((row, n) => {
+const el = EL[row[1]];
+const count = el.parts === 'rain' ? 14 : 8;
+const parts = [];
+for (let i = 0; i < count; i++) parts.push(particle(el.parts, i + n));
+const is = {};
+is[row[0]] = true;
+return {
+name: row[2],
+kindLabel: KIND[row[0]],
+el: el,
+is: is,
+parts: parts,
+offset: row[0] === 'dragon' ? '-50px' : '-40px',
+delay: '-' + ((n * 0.37) % 1).toFixed(2) + 's'
+};
+});
+const elements = Object.keys(EL).map((k) => EL[k]);
+return { bosses: bosses, elements: elements };
+}
+}
+</script>
+</body>
+</html>
