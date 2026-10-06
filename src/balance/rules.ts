@@ -67,6 +67,26 @@ export const RULES: readonly Rule[] = [
     },
   },
   {
+    id: 'bosses-still-threaten',
+    statement:
+      'Where the party is stuck, the hardest-hitting boss kind still outdamages its healing.',
+    why: 'Healing that outpaces every boss makes the party immortal and tanks pointless.',
+    threshold: 1,
+    judge({ heroes, frontier }) {
+      const healers = ofRole(heroes, HeroRole.Healer);
+
+      if (healers.length === 0 || !frontier) return null;
+      const measured =
+        sum(healers, (sheet) => sheet.healPerSecond) / frontier.harshestDamagePerSecond;
+
+      return {
+        passed: measured < this.threshold,
+        measured,
+        detail: `healing undoes ${percent(measured)} of the harshest boss at ${frontier.stage}`,
+      };
+    },
+  },
+  {
     id: 'party-outlasts-the-opening',
     statement: 'At the boss that stops the party, its health lasts 40% of the timer or longer.',
     why: 'A damage-heavy boss may cut a fight short to test toughness, never one-shot it.',
