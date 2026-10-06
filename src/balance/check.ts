@@ -1,6 +1,7 @@
 import { partyVitals, type PartyState, type Roster } from '@engine';
 import { compact } from './numbers';
 import { PACE_COINS, paceCurve, partyFor, type PacePoint } from './pace';
+import { ASCENSION_RULES } from './ascension-rules';
 import { greedyPartyFor } from './greedy';
 import { PACE_RULES } from './pace-rules';
 import { PLAY_RULES } from './play-rules';
@@ -40,7 +41,7 @@ export interface BalanceReport {
 function judgePace(roster: Roster): BalanceReport['pace'] {
   const steady = paceCurve(roster);
   const greedy = paceCurve(roster, greedyPartyFor);
-  const findings = [...PACE_RULES, ...PLAY_RULES].map((rule) => ({
+  const findings = [...PACE_RULES, ...PLAY_RULES, ...ASCENSION_RULES].map((rule) => ({
     rule: rule.id,
     threshold: rule.threshold,
     ...rule.judge({ roster, steady, greedy }),
