@@ -29,16 +29,23 @@ and every token they spend becomes a coin you can put into your heroes.
 
 Token Heroes sits next to your clock as a pixel sword. On macOS your coin balance shows beside it.
 Click the sword and a small window opens on an arena where your party fights forever. You never grind. Instead, the Rust host watches the session logs
-that Claude Code and Codex already write on your disk, counts the tokens they burn and credits
-one coin per token. You spend those coins on levels and hires.
+your coding agents already write on your disk, counts the tokens they burn and credits one coin
+per token. You spend those coins on levels and hires.
 
 The fight never pays you. When the party is stuck on a boss, the answer is to ship more work.
 
-| Agent       | Where it reads                                          | What counts as burned                                      |
-| ----------- | ------------------------------------------------------- | ---------------------------------------------------------- |
-| Claude Code | `~/.claude/projects/**/*.jsonl` (`CLAUDE_CONFIG_DIR`)   | input + output + cache writes, not cache reads             |
-| Codex       | `~/.codex/sessions/**/*.jsonl` (`CODEX_HOME`)           | input − cached input + output                              |
-| OpenCode    | `~/.local/share/opencode/opencode.db` (`XDG_DATA_HOME`) | input + output + reasoning + cache writes, not cache reads |
+| Agent       | Where it reads                                                  | What counts as burned                                      |
+| ----------- | --------------------------------------------------------------- | ---------------------------------------------------------- |
+| Claude Code | `~/.claude/projects/**/*.jsonl` (`CLAUDE_CONFIG_DIR`)           | input + output + cache writes, not cache reads             |
+| Codex       | `~/.codex/sessions/**/*.jsonl` (`CODEX_HOME`)                   | input − cached input + output                              |
+| Gemini CLI  | `~/.gemini/tmp/**/*.jsonl` (`GEMINI_CLI_HOME`)                  | total − cached input                                       |
+| Qwen Code   | `~/.qwen/projects/**/*.jsonl` (`QWEN_RUNTIME_DIR`, `QWEN_HOME`) | total − cached input                                       |
+| OpenCode    | `~/.local/share/opencode/opencode.db` (`OPENCODE_DB`)           | input + output + reasoning + cache writes, not cache reads |
+| Kilo Code   | `~/.local/share/kilo/kilo.db` (`KILO_DB`)                       | the same as OpenCode, whose fork it is                     |
+
+Tools that drive these agents, such as T3 Code, are counted through the agent's own logs.
+Cursor, Windsurf, Warp and Aider keep no per-request token counts on disk, so they cannot be
+counted yet.
 
 > [!TIP]
 > On the first launch the host reads the transcripts already on your disk, so your existing history
@@ -133,15 +140,15 @@ Token Heroes is young, and it is open to contributors. You can make a real diffe
 evening, and **you don't need to know Rust or React to start**. The game's content is plain data,
 one entity per file, and the registry finds new files on its own.
 
-| If you like…       | You could                                                                          |
-| ------------------ | ---------------------------------------------------------------------------------- |
-| Pixel art          | name one of the 42 free creature × element bosses, or draw a new enemy             |
-| Game design        | tune `balance.ts`, design a hero's role, propose a new mechanic                    |
-| Canvas and effects | add a weather kind, a particle preset or a combat effect in `src/render`           |
-| Rust               | teach the host a new agent: one `TokenSource` with a root folder and a line parser |
-| UI                 | polish the HUD and the hero roster in `src/ui`                                     |
-| Testing            | run it on Windows or Linux and tell us what broke                                  |
-| Languages          | the English catalogue in `src/i18n` is typed and ready for a second language       |
+| If you like…       | You could                                                                    |
+| ------------------ | ---------------------------------------------------------------------------- |
+| Pixel art          | name one of the 42 free creature × element bosses, or draw a new enemy       |
+| Game design        | tune `balance.ts`, design a hero's role, propose a new mechanic              |
+| Canvas and effects | add a weather kind, a particle preset or a combat effect in `src/render`     |
+| Rust               | teach the host a new agent, such as Copilot CLI, Goose, Cline or Amp         |
+| UI                 | polish the HUD and the hero roster in `src/ui`                               |
+| Testing            | run it on Windows or Linux and tell us what broke                            |
+| Languages          | the English catalogue in `src/i18n` is typed and ready for a second language |
 
 Read **[CONTRIBUTING.md](CONTRIBUTING.md)**. It has the setup, the house rules and step-by-step
 recipes for a boss, an enemy, a hero, an element and a token source. Coding agents are welcome
@@ -194,7 +201,7 @@ The game runs end to end today: the watcher, the ledger, the battle, the heroes 
 Next up:
 
 - [ ] Prebuilt installers for macOS, Windows and Linux
-- [ ] More agents as token sources
+- [ ] More agents as token sources: Copilot CLI, Goose, Cline, Roo Code, Amp
 - [ ] The remaining 42 creature × element bosses
 - [ ] A second language
 

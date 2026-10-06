@@ -17,8 +17,9 @@ Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
 - **Content.** Bosses, enemies, heroes and elements are plain data files. Of the 72 creature ×
   element bosses, 30 exist. The other 42 are waiting for a name.
 - **Effects.** Weather kinds, particle presets and combat effects live in `src/render`.
-- **Agents.** The host reads Claude Code and Codex today. Another agent that writes its usage to
-  disk can become a new token source.
+- **Agents.** The host reads Claude Code, Codex, Gemini CLI, Qwen Code, OpenCode and Kilo Code
+  today. Copilot CLI, Goose, Cline, Roo Code and Amp also write their usage to disk and are
+  waiting for a token source.
 - **Balance.** Every number that shapes the fight is in `src/engine/balance.ts`. `pnpm balance`
   plays the real battle and checks the rules in [docs/balance.md](docs/balance.md); agents get
   the same checks through an MCP server.
@@ -198,7 +199,7 @@ pub trait TokenSource: Send {
   personal content from them first.
 
 An agent that keeps its sessions in a database instead implements `StoreSource`, like
-`opencode.rs`: it names itself, watches a folder and reads every new reply since its cursor's
+`opencode.rs`: it names itself, watches its folder and reads every new reply since its cursor's
 watermark. A reply that grows while it streams is credited only for its growth, through the
 cursor's `seen` messages. Register it with `with_stores` in `src-tauri/src/app/crediting.rs`.
 
