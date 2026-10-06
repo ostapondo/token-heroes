@@ -38,7 +38,7 @@
 <text class="t" x="12" y="138" font-size="24" fill="#efe6d4">Archer</text>
 <text class="p" x="12" y="154" font-size="12" fill="#a89a84">Striker · arrow</text>
 
-<text class="p" x="12" y="170" font-size="12" fill="#efe6d4">Hire · 2K coins</text>
+<text class="p" x="12" y="170" font-size="12" fill="#efe6d4">Hire · 300K coins</text>
 </g>
 <g transform="translate(392,16)">
 <rect width="176" height="186" fill="#1a1612"/>
@@ -50,7 +50,7 @@
 <text class="t" x="12" y="138" font-size="24" fill="#efe6d4">Shieldbearer</text>
 <text class="p" x="12" y="154" font-size="12" fill="#a89a84">Tank · bash</text>
 
-<text class="p" x="12" y="170" font-size="12" fill="#efe6d4">Hire · 5K coins</text>
+<text class="p" x="12" y="170" font-size="12" fill="#efe6d4">Hire · 660K coins</text>
 </g>
 <g transform="translate(580,16)">
 <rect width="176" height="186" fill="#1a1612"/>
@@ -62,7 +62,7 @@
 <text class="t" x="12" y="138" font-size="24" fill="#efe6d4">Cleric</text>
 <text class="p" x="12" y="154" font-size="12" fill="#a89a84">Healer · heal</text>
 
-<text class="p" x="12" y="170" font-size="12" fill="#efe6d4">Hire · 25K coins</text>
+<text class="p" x="12" y="170" font-size="12" fill="#efe6d4">Hire · 1.5M coins</text>
 </g>
 <g transform="translate(768,16)">
 <rect width="176" height="186" fill="#1a1612"/>
@@ -74,7 +74,7 @@
 <text class="t" x="12" y="138" font-size="24" fill="#efe6d4">Fire Mage</text>
 <text class="p" x="12" y="154" font-size="12" fill="#a89a84">Striker · spell</text>
 
-<text class="p" x="12" y="170" font-size="12" fill="#efe6d4">Hire · 140K coins</text>
+<text class="p" x="12" y="170" font-size="12" fill="#efe6d4">Hire · 3.2M coins</text>
 </g>
 <g transform="translate(16,214)">
 <rect width="176" height="186" fill="#1a1612"/>
@@ -110,7 +110,7 @@
 <text class="t" x="12" y="138" font-size="24" fill="#efe6d4">Frost Witch</text>
 <text class="p" x="12" y="154" font-size="12" fill="#a89a84">Striker · spell</text>
 <path transform="translate(12,162)" fill="#a89a84" shape-rendering="crispEdges" d="M2 0h4v1h1v3h1v5h-8v-5h1v-3h1zM3 1v3h2v-3z"/>
-<text class="p" x="24" y="170" font-size="12" fill="#a89a84">Unlocks at 250M tokens</text>
+<text class="p" x="24" y="170" font-size="12" fill="#a89a84">Unlocks at 200M tokens</text>
 </g>
 <g transform="translate(580,214)">
 <rect width="176" height="186" fill="#1a1612"/>
@@ -122,7 +122,7 @@
 <text class="t" x="12" y="138" font-size="24" fill="#efe6d4">Necromancer</text>
 <text class="p" x="12" y="154" font-size="12" fill="#a89a84">Healer · heal</text>
 <path transform="translate(12,162)" fill="#a89a84" shape-rendering="crispEdges" d="M2 0h4v1h1v3h1v5h-8v-5h1v-3h1zM3 1v3h2v-3z"/>
-<text class="p" x="24" y="170" font-size="12" fill="#a89a84">Unlocks at 500M tokens</text>
+<text class="p" x="24" y="170" font-size="12" fill="#a89a84">Unlocks at 400M tokens</text>
 </g>
 <g transform="translate(768,214)">
 <rect width="176" height="186" fill="#1a1612"/>
@@ -134,7 +134,7 @@
 <text class="t" x="12" y="138" font-size="24" fill="#efe6d4">Paladin</text>
 <text class="p" x="12" y="154" font-size="12" fill="#a89a84">Tank · bash</text>
 <path transform="translate(12,162)" fill="#a89a84" shape-rendering="crispEdges" d="M2 0h4v1h1v3h1v5h-8v-5h1v-3h1zM3 1v3h2v-3z"/>
-<text class="p" x="24" y="170" font-size="12" fill="#a89a84">Unlocks at 1B tokens</text>
+<text class="p" x="24" y="170" font-size="12" fill="#a89a84">Unlocks at 800M tokens</text>
 </g>
 
 </svg>

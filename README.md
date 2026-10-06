@@ -50,7 +50,7 @@ The fight never pays you. When the party is stuck on a boss, the answer is to sh
 - **Auto battle.** Heroes attack on their own. Crits land 10% of the time for 2.5× damage.
 - **Tap to strike.** Click the arena to hit the front foe for half your party's power.
 - **Ultimate.** Every 50,000 burned tokens charge one ultimate worth 25× your party's power.
-- **Milestones.** Every 25 levels a hero's damage and health double.
+- **Milestones.** Every 25 levels a hero's damage and health grow fourfold.
 - **Wipes are gentle.** If the party falls, it is back in 10 seconds. Levels and coins stay.
 - **Offline progress.** Close the window and the party keeps fighting for up to 8 hours.
 
@@ -60,9 +60,10 @@ All of these numbers live in one file, [`src/engine/balance.ts`](src/engine/bala
 
 <img src="docs/readme/heroes.svg" alt="Ten hero cards: Wanderer, Archer, Shieldbearer, Cleric, Fire Mage, Rogue, Barbarian, Frost Witch, Necromancer, Paladin" width="100%">
 
-You start with the Wanderer. Strikers deal damage, tanks take the boss's hits and healers keep
-everyone standing. The rare heroes appear only once your lifetime burn passes their threshold.
-Anyone who reaches the Paladin has burned a billion tokens.
+You start with the Wanderer. Strikers deal damage, tanks hold the party's health and healers
+restore a share of it. Every later hero is stronger per coin than the one before; the rare ones
+appear only once your lifetime burn passes their threshold. Anyone who reaches the Paladin has
+burned 800 million tokens.
 
 ### Thirty bosses
 

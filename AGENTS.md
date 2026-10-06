@@ -66,6 +66,8 @@ to its right, and a feature or entity is reached only through its `index.ts`.
 ## Content
 
 - One entity per file. The registry collects files with `import.meta.glob`; no list to edit.
+- A hero names its role, attack, attack interval and optional `focus`. Its strength, hire price
+  and unlock come from its `order` through `designHero`; never write hero numbers by hand.
 - Sprites are rows of palette slots: `a` body, `b` shade, `c` light, `e` eyes, `h` horns or
   bone, `x` darkest, `.` transparent. Fixed colours go in the sprite's `fixed` map.
 - An element supplies the palette and the weather. A boss is a creature plus an element.

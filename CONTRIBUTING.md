@@ -153,11 +153,13 @@ the pull request.
 
 ### Add a hero
 
-Heroes live in `src/content/heroes/`. A hero sets its role (`Striker`, `Tank` or `Healer`), its
-attack style, base damage and health, attack interval, level cost, hire cost and the lifetime
-token burn that unlocks it. Hero sprites use `fixed` colours only, since no element recolours
-them. Use an `order` one past the last hero. A new hero changes the game's pacing, so open an
-issue first and describe the role it fills.
+Heroes live in `src/content/heroes/`. A hero names its role (`Striker`, `Tank` or `Healer`), its
+attack style and attack interval, and may lean its `focus` towards offence (up to `0.5`) or
+toughness (down to `-0.5`). It never sets damage, health or prices: `designHero` derives them
+from its `order`, so a hero with the next `order` is automatically stronger per coin, dearer to
+hire and unlocked later than the last one. Hero sprites use `fixed` colours only, since no
+element recolours them. Run `pnpm balance` before you open the pull request, and open an issue
+first to describe the role the hero fills.
 
 ### Add an element
 
