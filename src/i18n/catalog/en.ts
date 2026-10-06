@@ -2,7 +2,8 @@ export const en = {
   'hud.stage': 'STAGE {stage}',
   'hud.coins': '{coins} coins',
   'hud.income': '+{tokens} tokens',
-  'hud.footer': '1 burned token = 1 coin · {burned} burned so far',
+  'hud.burned': '{burned} tokens burned in all',
+  'hud.footer': '1 burned token = 1 coin',
 
   'arena.strike': 'Strike the front foe',
   'arena.bossTimer': '{element} · {seconds}s',
