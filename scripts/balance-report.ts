@@ -3,12 +3,15 @@ import { checkBalance, standardScenarios } from '@balance';
 
 const report = checkBalance(toRoster(CONTENT), standardScenarios(toRoster(CONTENT)));
 
-console.log('Pace: burned tokens -> stage (heroes, level)');
-for (const point of report.pace.curve) {
+console.log('Pace: burned tokens -> stage for an even player | a best-upgrade player');
+report.pace.steady.forEach((point, index) => {
+  const greedy = report.pace.greedy[index];
+  const heroes = point.party.heroes.length;
+
   console.log(
-    `  ${point.coins.toExponential(1)} -> stage ${point.stage} (${point.heroes}, ${point.level})`,
+    `  ${point.coins.toExponential(1)} -> ${point.stage} (${heroes} heroes) | ${greedy?.stage}`,
   );
-}
+});
 for (const finding of report.pace.findings) {
   console.log(`  ${finding.passed ? 'pass' : 'FAIL'}  ${finding.rule}: ${finding.detail}`);
 }

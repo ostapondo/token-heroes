@@ -3,20 +3,26 @@ import { compact } from './numbers';
 import { outputPerCoin, type PacePoint } from './pace';
 import type { Finding } from './rules';
 
+interface PaceContext {
+  readonly roster: Roster;
+  readonly steady: readonly PacePoint[];
+  readonly greedy: readonly PacePoint[];
+}
+
 export interface PaceRule {
   readonly id: string;
   readonly statement: string;
   readonly why: string;
   readonly threshold: number;
-  judge(curve: readonly PacePoint[], roster: Roster): Omit<Finding, 'rule' | 'threshold'>;
+  judge(context: PaceContext): Omit<Finding, 'rule' | 'threshold'>;
 }
 
 const stageAt = (curve: readonly PacePoint[], coins: number): number =>
   curve.find((point) => point.coins === coins)?.stage ?? 0;
 
 function window(coins: number, from: number, to: number) {
-  return (curve: readonly PacePoint[]) => {
-    const stage = stageAt(curve, coins);
+  return ({ steady }: PaceContext) => {
+    const stage = stageAt(steady, coins);
 
     return {
       passed: stage >= from && stage <= to,
@@ -71,8 +77,8 @@ export const PACE_RULES: readonly PaceRule[] = [
     statement: 'Ten times more burned tokens late in the game still buy at least 35 stages.',
     why: 'Each stage may cost a little more than the last, never so much that progress stops.',
     threshold: 35,
-    judge(curve) {
-      const gained = stageAt(curve, 3.6e10) - stageAt(curve, 3.6e9);
+    judge({ steady }) {
+      const gained = stageAt(steady, 3.6e10) - stageAt(steady, 3.6e9);
 
       return {
         passed: gained >= this.threshold,
@@ -86,7 +92,7 @@ export const PACE_RULES: readonly PaceRule[] = [
     statement: 'Every hero is worth at least 5% more per coin than the hero before it.',
     why: 'A hero the player waits weeks to unlock has to be worth the wait.',
     threshold: 1.05,
-    judge(_curve, roster) {
+    judge({ roster }) {
       const steps = roster.heroes.slice(1).map((hero, index) => {
         const before = roster.heroes[index] ?? hero;
         const coins = Math.max(UPGRADE_BUDGET, hero.hireCost * HIRE_TO_BUDGET);

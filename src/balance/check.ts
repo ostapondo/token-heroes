@@ -1,7 +1,9 @@
 import { partyVitals, type PartyState, type Roster } from '@engine';
 import { compact } from './numbers';
 import { PACE_COINS, paceCurve, partyFor, type PacePoint } from './pace';
+import { greedyPartyFor } from './greedy';
 import { PACE_RULES } from './pace-rules';
+import { PLAY_RULES } from './play-rules';
 import { judge, type Finding } from './rules';
 import { heroSheet, stageSheet, type StageSheet } from './sheets';
 import { runParty, type RunOptions, type RunReport } from './simulate';
@@ -27,26 +29,31 @@ export interface Verdict {
 export interface BalanceReport {
   readonly passed: number;
   readonly failed: number;
-  readonly pace: { readonly curve: readonly PacePoint[]; readonly findings: readonly Finding[] };
+  readonly pace: {
+    readonly steady: readonly PacePoint[];
+    readonly greedy: readonly PacePoint[];
+    readonly findings: readonly Finding[];
+  };
   readonly verdicts: readonly Verdict[];
 }
 
 function judgePace(roster: Roster): BalanceReport['pace'] {
-  const curve = paceCurve(roster);
-  const findings = PACE_RULES.map((rule) => ({
+  const steady = paceCurve(roster);
+  const greedy = paceCurve(roster, greedyPartyFor);
+  const findings = [...PACE_RULES, ...PLAY_RULES].map((rule) => ({
     rule: rule.id,
     threshold: rule.threshold,
-    ...rule.judge(curve, roster),
+    ...rule.judge({ roster, steady, greedy }),
   }));
 
-  return { curve, findings };
+  return { steady, greedy, findings };
 }
 
 // The parties a player owns after the burns the pace rules name, so a new hero or a new price
 // changes the parties that are judged.
 export function standardScenarios(roster: Roster): Scenario[] {
   return PACE_COINS.map((coins) => {
-    const { party } = partyFor(roster, coins);
+    const party = partyFor(roster, coins);
 
     return { name: `party after ${compact(coins)} burned tokens`, party: party.heroes };
   });
