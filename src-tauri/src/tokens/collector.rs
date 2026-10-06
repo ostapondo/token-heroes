@@ -5,6 +5,7 @@ use std::path::Path;
 use super::discovery;
 use super::memory::{FileCursor, LineMemory, Reading};
 use super::source::TokenSource;
+use super::store::{StoreSource, read_store};
 use crate::support::logging;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -24,19 +25,35 @@ impl Batch {
 
 pub struct Collector {
     sources: Vec<Box<dyn TokenSource>>,
+    stores: Vec<Box<dyn StoreSource>>,
 }
 
 impl Collector {
     pub fn new(sources: Vec<Box<dyn TokenSource>>) -> Self {
-        Self { sources }
+        Self {
+            sources,
+            stores: Vec::new(),
+        }
+    }
+
+    pub fn with_stores(self, stores: Vec<Box<dyn StoreSource>>) -> Self {
+        Self { stores, ..self }
     }
 
     pub fn roots(&self) -> impl Iterator<Item = &Path> {
-        self.sources.iter().map(|source| source.root())
+        self.sources
+            .iter()
+            .map(|source| source.root())
+            .chain(self.stores.iter().map(|store| store.root()))
     }
 
     pub fn scan(&self, reading: &mut Reading, now: u64) -> Batch {
-        let forgotten = self.forget_deleted(reading);
+        let forgotten = self
+            .stores
+            .iter()
+            .fold(self.forget_deleted(reading), |batch, store| {
+                batch.and(read_store(store.as_ref(), reading, now))
+            });
 
         self.sources
             .iter()
@@ -51,6 +68,13 @@ impl Collector {
     }
 
     pub fn read(&self, path: &Path, reading: &mut Reading, now: u64) -> Batch {
+        if let Some(store) = self
+            .stores
+            .iter()
+            .find(|store| path.starts_with(store.root()))
+        {
+            return read_store(store.as_ref(), reading, now);
+        }
         if !discovery::is_transcript(path) {
             return Batch::default();
         }
@@ -63,7 +87,12 @@ impl Collector {
     // A root that is missing may only be unmounted; forgetting its cursors would credit its
     // whole history again when it comes back.
     fn forget_deleted(&self, reading: &mut Reading) -> Batch {
-        let present: Vec<&Path> = self.roots().filter(|root| root.exists()).collect();
+        let present: Vec<&Path> = self
+            .sources
+            .iter()
+            .map(|source| source.root())
+            .filter(|root| root.exists())
+            .collect();
         let before = reading.files.len();
 
         reading
@@ -91,7 +120,7 @@ fn read_appended(
     now: u64,
 ) -> io::Result<Batch> {
     let length = fs::metadata(path)?.len();
-    let Reading { files, seen } = reading;
+    let Reading { files, seen, .. } = reading;
     let cursor = files.entry(path.to_path_buf()).or_default();
     let started_at = cursor.offset;
 

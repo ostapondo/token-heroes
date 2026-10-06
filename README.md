@@ -34,10 +34,11 @@ one coin per token. You spend those coins on levels and hires.
 
 The fight never pays you. When the party is stuck on a boss, the answer is to ship more work.
 
-| Agent       | Where it reads                                        | What counts as burned                          |
-| ----------- | ----------------------------------------------------- | ---------------------------------------------- |
-| Claude Code | `~/.claude/projects/**/*.jsonl` (`CLAUDE_CONFIG_DIR`) | input + output + cache writes, not cache reads |
-| Codex       | `~/.codex/sessions/**/*.jsonl` (`CODEX_HOME`)         | input − cached input + output                  |
+| Agent       | Where it reads                                          | What counts as burned                                      |
+| ----------- | ------------------------------------------------------- | ---------------------------------------------------------- |
+| Claude Code | `~/.claude/projects/**/*.jsonl` (`CLAUDE_CONFIG_DIR`)   | input + output + cache writes, not cache reads             |
+| Codex       | `~/.codex/sessions/**/*.jsonl` (`CODEX_HOME`)           | input − cached input + output                              |
+| OpenCode    | `~/.local/share/opencode/opencode.db` (`XDG_DATA_HOME`) | input + output + reasoning + cache writes, not cache reads |
 
 > [!TIP]
 > On the first launch the host reads the transcripts already on your disk, so your existing history

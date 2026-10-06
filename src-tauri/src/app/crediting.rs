@@ -14,6 +14,7 @@ use crate::tokens::claude::ClaudeCode;
 use crate::tokens::codex::Codex;
 use crate::tokens::collector::{Batch, Collector};
 use crate::tokens::memory::Reading;
+use crate::tokens::opencode::OpenCode;
 
 const CREDIT_EVERY: Duration = Duration::from_secs(1);
 const RESCAN_WITH_EVENTS: Duration = Duration::from_secs(300);
@@ -48,7 +49,8 @@ fn run(app: &AppHandle) {
     let collector = Collector::new(vec![
         Box::new(ClaudeCode::new(paths.claude_projects.clone())),
         Box::new(Codex::new(paths.codex_sessions.clone())),
-    ]);
+    ])
+    .with_stores(vec![Box::new(OpenCode::new(paths.opencode_data.clone()))]);
     let (sender, changed) = mpsc::channel();
     let watcher = subscribe(&collector, sender);
     let mut crediting = Crediting {

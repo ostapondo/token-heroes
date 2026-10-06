@@ -54,12 +54,23 @@ impl SeenMessages {
     }
 }
 
+// How far a database-backed source has been read: the newest update counted and what each
+// recently updated message has been credited, since such a message grows while it streams.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct StoreCursor {
+    pub watermark: i64,
+    #[serde(default)]
+    pub seen: SeenMessages,
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Reading {
     #[serde(default)]
     pub files: HashMap<PathBuf, FileCursor>,
     #[serde(default)]
     pub seen: SeenMessages,
+    #[serde(default)]
+    pub stores: HashMap<String, StoreCursor>,
 }
 
 pub struct LineMemory<'reading> {
