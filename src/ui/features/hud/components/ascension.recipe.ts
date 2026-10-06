@@ -1,10 +1,22 @@
 import { sva } from '@styled/css';
 
 export const ascensionRecipe = sva({
-  slots: ['root', 'power', 'open', 'dialog', 'title', 'body', 'change', 'actions'],
+  slots: [
+    'root',
+    'power',
+    'next',
+    'open',
+    'dialog',
+    'title',
+    'body',
+    'warning',
+    'change',
+    'actions',
+  ],
   base: {
     root: { display: 'flex', alignItems: 'center', gap: '2' },
     power: { textStyle: 'caption', color: 'ultimate' },
+    next: { textStyle: 'caption', color: 'textMuted' },
     open: {
       paddingInline: '2',
       paddingBlock: '0.5',
@@ -27,6 +39,7 @@ export const ascensionRecipe = sva({
     },
     title: { margin: 0, textStyle: 'title' },
     body: { marginBlock: '2', textStyle: 'body', color: 'textMuted' },
+    warning: { marginBlock: '2', textStyle: 'small', color: 'wound' },
     change: { textStyle: 'heading', color: 'ultimate' },
     actions: { display: 'flex', justifyContent: 'flex-end', gap: '2', marginTop: '3' },
   },

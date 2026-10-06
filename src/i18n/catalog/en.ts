@@ -45,8 +45,10 @@ export const en = {
 
   'ascend.button': 'Ascend',
   'ascend.power': 'Power {power}',
+  'ascend.next': 'next at stage {stage}',
   'ascend.title': 'Ascend?',
-  'ascend.body': 'The party returns to stage 1 and keeps every hero, level and coin.',
+  'ascend.body': 'Every hero returns to level 1, the party to stage 1. Heroes and coins stay.',
+  'ascend.warning': 'Levels bought with tokens are not refunded.',
   'ascend.change': 'Power {from} → {to}',
   'ascend.confirm': 'Ascend',
   'ascend.cancel': 'Not yet',
@@ -61,7 +63,7 @@ export const en = {
   'notice.notEnoughCoins': 'Not enough coins. Burn more tokens.',
   'notice.hostUnavailable': 'Could not reach the coin ledger. Try again.',
   'notice.saveFailed': 'Progress could not be saved. Retrying soon.',
-  'notice.ascended': 'Ascended. Your heroes fight with power {power}.',
+  'notice.ascended': 'Ascended. Your heroes start again at level 1 with power {power}.',
   'notice.away.one': 'While you were away the party cleared {count} stage.',
   'notice.away.other': 'While you were away the party cleared {count} stages.',
 } as const;

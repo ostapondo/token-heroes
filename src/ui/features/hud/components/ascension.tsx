@@ -24,6 +24,9 @@ export function Ascension() {
           {t('ascend.power', { power: formatPower(offer.power) })}
         </span>
       )}
+      {offer.power > 1 && !offer.available && (
+        <span className={classes.next}>{t('ascend.next', { stage: offer.nextStage })}</span>
+      )}
       {offer.available && (
         <button type="button" className={classes.open} onClick={() => dialog.current?.showModal()}>
           {t('ascend.button')}
@@ -34,6 +37,7 @@ export function Ascension() {
           {t('ascend.title')}
         </h2>
         <p className={classes.body}>{t('ascend.body')}</p>
+        <p className={classes.warning}>{t('ascend.warning')}</p>
         <p className={classes.change}>
           {t('ascend.change', {
             from: formatPower(offer.power),
