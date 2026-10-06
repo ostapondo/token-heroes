@@ -1,7 +1,7 @@
 import { sva } from '@styled/css';
 
 export const ultimateBarRecipe = sva({
-  slots: ['root', 'gauge', 'caption'],
+  slots: ['root', 'gauge', 'caption', 'hint', 'strike'],
   base: {
     root: {
       display: 'flex',
@@ -17,5 +17,7 @@ export const ultimateBarRecipe = sva({
       textStyle: 'small',
       color: 'textMuted',
     },
+    hint: { display: 'flex', gap: '1' },
+    strike: { color: 'strike' },
   },
 });

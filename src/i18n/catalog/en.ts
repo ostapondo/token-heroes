@@ -16,7 +16,7 @@ export const en = {
   'wipe.title': 'PARTY WIPED',
   'wipe.kept': 'Levels and coins are kept. Back in',
 
-  'ultimate.hint': 'Tap the arena to strike',
+  'ultimate.hint': 'Tap the arena to strike for',
   'ultimate.charge': 'Ultimate {percent}%',
   'ultimate.chargeLabel': 'Ultimate charge',
   'ultimate.button': 'ULT',

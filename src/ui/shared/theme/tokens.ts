@@ -15,6 +15,7 @@ export const tokens = defineTokens({
     ultimateShade: { value: '#4f8fb8' },
     ultimateInk: { value: '#08131c' },
     heal: { value: '#7cc35b' },
+    strike: { value: '#6fe3ff' },
     wound: { value: '#ff5b4a' },
     void: { value: '#000000' },
   },

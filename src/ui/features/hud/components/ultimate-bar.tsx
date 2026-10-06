@@ -1,6 +1,8 @@
+import { strikeDamage } from '@engine';
 import { t } from '@i18n';
+import { compactNumber } from '@render';
 import { pixelButton } from '@styled/recipes';
-import { selectUltimatePercent, useGame, useSession } from '../../../entities/game';
+import { selectParty, selectUltimatePercent, useGame, useSession } from '../../../entities/game';
 import { Meter } from '../../../shared/ui';
 import { ultimateBarRecipe } from './ultimate-bar.recipe';
 
@@ -9,6 +11,8 @@ const FULL_CHARGE = 100;
 export function UltimateBar() {
   const session = useSession();
   const percent = useGame(selectUltimatePercent);
+  const party = useGame(selectParty);
+  const damage = party ? compactNumber(strikeDamage(party, session.roster)) : null;
   const ready = percent >= FULL_CHARGE;
   const classes = ultimateBarRecipe();
 
@@ -16,7 +20,10 @@ export function UltimateBar() {
     <div className={classes.root}>
       <div className={classes.gauge}>
         <div className={classes.caption}>
-          <span>{t('ultimate.hint')}</span>
+          <span className={classes.hint}>
+            {t('ultimate.hint')}
+            {damage && <span className={classes.strike}>{damage}</span>}
+          </span>
           <span>{t('ultimate.charge', { percent })}</span>
         </div>
         <Meter
