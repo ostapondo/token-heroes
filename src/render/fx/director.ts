@@ -165,7 +165,9 @@ export class Director {
   }
 
   #partyHit(event: EventOf<typeof BattleEventType.PartyHit>, stage: Stage): Reaction {
-    stage.foes[event.foe]?.motion.cue(MotionCue.Lunge);
+    const attacker = stage.foes[event.foe];
+
+    attacker?.motion.cue(attacker.boss ? MotionCue.Lunge : MotionCue.Hop);
     for (const hero of stage.heroes) hero.motion.cue(MotionCue.Hurt);
     const target = stage.heroes[0];
     const wound = target

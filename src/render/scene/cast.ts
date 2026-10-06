@@ -17,10 +17,12 @@ import { Motion } from './motion';
 
 export interface Actor {
   readonly id: string;
+  readonly boss: boolean;
   readonly key: string;
   readonly sprite: SpriteDef;
   readonly palette: Palette | undefined;
   readonly box: Box;
+  readonly pixel: number;
   readonly motion: Motion;
 }
 
@@ -81,10 +83,12 @@ export class Cast {
 
     return {
       id: heroId,
+      boss: false,
       key: `hero:${heroId}`,
       sprite,
       palette: undefined,
       box: partySlot(index, scaled(sprite, SPRITE_SCALE.hero)),
+      pixel: SPRITE_SCALE.hero,
       motion: this.hero(heroId)?.motion ?? new Motion(),
     };
   }
@@ -95,10 +99,12 @@ export class Cast {
 
     return {
       id: bossId,
+      boss: true,
       key: `boss:${boss.creature}:${element.id}`,
       sprite,
       palette: element.palette,
       box: bossSlot(scaled(sprite, SPRITE_SCALE.boss)),
+      pixel: SPRITE_SCALE.boss,
       motion: new Motion(),
     };
   }
@@ -108,10 +114,12 @@ export class Cast {
 
     return {
       id: enemyId,
+      boss: false,
       key: `enemy:${enemyId}:${element.id}`,
       sprite,
       palette: element.palette,
       box: packSlot(index, scaled(sprite, SPRITE_SCALE.enemy)),
+      pixel: SPRITE_SCALE.enemy,
       motion: new Motion(),
     };
   }

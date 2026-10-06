@@ -2,6 +2,7 @@ export const MotionCue = {
   Flash: 'flash',
   Dash: 'dash',
   Lunge: 'lunge',
+  Hop: 'hop',
   Hurt: 'hurt',
   Dying: 'dying',
   Entering: 'entering',
@@ -13,13 +14,14 @@ const DURATION: Readonly<Record<MotionCue, number>> = {
   [MotionCue.Flash]: 0.32,
   [MotionCue.Dash]: 0.45,
   [MotionCue.Lunge]: 0.5,
+  [MotionCue.Hop]: 0.3,
   [MotionCue.Hurt]: 0.5,
   [MotionCue.Dying]: 1.2,
   [MotionCue.Entering]: 0.5,
   [MotionCue.Glow]: 0.6,
 };
 
-const REACH = { dash: 64, lunge: 70, knockback: 5, enterDrop: 120 } as const;
+const REACH = { dash: 64, lunge: 70, hop: 8, knockback: 5, enterDrop: 120 } as const;
 const BOB_PERIOD = 1;
 const SWING_PEAK = 0.4;
 
@@ -43,7 +45,8 @@ export class Motion {
     const bob = Math.floor((this.#time % BOB_PERIOD) * 2) === 0 ? 0 : -1;
     const x =
       (this.#swing(MotionCue.Dash) * REACH.dash +
-        this.#swing(MotionCue.Lunge) * REACH.lunge -
+        this.#swing(MotionCue.Lunge) * REACH.lunge +
+        this.#swing(MotionCue.Hop) * REACH.hop -
         this.#fraction(MotionCue.Flash) * REACH.knockback) *
       facing;
     const y = bob - this.#fraction(MotionCue.Entering) * REACH.enterDrop;

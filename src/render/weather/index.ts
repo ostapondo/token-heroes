@@ -34,4 +34,4 @@ export function createWeather(def: WeatherDef): Weather {
   }
 }
 
-export { WeatherLayer, type Weather, type WeatherScene } from './weather';
+export { WeatherLayer, type Weather } from './weather';

@@ -18,5 +18,3 @@ export const center = (box: Box): Point => ({
   x: box.x + box.width / 2,
   y: box.y + box.height / 2,
 });
-
-export const feet = (box: Box): Point => ({ x: box.x + box.width / 2, y: box.y + box.height });

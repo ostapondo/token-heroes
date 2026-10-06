@@ -1,7 +1,7 @@
 import type { ElementDef } from '@content';
 import { BattlePhase, type BattleState } from '@engine';
 import { FX_COLOR } from '../fx/colors';
-import type { SpriteCache } from '../sprites/sprite-cache';
+import { SPRITE_OUTLINE, type SpriteCache } from '../sprites/sprite-cache';
 import type { Actor } from './cast';
 import { ARENA, floorTop } from './geometry';
 
@@ -38,14 +38,18 @@ function paintActor(
     ? sprites.silhouette(actor.key, actor.sprite, tint, actor.palette)
     : sprites.get(actor.key, actor.sprite, actor.palette);
   const offset = actor.motion.offset(facing);
-  const { x, y, width, height } = actor.box;
+  const border = SPRITE_OUTLINE * actor.pixel;
+  const x = actor.box.x - border;
+  const y = actor.box.y - border;
+  const width = actor.box.width + border * 2;
+  const height = actor.box.height + border * 2;
 
   context.save();
   context.globalAlpha = fallen ? FALLEN_ALPHA : actor.motion.fade;
   if (fallen) {
     context.translate(x + width / 2, y + height);
     context.rotate(-Math.PI / 2);
-    context.drawImage(bitmap, -height, -width / 2, width, height);
+    context.drawImage(bitmap, 0, -height / 2, width, height);
   } else {
     context.drawImage(bitmap, x + offset.x, y + offset.y, width, height);
   }
