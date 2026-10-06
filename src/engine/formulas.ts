@@ -32,6 +32,10 @@ export function heroDamage(hero: HeroStats, level: number): number {
   return safeAmount(hero.baseDamage * level * milestoneBonus(level));
 }
 
+export function heroHeal(hero: HeroStats, level: number): number {
+  return safeAmount(heroDamage(hero, level) * BALANCE.healerShare);
+}
+
 export function heroHp(hero: HeroStats, level: number): number {
   return safeAmount(hero.baseHp * level * milestoneBonus(level));
 }

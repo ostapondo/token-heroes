@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { foeDamage, foeHp, heroDamage, heroHp, levelCost, levelsToMilestone } from './formulas';
+import { BALANCE } from './balance';
+import {
+  foeDamage,
+  foeHp,
+  heroDamage,
+  heroHeal,
+  heroHp,
+  levelCost,
+  levelsToMilestone,
+} from './formulas';
 import { heroById } from './roster';
 import { testRoster } from './testing';
 
@@ -10,6 +19,10 @@ describe('hero growth', () => {
     expect(heroDamage(knight, 24)).toBe(knight.baseDamage * 24);
     expect(heroDamage(knight, 25)).toBe(knight.baseDamage * 25 * 2);
     expect(heroDamage(knight, 50)).toBe(knight.baseDamage * 50 * 4);
+  });
+
+  it('heals for a share of the damage the hero would deal', () => {
+    expect(heroHeal(knight, 10)).toBe(Math.ceil(heroDamage(knight, 10) * BALANCE.healerShare));
   });
 
   it('counts the levels left to the next doubling', () => {

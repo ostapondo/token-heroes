@@ -1,5 +1,5 @@
 import { BALANCE } from '../balance';
-import { heroDamage, safeAmount } from '../formulas';
+import { heroDamage, heroHeal, safeAmount } from '../formulas';
 import { partyMaxHp } from '../party';
 import { nextRandom } from '../random';
 import { heroById } from '../roster';
@@ -84,10 +84,8 @@ function heroesAct(
     let cooldown = (draft.cooldowns[hero.id] ?? 0) - dt;
 
     while (cooldown <= 0 && frontFoe(draft) !== -1) {
-      const power = heroDamage(hero, slot.level);
-
       if (hero.role === HeroRole.Healer) {
-        const amount = safeAmount(power * BALANCE.healerShare);
+        const amount = heroHeal(hero, slot.level);
 
         draft.partyHp = Math.min(maxHp, draft.partyHp + amount);
         events.push({ type: BattleEventType.Heal, source: hero.id, amount });
@@ -95,6 +93,7 @@ function heroesAct(
         const [roll, seed] = nextRandom(draft.seed);
 
         draft.seed = seed;
+        const power = heroDamage(hero, slot.level);
         const crit = roll < BALANCE.critChance;
         const amount = crit ? safeAmount(power * BALANCE.critMultiplier) : power;
 
