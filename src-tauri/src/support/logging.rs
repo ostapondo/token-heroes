@@ -2,7 +2,8 @@ use std::fs::{self, OpenOptions};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock, PoisonError};
-use std::time::{SystemTime, UNIX_EPOCH};
+
+use super::clock;
 
 const FILE_NAME: &str = "token-heroes.log";
 const MAX_BYTES: u64 = 1024 * 1024;
@@ -54,9 +55,7 @@ pub fn error(message: &str) {
 pub fn write(level: Level, message: &str) {
     let Some(file) = LOG_FILE.get() else { return };
     let path = file.lock().unwrap_or_else(PoisonError::into_inner);
-    let seconds = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_or(0, |since| since.as_secs());
+    let seconds = clock::unix_seconds();
     let text: String = message.chars().take(MAX_MESSAGE_CHARS).collect();
 
     rotate(&path);
