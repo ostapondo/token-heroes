@@ -1,3 +1,8 @@
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::thread;
+use std::time::Duration;
+
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder, WindowEvent};
 
 use crate::state::AppState;
@@ -8,6 +13,7 @@ use crate::support::logging;
 
 pub const GAME_WINDOW: &str = "game";
 const SIZE: (f64, f64) = (400.0, 680.0);
+const REFOCUS_GRACE: Duration = Duration::from_millis(150);
 
 pub fn toggle(app: &AppHandle) {
     match app.get_webview_window(GAME_WINDOW) {
@@ -38,23 +44,33 @@ pub fn show(app: &AppHandle) {
             {
                 logging::warn(&format!("could not place the game window: {problem}"));
             }
-            let closer = window.clone();
+            let app = app.clone();
+            let focused = Arc::new(AtomicBool::new(false));
 
             window.on_window_event(move |event| {
-                let closes_on_blur = closer
-                    .app_handle()
-                    .state::<AppState>()
-                    .settings()
-                    .close_on_blur;
-
-                if closes_on_blur && matches!(event, WindowEvent::Focused(false)) {
-                    close(&closer);
+                if let WindowEvent::Focused(now) = event {
+                    focused.store(*now, Ordering::Relaxed);
+                    if !now && app.state::<AppState>().settings().close_on_blur {
+                        close_unless_refocused(app.clone(), Arc::clone(&focused));
+                    }
                 }
             });
             focus(&window);
         }
         Err(problem) => logging::error(&format!("could not open the game window: {problem}")),
     }
+}
+
+fn close_unless_refocused(app: AppHandle, focused: Arc<AtomicBool>) {
+    thread::spawn(move || {
+        thread::sleep(REFOCUS_GRACE);
+        if focused.load(Ordering::Relaxed) {
+            return;
+        }
+        if let Some(window) = app.get_webview_window(GAME_WINDOW) {
+            close(&window);
+        }
+    });
 }
 
 fn focus(window: &WebviewWindow) {
