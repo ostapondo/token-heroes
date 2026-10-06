@@ -10,13 +10,18 @@ export interface AscensionOffer {
   readonly nextPower: number;
 }
 
-// The party may ascend once it has gone a few stages deeper than the last time it did.
+export function nextAscensionStage(renown: number): number {
+  const { minStage, depthStep } = BALANCE.ascension;
+
+  return Math.max(minStage, Math.ceil(renown * depthStep));
+}
+
+// The party may ascend once it is a quarter deeper than where it last ascended.
 export function ascensionOffer(save: GameSave): AscensionOffer {
-  const { minStage, minGain } = BALANCE.ascension;
   const renown = save.party.renown ?? 0;
 
   return {
-    available: save.bestStage >= minStage && save.bestStage >= renown + minGain,
+    available: save.bestStage >= nextAscensionStage(renown),
     power: renownPower(renown),
     nextPower: renownPower(Math.max(renown, save.bestStage)),
   };

@@ -48,13 +48,13 @@ export const BALANCE = {
   // The share of the party's health a first-rank healer restores each second at the party's
   // level. A healer heals in proportion to its level against the party's, up to the cap, so a
   // neglected healer cannot keep healing for free.
-  healShare: 0.02,
+  healShare: 0.0045,
   healLevelFactor: { min: 0, max: 1.5 },
 
-  // Ascending sends the party back to stage 1 for good: its heroes grow by the deepest stage
-  // reached, as a power of it. A power law grows slower than the foes, so ascending again and
-  // again without new tokens converges instead of carrying the party on forever.
-  ascension: { minStage: 60, minGain: 5, baseStage: 50, exponent: 1 },
+  // Ascending sends the party back to stage 1: its heroes grow by the deepest stage reached over
+  // the base stage. The first ascension opens at minStage and each next one a quarter deeper than
+  // the last, which costs months of tokens, so ascending stays a rare event, not a routine.
+  ascension: { minStage: 100, depthStep: 1.25, baseStage: 50, exponent: 1 },
 
   offlineCapSeconds: 8 * 60 * 60,
   offlineStepSeconds: 1,
