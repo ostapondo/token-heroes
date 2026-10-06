@@ -3,18 +3,26 @@
     reason = "Tauri hands every command argument over by value"
 )]
 
+use serde::Serialize;
 use serde_json::Value;
 use tauri::{AppHandle, State};
 
-use crate::app::state::AppState;
 use crate::economy::ledger::Wallet;
 use crate::persistence::storage;
 use crate::shell::tray;
+use crate::state::AppState;
 use crate::support::logging::{self, Level};
 
-const INSUFFICIENT_COINS: &str = "insufficient-coins";
-const SAVE_TOO_LARGE: &str = "save-too-large";
 const SAVE_LIMIT_BYTES: usize = 1024 * 1024;
+
+#[derive(Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum CommandError {
+    InsufficientCoins,
+    SaveTooLarge,
+    SaveUnreadable,
+    SaveNotWritten,
+}
 
 #[tauri::command]
 pub fn wallet(state: State<'_, AppState>) -> Wallet {
@@ -22,10 +30,14 @@ pub fn wallet(state: State<'_, AppState>) -> Wallet {
 }
 
 #[tauri::command]
-pub fn spend(app: AppHandle, state: State<'_, AppState>, amount: u64) -> Result<Wallet, String> {
+pub fn spend(
+    app: AppHandle,
+    state: State<'_, AppState>,
+    amount: u64,
+) -> Result<Wallet, CommandError> {
     let wallet = state
         .spend(amount)
-        .map_err(|_| INSUFFICIENT_COINS.to_owned())?;
+        .map_err(|_| CommandError::InsufficientCoins)?;
 
     tray::refresh_balance(&app);
 
@@ -38,14 +50,14 @@ pub fn load_save(state: State<'_, AppState>) -> Option<String> {
 }
 
 #[tauri::command]
-pub fn write_save(state: State<'_, AppState>, save: &str) -> Result<(), String> {
+pub fn write_save(state: State<'_, AppState>, save: &str) -> Result<(), CommandError> {
     if save.len() > SAVE_LIMIT_BYTES {
-        return Err(SAVE_TOO_LARGE.to_owned());
+        return Err(CommandError::SaveTooLarge);
     }
-    serde_json::from_str::<Value>(save).map_err(|problem| problem.to_string())?;
+    serde_json::from_str::<Value>(save).map_err(|_| CommandError::SaveUnreadable)?;
     storage::write_atomic(&state.paths.save(), save.as_bytes()).map_err(|problem| {
         logging::error(&format!("could not write the save: {problem}"));
-        problem.to_string()
+        CommandError::SaveNotWritten
     })
 }
 
@@ -58,4 +70,18 @@ pub fn log(level: &str, message: &str) {
     };
 
     logging::write(level, &format!("ui: {message}"));
+}
+
+#[cfg(test)]
+mod tests {
+    use super::CommandError;
+
+    #[test]
+    fn sends_errors_as_the_strings_the_window_expects() -> Result<(), serde_json::Error> {
+        assert_eq!(
+            serde_json::to_string(&CommandError::InsufficientCoins)?,
+            r#""insufficient-coins""#
+        );
+        Ok(())
+    }
 }

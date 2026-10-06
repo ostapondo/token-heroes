@@ -4,8 +4,8 @@ use tauri::{AppHandle, Manager};
 
 use super::copy;
 use super::tray_menu;
-use crate::app::state::AppState;
 use crate::shell::window;
+use crate::state::AppState;
 use crate::support::format;
 use crate::support::logging;
 

@@ -3,6 +3,7 @@ mod economy;
 mod persistence;
 mod preferences;
 mod shell;
+mod state;
 mod support;
 mod tokens;
 
@@ -33,7 +34,7 @@ pub fn run() {
         .build(tauri::generate_context!());
 
     match built {
-        Ok(app) => app.run(setup::keep_running_in_tray),
+        Ok(app) => app.run(setup::on_run_event),
         Err(problem) => logging::error(&format!("Token Heroes could not start: {problem}")),
     }
 }

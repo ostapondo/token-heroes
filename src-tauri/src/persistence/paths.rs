@@ -39,7 +39,7 @@ impl Paths {
         self.data.join("settings.json")
     }
 
-    pub fn cursors(&self) -> PathBuf {
+    pub fn legacy_cursors(&self) -> PathBuf {
         self.data.join("sources.json")
     }
 }

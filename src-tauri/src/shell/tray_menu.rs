@@ -4,8 +4,8 @@ use tauri_plugin_autostart::ManagerExt;
 
 use super::copy;
 use super::tray;
-use crate::app::state::AppState;
 use crate::shell::window;
+use crate::state::AppState;
 use crate::support::logging;
 
 mod item {

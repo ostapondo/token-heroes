@@ -1,6 +1,6 @@
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder, WindowEvent};
 
-use crate::app::state::AppState;
+use crate::state::AppState;
 use tauri_plugin_positioner::{Position, WindowExt};
 
 use super::copy;

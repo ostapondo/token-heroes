@@ -2,11 +2,11 @@ use std::error::Error;
 
 use tauri::{App, AppHandle, Manager, RunEvent};
 
-use crate::app::state::AppState;
+use super::crediting;
 use crate::persistence::paths::Paths;
 use crate::shell::tray;
+use crate::state::AppState;
 use crate::support::logging;
-use crate::tokens::watcher;
 
 pub fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     #[cfg(target_os = "macos")]
@@ -18,16 +18,21 @@ pub fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     logging::info("Token Heroes started");
     app.manage(AppState::load(paths));
     tray::create(app.handle())?;
-    watcher::start(app.handle().clone());
+    crediting::start(app.handle().clone());
 
     Ok(())
 }
 
-pub fn keep_running_in_tray(_app: &AppHandle, event: RunEvent) {
-    if let RunEvent::ExitRequested {
-        code: None, api, ..
-    } = event
-    {
-        api.prevent_exit();
+pub fn on_run_event(app: &AppHandle, event: RunEvent) {
+    match event {
+        RunEvent::ExitRequested {
+            code: None, api, ..
+        } => api.prevent_exit(),
+        RunEvent::Exit => {
+            if let Some(state) = app.try_state::<AppState>() {
+                state.save();
+            }
+        }
+        _ => {}
     }
 }

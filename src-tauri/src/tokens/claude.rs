@@ -2,7 +2,8 @@ use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
 
-use super::source::{FileMemory, TokenSource};
+use super::memory::LineMemory;
+use super::source::TokenSource;
 
 const USAGE_MARKER: &str = "\"usage\"";
 
@@ -42,7 +43,7 @@ impl TokenSource for ClaudeCode {
         &self.root
     }
 
-    fn tokens_in(&self, line: &str, memory: &mut FileMemory) -> Result<u64, serde_json::Error> {
+    fn tokens_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<u64, serde_json::Error> {
         if !line.contains(USAGE_MARKER) {
             return Ok(0);
         }
@@ -54,21 +55,20 @@ impl TokenSource for ClaudeCode {
         else {
             return Ok(0);
         };
-        if id.is_some_and(|id| !memory.first_sighting(&id)) {
-            return Ok(0);
-        }
-
-        Ok(usage
+        let tokens = usage
             .input
             .saturating_add(usage.output)
-            .saturating_add(usage.cache_writes))
+            .saturating_add(usage.cache_writes);
+
+        Ok(id.map_or(tokens, |id| memory.message_growth(&id, tokens)))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::ClaudeCode;
-    use crate::tokens::source::{FileMemory, TokenSource};
+    use crate::tokens::source::TokenSource;
+    use crate::tokens::testing::Memory;
     use std::path::PathBuf;
 
     const ANSWER: &str = r#"{"type":"assistant","message":{"id":"msg_1","usage":{"input_tokens":2,"cache_creation_input_tokens":20329,"cache_read_input_tokens":26639,"output_tokens":865}}}"#;
@@ -78,7 +78,7 @@ mod tests {
         let source = ClaudeCode::new(PathBuf::new());
 
         assert_eq!(
-            source.tokens_in(ANSWER, &mut FileMemory::default())?,
+            source.tokens_in(ANSWER, &mut Memory::default().at(0))?,
             2 + 20_329 + 865
         );
         Ok(())
@@ -87,22 +87,39 @@ mod tests {
     #[test]
     fn counts_a_streamed_message_once() -> Result<(), serde_json::Error> {
         let source = ClaudeCode::new(PathBuf::new());
-        let mut memory = FileMemory::default();
+        let mut memory = Memory::default();
 
-        assert!(source.tokens_in(ANSWER, &mut memory)? > 0);
-        assert_eq!(source.tokens_in(ANSWER, &mut memory)?, 0);
+        assert!(source.tokens_in(ANSWER, &mut memory.at(0))? > 0);
+        assert_eq!(source.tokens_in(ANSWER, &mut memory.at(1))?, 0);
+        Ok(())
+    }
+
+    #[test]
+    fn counts_the_final_usage_of_a_streamed_message() -> Result<(), serde_json::Error> {
+        let source = ClaudeCode::new(PathBuf::new());
+        let mut memory = Memory::default();
+        let longer = ANSWER.replace(r#""output_tokens":865"#, r#""output_tokens":1000"#);
+
+        assert_eq!(source.tokens_in(ANSWER, &mut memory.at(0))?, 21_196);
+        assert_eq!(source.tokens_in(&longer, &mut memory.at(0))?, 135);
         Ok(())
     }
 
     #[test]
     fn ignores_lines_without_usage_and_rejects_broken_json() {
         let source = ClaudeCode::new(PathBuf::new());
-        let mut memory = FileMemory::default();
+        let mut memory = Memory::default();
 
         assert_eq!(
-            source.tokens_in(r#"{"type":"user"}"#, &mut memory).ok(),
+            source
+                .tokens_in(r#"{"type":"user"}"#, &mut memory.at(0))
+                .ok(),
             Some(0)
         );
-        assert!(source.tokens_in(r#"{"usage": "#, &mut memory).is_err());
+        assert!(
+            source
+                .tokens_in(r#"{"usage": "#, &mut memory.at(0))
+                .is_err()
+        );
     }
 }

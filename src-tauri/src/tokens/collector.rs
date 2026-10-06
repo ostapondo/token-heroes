@@ -1,199 +1,145 @@
-use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Seek, SeekFrom};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
-use super::source::{FileMemory, TokenSource};
+use super::discovery;
+use super::memory::{FileCursor, LineMemory, Reading};
+use super::source::TokenSource;
 use crate::support::logging;
 
-const TRANSCRIPT_EXTENSION: &str = "jsonl";
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Batch {
+    pub tokens: u64,
+    pub advanced: bool,
+}
 
-pub type Cursors = HashMap<PathBuf, FileMemory>;
+impl Batch {
+    pub const fn and(self, other: Self) -> Self {
+        Self {
+            tokens: self.tokens.saturating_add(other.tokens),
+            advanced: self.advanced || other.advanced,
+        }
+    }
+}
 
 pub struct Collector {
     sources: Vec<Box<dyn TokenSource>>,
-    cursors: Cursors,
-    dirty: bool,
 }
 
 impl Collector {
-    pub fn new(sources: Vec<Box<dyn TokenSource>>, cursors: Cursors) -> Self {
-        Self {
-            sources,
-            cursors,
-            dirty: false,
-        }
+    pub fn new(sources: Vec<Box<dyn TokenSource>>) -> Self {
+        Self { sources }
     }
 
     pub fn roots(&self) -> impl Iterator<Item = &Path> {
         self.sources.iter().map(|source| source.root())
     }
 
-    pub const fn cursors(&self) -> &Cursors {
-        &self.cursors
-    }
+    pub fn scan(&self, reading: &mut Reading, now: u64) -> Batch {
+        let forgotten = self.forget_deleted(reading);
 
-    pub const fn take_dirty(&mut self) -> bool {
-        std::mem::replace(&mut self.dirty, false)
-    }
-
-    pub fn scan(&mut self) -> u64 {
-        let files: Vec<PathBuf> = self.roots().flat_map(transcripts_under).collect();
-
-        self.cursors.retain(|path, _| path.exists());
-
-        files
+        self.sources
             .iter()
-            .fold(0, |total, path| total.saturating_add(self.read(path)))
+            .flat_map(|source| {
+                discovery::transcripts_under(source.root())
+                    .into_iter()
+                    .map(move |path| (source.as_ref(), path))
+            })
+            .fold(forgotten, |batch, (source, path)| {
+                batch.and(read_logged(source, &path, reading, now))
+            })
     }
 
-    pub fn read(&mut self, path: &Path) -> u64 {
-        let is_transcript = path
-            .extension()
-            .is_some_and(|extension| extension == TRANSCRIPT_EXTENSION);
-        let Some(index) = self
-            .sources
-            .iter()
-            .position(|source| path.starts_with(source.root()))
-        else {
-            return 0;
-        };
-        if !is_transcript {
-            return 0;
+    pub fn read(&self, path: &Path, reading: &mut Reading, now: u64) -> Batch {
+        if !discovery::is_transcript(path) {
+            return Batch::default();
         }
 
-        match self.read_appended(index, path) {
-            Ok(tokens) => tokens,
-            Err(problem) => {
-                logging::warn(&format!("could not read {}: {problem}", path.display()));
-                0
-            }
-        }
+        discovery::locate(&self.sources, path).map_or_else(Batch::default, |(source, path)| {
+            read_logged(source, &path, reading, now)
+        })
     }
 
-    fn read_appended(&mut self, index: usize, path: &Path) -> io::Result<u64> {
-        let Some(source) = self.sources.get(index) else {
-            return Ok(0);
-        };
-        let mut file = File::open(path)?;
-        let length = file.metadata()?.len();
-        let memory = self.cursors.entry(path.to_path_buf()).or_default();
+    // A root that is missing may only be unmounted; forgetting its cursors would credit its
+    // whole history again when it comes back.
+    fn forget_deleted(&self, reading: &mut Reading) -> Batch {
+        let present: Vec<&Path> = self.roots().filter(|root| root.exists()).collect();
+        let before = reading.files.len();
 
-        if length < memory.offset {
-            *memory = FileMemory::default();
-        }
-        if length == memory.offset {
-            return Ok(0);
-        }
-        file.seek(SeekFrom::Start(memory.offset))?;
-        let mut reader = BufReader::new(file);
-        let mut line = Vec::new();
-        let mut tokens = 0_u64;
-        let mut unreadable = 0_usize;
+        reading
+            .files
+            .retain(|path, _| path.exists() || !present.iter().any(|root| path.starts_with(root)));
 
-        loop {
-            line.clear();
-            let read = reader.read_until(b'\n', &mut line)?;
-
-            if read == 0 || line.last() != Some(&b'\n') {
-                break;
-            }
-            memory.offset = memory
-                .offset
-                .saturating_add(u64::try_from(read).map_err(io::Error::other)?);
-            match source.tokens_in(&String::from_utf8_lossy(&line), memory) {
-                Ok(found) => tokens = tokens.saturating_add(found),
-                Err(_) => unreadable += 1,
-            }
+        Batch {
+            tokens: 0,
+            advanced: reading.files.len() != before,
         }
-        if unreadable > 0 {
-            logging::warn(&format!(
-                "skipped {unreadable} unreadable lines in {}",
-                path.display()
-            ));
-        }
-        self.dirty = true;
-
-        Ok(tokens)
     }
 }
 
-fn transcripts_under(root: &Path) -> Vec<PathBuf> {
-    let mut pending = vec![root.to_path_buf()];
-    let mut found = Vec::new();
+fn read_logged(source: &dyn TokenSource, path: &Path, reading: &mut Reading, now: u64) -> Batch {
+    read_appended(source, path, reading, now).unwrap_or_else(|problem| {
+        logging::warn(&format!("could not read {}: {problem}", path.display()));
+        Batch::default()
+    })
+}
 
-    while let Some(folder) = pending.pop() {
-        let Ok(entries) = fs::read_dir(&folder) else {
-            continue;
-        };
+fn read_appended(
+    source: &dyn TokenSource,
+    path: &Path,
+    reading: &mut Reading,
+    now: u64,
+) -> io::Result<Batch> {
+    let length = fs::metadata(path)?.len();
+    let Reading { files, seen } = reading;
+    let cursor = files.entry(path.to_path_buf()).or_default();
+    let started_at = cursor.offset;
 
-        for entry in entries.flatten() {
-            let path = entry.path();
+    if length < cursor.offset {
+        *cursor = FileCursor::default();
+    }
+    if length == cursor.offset {
+        return Ok(Batch {
+            tokens: 0,
+            advanced: cursor.offset != started_at,
+        });
+    }
+    let mut reader = BufReader::new(File::open(path)?);
+    let mut memory = LineMemory { cursor, seen, now };
+    let mut line = Vec::new();
+    let mut tokens = 0_u64;
+    let mut unreadable = 0_usize;
 
-            if path.is_dir() {
-                pending.push(path);
-            } else if path
-                .extension()
-                .is_some_and(|extension| extension == TRANSCRIPT_EXTENSION)
-            {
-                found.push(path);
-            }
+    reader.seek(SeekFrom::Start(memory.cursor.offset))?;
+    loop {
+        line.clear();
+        let read = reader.read_until(b'\n', &mut line)?;
+
+        if read == 0 || line.last() != Some(&b'\n') {
+            break;
+        }
+        memory.cursor.offset = memory
+            .cursor
+            .offset
+            .saturating_add(u64::try_from(read).map_err(io::Error::other)?);
+        match source.tokens_in(&String::from_utf8_lossy(&line), &mut memory) {
+            Ok(found) => tokens = tokens.saturating_add(found),
+            Err(_) => unreadable += 1,
         }
     }
+    if unreadable > 0 {
+        logging::warn(&format!(
+            "skipped {unreadable} unreadable lines in {}",
+            path.display()
+        ));
+    }
 
-    found
+    Ok(Batch {
+        tokens,
+        advanced: memory.cursor.offset != started_at,
+    })
 }
 
 #[cfg(test)]
-mod tests {
-    use super::{Collector, Cursors};
-    use crate::tokens::claude::ClaudeCode;
-    use std::fs::{self, OpenOptions};
-    use std::io::Write;
-
-    const ANSWER: &str = r#"{"message":{"id":"ID","usage":{"input_tokens":10,"output_tokens":5}}}"#;
-
-    fn answer(id: &str) -> String {
-        format!("{}\n", ANSWER.replace("ID", id))
-    }
-
-    #[test]
-    fn reads_only_new_complete_lines() -> std::io::Result<()> {
-        let root = tempfile::tempdir()?;
-        let project = root.path().join("project");
-        let transcript = project.join("session.jsonl");
-        let mut collector = Collector::new(
-            vec![Box::new(ClaudeCode::new(root.path().to_path_buf()))],
-            Cursors::default(),
-        );
-
-        fs::create_dir_all(&project)?;
-        fs::write(&transcript, answer("a"))?;
-        assert_eq!(collector.scan(), 15);
-
-        let mut file = OpenOptions::new().append(true).open(&transcript)?;
-        file.write_all(answer("b").as_bytes())?;
-        file.write_all(br#"{"message":{"id":"c","usage":"#)?;
-        assert_eq!(collector.read(&transcript), 15);
-
-        writeln!(file, r#"{{"input_tokens":1,"output_tokens":1}}}}}}"#)?;
-        assert_eq!(collector.read(&transcript), 2);
-        assert_eq!(collector.scan(), 0);
-        Ok(())
-    }
-
-    #[test]
-    fn ignores_files_outside_its_sources() -> std::io::Result<()> {
-        let root = tempfile::tempdir()?;
-        let elsewhere = tempfile::tempdir()?;
-        let stray = elsewhere.path().join("other.jsonl");
-        let mut collector = Collector::new(
-            vec![Box::new(ClaudeCode::new(root.path().to_path_buf()))],
-            Cursors::default(),
-        );
-
-        fs::write(&stray, answer("x"))?;
-        assert_eq!(collector.read(&stray), 0);
-        Ok(())
-    }
-}
+#[path = "collector_tests.rs"]
+mod tests;
