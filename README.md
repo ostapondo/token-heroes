@@ -8,6 +8,7 @@ An endless idle RPG that lives in your system tray. Your agents write code, the 
 and every token they spend becomes a coin you can put into your heroes.
 
 [![Status: early development](https://img.shields.io/badge/status-early%20development-e8b23a?style=flat-square&labelColor=0d0b09)](#roadmap)
+[![CI](https://github.com/ostapondo/token-heroes/actions/workflows/ci.yml/badge.svg)](https://github.com/ostapondo/token-heroes/actions/workflows/ci.yml)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-7be07b?style=flat-square&labelColor=0d0b09)](CONTRIBUTING.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-efe6d4?style=flat-square&labelColor=0d0b09)](LICENSE)
 <br>
