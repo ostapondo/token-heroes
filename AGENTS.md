@@ -86,8 +86,8 @@ to its right, and a feature or entity is reached only through its `index.ts`.
 - One burned token is one coin. Only `src-tauri` adds coins.
 - The UI spends coins through `@platform`; the host refuses a spend above the balance.
 - Battle rewards nothing. Never add coin drops, kill bounties or interest.
-- Ascension trades the stage for power: the party returns to stage 1 with every hero, level
-  and coin, and grows by the deepest stage reached. It never gives or takes coins.
+- Ascension trades the stage for power: from stage 100 the party returns to stage 1 with every
+  hero, level and coin, and grows by the deepest stage reached. It never gives or takes coins.
 
 ## Code
 
