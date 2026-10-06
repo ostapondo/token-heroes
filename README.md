@@ -34,6 +34,10 @@ per token. You spend those coins on levels and hires.
 
 The fight never pays you. When the party is stuck on a boss, the answer is to ship more work.
 
+<p align="center">
+  <img src="docs/readme/demo.gif" alt="The game window: the party fights the Plague Brute on stage 25 while burned tokens arrive as coins and buy levels and a Cleric" width="393">
+</p>
+
 | Agent       | Where it reads                                                  | What counts as burned                                   |
 | ----------- | --------------------------------------------------------------- | ------------------------------------------------------- |
 | Claude Code | `~/.claude/projects/**/*.jsonl` (`CLAUDE_CONFIG_DIR`)           | input + output + cache writes + cache reads             |
