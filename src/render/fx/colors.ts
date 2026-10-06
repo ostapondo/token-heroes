@@ -1,0 +1,12 @@
+export const FX_COLOR = {
+  steel: '#ffffff',
+  shadow: '#000000',
+  crit: '#ffe066',
+  gold: '#ffd36a',
+  holy: '#fff6d6',
+  ember: '#ff5a1f',
+  wood: '#e8d9c0',
+  heal: '#7cc35b',
+  wound: '#ff5b4a',
+  stone: '#c9ced6',
+} as const;
