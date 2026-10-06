@@ -2,19 +2,33 @@ use super::OpenCode;
 use crate::tokens::memory::StoreCursor;
 use crate::tokens::store::StoreSource;
 use rusqlite::{Connection, params};
+use std::path::PathBuf;
 
 const REPLY: &str = r#"{"role":"assistant","tokens":{"input":100,"output":20,"reasoning":5,"cache":{"read":9000,"write":30}}}"#;
 const PROMPT: &str = r#"{"role":"user"}"#;
 
-fn database() -> Result<(tempfile::TempDir, Connection), Box<dyn std::error::Error>> {
+struct Database {
+    _folder: tempfile::TempDir,
+    path: PathBuf,
+    connection: Connection,
+}
+
+fn database(version: &str) -> Result<Database, Box<dyn std::error::Error>> {
     let folder = tempfile::tempdir()?;
-    let connection = Connection::open(folder.path().join("opencode.db"))?;
+    let path = folder.path().join("opencode.db");
+    let connection = Connection::open(&path)?;
 
     connection.execute_batch(
-        "CREATE TABLE message (id TEXT PRIMARY KEY, session_id TEXT NOT NULL,
+        "CREATE TABLE session (id TEXT PRIMARY KEY, version TEXT NOT NULL);
+         CREATE TABLE message (id TEXT PRIMARY KEY, session_id TEXT NOT NULL,
          time_created INTEGER NOT NULL, time_updated INTEGER NOT NULL, data TEXT NOT NULL);",
     )?;
-    Ok((folder, connection))
+    connection.execute("INSERT INTO session VALUES ('s', ?1)", params![version])?;
+    Ok(Database {
+        _folder: folder,
+        path,
+        connection,
+    })
 }
 
 fn write(connection: &Connection, id: &str, updated: i64, data: &str) -> rusqlite::Result<()> {
@@ -29,12 +43,12 @@ fn write(connection: &Connection, id: &str, updated: i64, data: &str) -> rusqlit
 
 #[test]
 fn counts_replies_but_not_prompts_or_cache_reads() -> Result<(), Box<dyn std::error::Error>> {
-    let (folder, connection) = database()?;
-    let source = OpenCode::new(folder.path().to_path_buf());
+    let database = database("1.18.27")?;
+    let source = OpenCode::new(database.path.clone());
     let mut cursor = StoreCursor::default();
 
-    write(&connection, "msg_1", 10, REPLY)?;
-    write(&connection, "msg_2", 11, PROMPT)?;
+    write(&database.connection, "msg_1", 10, REPLY)?;
+    write(&database.connection, "msg_2", 11, PROMPT)?;
 
     assert_eq!(source.read_new(&mut cursor, 0)?, 100 + 20 + 5 + 30);
     assert_eq!(source.read_new(&mut cursor, 0)?, 0);
@@ -43,23 +57,37 @@ fn counts_replies_but_not_prompts_or_cache_reads() -> Result<(), Box<dyn std::er
 
 #[test]
 fn credits_only_the_growth_of_a_reply_that_streams() -> Result<(), Box<dyn std::error::Error>> {
-    let (folder, connection) = database()?;
-    let source = OpenCode::new(folder.path().to_path_buf());
+    let database = database("1.18.27")?;
+    let source = OpenCode::new(database.path.clone());
     let mut cursor = StoreCursor::default();
     let early = r#"{"role":"assistant","tokens":{"input":100,"output":2}}"#;
 
-    write(&connection, "msg_1", 10, early)?;
+    write(&database.connection, "msg_1", 10, early)?;
     assert_eq!(source.read_new(&mut cursor, 0)?, 102);
-    write(&connection, "msg_1", 12, REPLY)?;
+    write(&database.connection, "msg_1", 12, REPLY)?;
 
     assert_eq!(source.read_new(&mut cursor, 0)?, 155 - 102);
     Ok(())
 }
 
 #[test]
+fn does_not_count_reasoning_twice_in_old_sessions() -> Result<(), Box<dyn std::error::Error>> {
+    let database = database("1.3.15")?;
+    let source = OpenCode::new(database.path.clone());
+
+    write(&database.connection, "msg_1", 10, REPLY)?;
+
+    assert_eq!(
+        source.read_new(&mut StoreCursor::default(), 0)?,
+        100 + 20 + 30
+    );
+    Ok(())
+}
+
+#[test]
 fn reads_nothing_where_opencode_never_ran() -> Result<(), String> {
     let folder = tempfile::tempdir().map_err(|problem| problem.to_string())?;
-    let source = OpenCode::new(folder.path().join("missing"));
+    let source = OpenCode::new(folder.path().join("missing").join("opencode.db"));
 
     assert_eq!(source.read_new(&mut StoreCursor::default(), 0)?, 0);
     Ok(())

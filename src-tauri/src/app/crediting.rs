@@ -13,8 +13,10 @@ use crate::support::{clock, logging};
 use crate::tokens::claude::ClaudeCode;
 use crate::tokens::codex::Codex;
 use crate::tokens::collector::{Batch, Collector};
+use crate::tokens::gemini::GeminiCli;
 use crate::tokens::memory::Reading;
 use crate::tokens::opencode::OpenCode;
+use crate::tokens::qwen::QwenCode;
 
 const CREDIT_EVERY: Duration = Duration::from_secs(1);
 const RESCAN_WITH_EVENTS: Duration = Duration::from_secs(300);
@@ -49,8 +51,13 @@ fn run(app: &AppHandle) {
     let collector = Collector::new(vec![
         Box::new(ClaudeCode::new(paths.claude_projects.clone())),
         Box::new(Codex::new(paths.codex_sessions.clone())),
+        Box::new(GeminiCli::new(paths.gemini_sessions.clone())),
+        Box::new(QwenCode::new(paths.qwen_projects.clone())),
     ])
-    .with_stores(vec![Box::new(OpenCode::new(paths.opencode_data.clone()))]);
+    .with_stores(vec![
+        Box::new(OpenCode::new(paths.opencode_database.clone())),
+        Box::new(OpenCode::kilo(paths.kilo_database.clone())),
+    ]);
     let (sender, changed) = mpsc::channel();
     let watcher = subscribe(&collector, sender);
     let mut crediting = Crediting {
