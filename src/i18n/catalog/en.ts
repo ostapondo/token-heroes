@@ -9,6 +9,7 @@ export const en = {
   'arena.bossHp': '{hp} / {maxHp}',
   'arena.defeated': 'DEFEATED',
   'arena.levelUp': 'LV {level}!',
+  'arena.joined': 'JOINED!',
 
   'wipe.title': 'PARTY WIPED',
   'wipe.kept': 'Levels and coins are kept. Back in',

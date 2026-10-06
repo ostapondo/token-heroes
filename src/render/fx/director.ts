@@ -1,17 +1,18 @@
 import { heroDefById, type Content, type ElementDef } from '@content';
-import { AttackStyle, BattleEventType, type BattleEvent } from '@engine';
+import { BattleEventType, type BattleEvent } from '@engine';
 import { t } from '@i18n';
 import { compactNumber } from '../format';
 import type { Actor } from '../scene/cast';
 import { ARENA, center, floorTop, type Point } from '../scene/geometry';
 import { MotionCue } from '../scene/motion';
 import { bossAttack } from './boss-attacks';
-import { Shockwave, Sparks } from './bursts';
+import { Sparks } from './bursts';
 import { FX_COLOR } from './colors';
 import type { Effect } from './effect';
 import { FloatingText, type TextStyle } from './floating-text';
 import { LightPillar, ScreenFlash } from './screen';
-import { Beam, CrossSlash, Projectile, Slash } from './strikes';
+import { heroAttack } from './hero-attacks';
+import { Beam, CrossSlash } from './strikes';
 
 const TEXT = {
   hit: { color: FX_COLOR.steel, size: 10 },
@@ -89,7 +90,11 @@ export class Director {
     return {
       effects: [
         new LightPillar(center(hero.box).x, floorTop() + 18),
-        new FloatingText(t('arena.levelUp', { level }), above(hero, 6), TEXT.levelUp),
+        new FloatingText(
+          level === 1 ? t('arena.joined') : t('arena.levelUp', { level }),
+          above(hero, 6),
+          TEXT.levelUp,
+        ),
       ],
       shake: 0,
     };
@@ -105,7 +110,7 @@ export class Director {
 
     return {
       effects: [
-        ...this.#attack(style, hero, foe, stage.element.accent),
+        ...heroAttack(style, hero, foe, stage.element.accent),
         new Sparks(center(foe.box), [FX_COLOR.steel, stage.element.accent], {
           count: 8,
           reach: 18,
@@ -207,27 +212,5 @@ export class Director {
       ],
       shake: 4,
     };
-  }
-
-  #attack(style: AttackStyle, hero: Actor, foe: Actor, accent: string): Effect[] {
-    const from = center(hero.box);
-    const to = center(foe.box);
-
-    switch (style) {
-      case AttackStyle.Slash:
-        hero.motion.cue(MotionCue.Dash);
-
-        return [new Slash(to, accent)];
-      case AttackStyle.Arrow:
-        return [new Projectile(from, to, [FX_COLOR.wood, FX_COLOR.heal], 1)];
-      case AttackStyle.Bash:
-        return [new Shockwave(to, FX_COLOR.stone)];
-      case AttackStyle.Spell:
-        return [new Projectile(from, to, [FX_COLOR.gold, FX_COLOR.ember], 3)];
-      case AttackStyle.Heal:
-        return [];
-      default:
-        return unhandled(style);
-    }
   }
 }
