@@ -41,21 +41,21 @@ to its right, and a feature or entity is reached only through its `index.ts`.
 
 ## Rust host
 
-| Folder         | Holds                                                                 |
-| -------------- | --------------------------------------------------------------------- |
-| `app/`         | Tauri wiring: setup, IPC commands, events, the crediting loop         |
-| `shell/`       | tray, tray menu, game window and their copy                           |
-| `state/`       | `AppState`: the book (ledger plus transcript positions) and settings  |
-| `tokens/`      | the `TokenSource` trait, Claude Code and Codex readers, the collector |
-| `persistence/` | data paths and atomic JSON storage with backups and quarantine        |
-| `economy/`     | the ledger and the wallet sent to the UI                              |
-| `preferences/` | the tray settings                                                     |
-| `support/`     | rotating log file, panic hook, clock, number formatting               |
+| Folder         | Holds                                                                           |
+| -------------- | ------------------------------------------------------------------------------- |
+| `app/`         | Tauri wiring: setup, IPC commands, events, the crediting loop                   |
+| `shell/`       | tray, tray menu, game window and their copy                                     |
+| `state/`       | `AppState`: the book (ledger plus transcript positions) and settings            |
+| `tokens/`      | the `TokenSource` and `StoreSource` traits, one reader per agent, the collector |
+| `persistence/` | data paths and atomic JSON storage with backups and quarantine                  |
+| `economy/`     | the ledger and the wallet sent to the UI                                        |
+| `preferences/` | the tray settings                                                               |
+| `support/`     | rotating log file, panic hook, clock, number formatting                         |
 
 - The folders are layers, top to bottom as listed: a module imports only the ones below it.
   `src/layers.rs` fails on a crossing.
-- A new agent is one `tokens/<agent>.rs` implementing `TokenSource` and one line in
-  `app/crediting.rs`.
+- A new agent is one `tokens/<agent>.rs` implementing `TokenSource` (or `StoreSource` for a
+  database) and one line in `app/crediting.rs`.
 - Coins and transcript positions are one record in `ledger.json`. Change them together
   through `AppState::credit`, so a crash rolls both back and nothing is credited twice.
 - Clippy runs `pedantic` and `nursery` with `unwrap`, `expect`, `panic`, indexing, `as`
