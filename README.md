@@ -54,9 +54,10 @@ The fight never pays you. When the party is stuck on a boss, the answer is to sh
 - **Milestones.** Every 25 levels a hero's damage and health grow fourfold.
 - **Wipes are gentle.** If the party falls, it is back in 10 seconds. Levels and coins stay.
 - **Offline progress.** Close the window and the party keeps fighting for up to 8 hours.
-- **Ascension.** From stage 100 the party may ascend: it starts again at stage 1 with every
-  hero, level and coin, and fights with power equal to its deepest stage over 50 (stage 130 →
-  ×2.6). The next ascension opens a quarter deeper. You confirm first and see the change.
+- **Ascension.** From stage 100 the party may ascend: every hero goes back to level 1 and the
+  party to stage 1, but with lasting power, the deepest stage over 50, squared (stage 130 →
+  ×6.8). Levels are not refunded; the power wins them back with about a quarter of the tokens
+  they took. The next ascension opens a quarter deeper. You confirm first and see the change.
 
 All of these numbers live in one file, [`src/engine/balance.ts`](src/engine/balance.ts).
 

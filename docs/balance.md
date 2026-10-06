@@ -39,9 +39,10 @@ hero, boss or tweak keeps the game in shape without hand-tuned stats.
   and healers.
 - **Levels cost 7% more each, and every 25th level multiplies a hero's power by 4.** Together
   with the foes' growth this keeps each stage only a little dearer than the last, forever.
-- **Ascension trades the stage for power.** From stage 100 the party may return to stage 1
-  with every hero, level and coin; its power becomes the deepest stage reached over 50. The next
-  ascension opens a quarter deeper than the last, which costs months of tokens, so it stays rare.
+- **Ascension starts the game over for power.** From stage 100 every hero may go back to level 1
+  and the party to stage 1; its power becomes (deepest stage ÷ 50)². Levels are not refunded, so
+  the power is set to win the wall back with under half the tokens it took. The next ascension
+  opens a quarter deeper than the last, which costs months of tokens, so it stays rare.
 - **Healers restore a share of the party's health**, more when they keep up with the party's
   level, so healing scales with everything else instead of falling behind.
 
@@ -67,18 +68,18 @@ The rules live in [`src/balance/pace-rules.ts`](../src/balance/pace-rules.ts),
 [`src/balance/rules.ts`](../src/balance/rules.ts); `balance_rules` and `pnpm balance` always show
 the current set.
 
-| Pace rule                       | Passes when                                                          |
-| ------------------------------- | -------------------------------------------------------------------- |
-| `first-hour-feels-fast`         | 1M burned tokens reach stage 15 to 35                                |
-| `first-day-reaches-mid-game`    | 10M burned tokens reach stage 40 to 60                               |
-| `first-month-reaches-stage-100` | 300M burned tokens reach stage 90 to 120                             |
-| `progress-never-stalls`         | late in the game, ten times more tokens still buy 35+ stages         |
-| `rarer-heroes-are-upgrades`     | every hero is worth 5% more per coin than the hero before it         |
-| `no-dominant-strategy`          | a best-upgrade player stays within 15 stages of an even one          |
-| `active-play-is-a-bonus`        | clicking twice a second gains at most 15 stages                      |
-| `ultimate-is-a-boost`           | one ultimate takes at most a quarter of the wall boss's health       |
-| `ascension-pays-at-the-wall`    | ascending at the wall carries the party at least 5 stages past it    |
-| `ascension-runs-dry`            | ascending again and again without new tokens gains at most 25 stages |
+| Pace rule                       | Passes when                                                      |
+| ------------------------------- | ---------------------------------------------------------------- |
+| `first-hour-feels-fast`         | 1M burned tokens reach stage 15 to 35                            |
+| `first-day-reaches-mid-game`    | 10M burned tokens reach stage 40 to 60                           |
+| `first-month-reaches-stage-100` | 300M burned tokens reach stage 90 to 120                         |
+| `progress-never-stalls`         | late in the game, ten times more tokens still buy 35+ stages     |
+| `rarer-heroes-are-upgrades`     | every hero is worth 5% more per coin than the hero before it     |
+| `no-dominant-strategy`          | a best-upgrade player stays within 15 stages of an even one      |
+| `active-play-is-a-bonus`        | clicking twice a second gains at most 15 stages                  |
+| `ultimate-is-a-boost`           | one ultimate takes at most a quarter of the wall boss's health   |
+| `ascension-pays-back`           | after ascending at the wall, half the tokens it took win it back |
+| `ascension-pays-off`            | ten times the tokens later, an ascended party is 5+ stages ahead |
 
 | Party rule                   | The party passes when                                      |
 | ---------------------------- | ---------------------------------------------------------- |
