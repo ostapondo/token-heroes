@@ -2,7 +2,6 @@ use super::AppState;
 use crate::economy::ledger::InsufficientCoins;
 use crate::persistence::paths::Paths;
 use crate::tokens::memory::{FileCursor, Reading};
-use std::fs;
 use std::path::{Path, PathBuf};
 
 fn read_up_to(offset: u64) -> Reading {
@@ -57,26 +56,21 @@ fn a_spend_is_saved_at_once_with_everything_credited_before_it() -> std::io::Res
 }
 
 #[test]
-fn moves_positions_from_the_old_file_into_the_ledger() -> std::io::Result<()> {
+fn a_restart_keeps_the_coins_the_start_and_the_positions() -> std::io::Result<()> {
     let home = tempfile::tempdir()?;
-    let paths = Paths::resolve(home.path());
-
-    fs::create_dir_all(&paths.data)?;
-    fs::write(paths.ledger(), r#"{"burned":500,"spent":100}"#)?;
-    fs::write(
-        paths.legacy_cursors(),
-        r#"{"session.jsonl":{"offset":10,"recent_ids":["msg_1"],"last_total":0}}"#,
-    )?;
-
     let state = reopen(home.path());
-    let mut seen = state.reading().seen;
+    let started = Reading {
+        started_at: Some(7),
+        ..read_up_to(10)
+    };
 
-    assert_eq!(state.wallet().balance, 400);
-    assert_eq!(state.reading().files, read_up_to(10).files);
-    assert_eq!(seen.growth("msg_1", 500, 0), 0);
-    assert!(!paths.legacy_cursors().exists());
+    state.credit(100, started.clone());
+    assert!(state.spend(30).is_ok());
     drop(state);
 
-    assert_eq!(reopen(home.path()).reading().files, read_up_to(10).files);
+    let state = reopen(home.path());
+
+    assert_eq!(state.wallet().balance, 70);
+    assert_eq!(state.reading(), started);
     Ok(())
 }

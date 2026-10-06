@@ -28,7 +28,7 @@ fn reads_only_new_complete_lines() -> std::io::Result<()> {
     let project = root.path().join("project");
     let transcript = project.join("session.jsonl");
     let collector = claude_at(root.path());
-    let mut reading = Reading::default();
+    let mut reading = Reading::starting_at(0);
 
     fs::create_dir_all(&project)?;
     fs::write(&transcript, answer("a"))?;
@@ -46,11 +46,49 @@ fn reads_only_new_complete_lines() -> std::io::Result<()> {
 }
 
 #[test]
+fn credits_nothing_already_on_disk_when_the_game_starts() -> std::io::Result<()> {
+    let root = tempfile::tempdir()?;
+    let transcript = root.path().join("session.jsonl");
+    let collector = claude_at(root.path());
+    let mut reading = Reading::default();
+
+    fs::write(&transcript, answer("a"))?;
+    assert_eq!(collector.scan(&mut reading, 7), credited(0));
+    assert_eq!(reading.started_at, Some(7));
+
+    let mut file = OpenOptions::new().append(true).open(&transcript)?;
+    file.write_all(answer("b").as_bytes())?;
+    assert_eq!(collector.read(&transcript, &mut reading, 8), credited(15));
+    Ok(())
+}
+
+#[test]
+fn places_again_the_positions_kept_from_before_a_start() -> std::io::Result<()> {
+    let root = tempfile::tempdir()?;
+    let transcript = root.path().join("session.jsonl");
+    let collector = claude_at(root.path());
+    let mut reading = Reading::default();
+    let history = answer("a") + &answer("b");
+
+    fs::write(&transcript, &history)?;
+    reading
+        .files
+        .insert(transcript.clone(), FileCursor::default());
+
+    assert_eq!(collector.scan(&mut reading, 0), credited(0));
+    assert_eq!(
+        reading.files.get(&transcript).map(|cursor| cursor.offset),
+        u64::try_from(history.len()).ok()
+    );
+    Ok(())
+}
+
+#[test]
 fn counts_a_message_once_across_a_session_and_its_compaction() -> std::io::Result<()> {
     let root = tempfile::tempdir()?;
     let subagents = root.path().join("project/session/subagents");
     let collector = claude_at(root.path());
-    let mut reading = Reading::default();
+    let mut reading = Reading::starting_at(0);
 
     fs::create_dir_all(&subagents)?;
     fs::write(root.path().join("project/session.jsonl"), answer("a"))?;
@@ -68,7 +106,7 @@ fn rereads_a_transcript_that_was_cut_short() -> std::io::Result<()> {
     let root = tempfile::tempdir()?;
     let transcript = root.path().join("session.jsonl");
     let collector = claude_at(root.path());
-    let mut reading = Reading::default();
+    let mut reading = Reading::starting_at(0);
 
     fs::write(&transcript, answer("a") + &answer("b"))?;
     collector.scan(&mut reading, 0);
@@ -88,7 +126,7 @@ fn forgets_deleted_transcripts_but_not_those_of_a_missing_root() -> std::io::Res
         Box::new(ClaudeCode::new(root.path().to_path_buf())),
         Box::new(ClaudeCode::new(unmounted.clone())),
     ]);
-    let mut reading = Reading::default();
+    let mut reading = Reading::starting_at(0);
 
     fs::write(&gone, answer("a"))?;
     collector.scan(&mut reading, 0);
@@ -129,7 +167,7 @@ fn keeps_one_cursor_when_events_arrive_through_a_symlinked_root() -> std::io::Re
     let real = folder.path().join("real");
     let linked = folder.path().join("linked");
     let collector = claude_at(&linked);
-    let mut reading = Reading::default();
+    let mut reading = Reading::starting_at(0);
 
     fs::create_dir_all(&real)?;
     std::os::unix::fs::symlink(&real, &linked)?;

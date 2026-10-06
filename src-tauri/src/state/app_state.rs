@@ -1,12 +1,11 @@
 use std::sync::{Mutex, MutexGuard, PoisonError};
 
 use super::book::Book;
-use super::legacy;
 use crate::economy::ledger::{InsufficientCoins, Wallet};
 use crate::persistence::paths::Paths;
 use crate::persistence::storage;
 use crate::preferences::settings::Settings;
-use crate::support::{clock, logging};
+use crate::support::logging;
 use crate::tokens::memory::Reading;
 
 struct Journal {
@@ -27,24 +26,18 @@ fn locked<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
 
 impl AppState {
     pub fn load(paths: Paths) -> Self {
-        let mut book: Book = storage::read_json(&paths.ledger()).unwrap_or_default();
-        let adopted = legacy::adopt_cursors(&paths, &mut book, clock::unix_seconds());
+        let book: Book = storage::read_json(&paths.ledger()).unwrap_or_default();
         let settings = storage::read_json(&paths.settings()).unwrap_or_default();
-        let state = Self {
+
+        Self {
             paths,
             journal: Mutex::new(Journal {
                 book,
-                unsaved: adopted,
+                unsaved: false,
             }),
             settings: Mutex::new(settings),
             disk: Mutex::new(()),
-        };
-
-        if adopted && state.save() {
-            legacy::retire_cursors(&state.paths);
         }
-
-        state
     }
 
     pub fn wallet(&self) -> Wallet {
