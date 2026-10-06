@@ -20,6 +20,12 @@ body:
         1. Open the tray window
         2. Reach stage 25
         3. …
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Filled in for you when you report from the game or the tray menu.
+      placeholder: 0.1.0 · macos aarch64
   - type: dropdown
     id: os
     attributes:

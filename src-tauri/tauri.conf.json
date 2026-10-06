@@ -33,5 +33,16 @@
         "installMode": "currentUser"
       }
     }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE3MEEyNEU2RUY4ODhBNjYKUldSbWlvanY1aVFLRi96dEx2OVRXSzJmTFNuUDhoNjBQbkJ0R2l4ZjdEQ2k0SlF0MHAzLzVtSDYK",
+      "endpoints": [
+        "https://github.com/ostapondo/token-heroes/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
   }
 }

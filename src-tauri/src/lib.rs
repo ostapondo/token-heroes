@@ -12,7 +12,7 @@ mod layers;
 
 use tauri_plugin_autostart::MacosLauncher;
 
-use crate::app::{commands, setup};
+use crate::app::{commands, release, setup};
 use crate::shell::window;
 use crate::support::logging;
 
@@ -22,6 +22,8 @@ pub fn run() {
             |app, _arguments, _cwd| window::show(app),
         ))
         .plugin(tauri_plugin_positioner::init())
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             None,
@@ -33,6 +35,9 @@ pub fn run() {
             commands::load_save,
             commands::write_save,
             commands::log,
+            release::check_update,
+            release::install_update,
+            release::report_bug,
         ])
         .build(tauri::generate_context!());
 

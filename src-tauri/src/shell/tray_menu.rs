@@ -3,6 +3,7 @@ use tauri::{AppHandle, Manager, Wry};
 use tauri_plugin_autostart::ManagerExt;
 
 use super::copy;
+use super::feedback;
 use super::tray;
 use crate::shell::window;
 use crate::state::AppState;
@@ -12,6 +13,7 @@ mod item {
     pub const SHOW_BALANCE: &str = "show-balance";
     pub const START_AT_LOGIN: &str = "start-at-login";
     pub const CLOSE_ON_BLUR: &str = "close-on-blur";
+    pub const REPORT_BUG: &str = "report-bug";
     pub const OPEN: &str = "open";
     pub const QUIT: &str = "quit";
 }
@@ -30,6 +32,8 @@ pub fn build(app: &AppHandle) -> tauri::Result<Menu<Wry>> {
         start_at_login: check(item::START_AT_LOGIN, copy::START_AT_LOGIN)?,
         close_on_blur: check(item::CLOSE_ON_BLUR, copy::CLOSE_ON_BLUR)?,
     };
+    let report_bug =
+        MenuItem::with_id(app, item::REPORT_BUG, copy::REPORT_BUG, true, None::<&str>)?;
     let open = MenuItem::with_id(app, item::OPEN, copy::OPEN, true, None::<&str>)?;
     let quit = MenuItem::with_id(app, item::QUIT, copy::QUIT, true, None::<&str>)?;
     let menu = Menu::with_items(
@@ -39,6 +43,7 @@ pub fn build(app: &AppHandle) -> tauri::Result<Menu<Wry>> {
             &checks.start_at_login,
             &checks.close_on_blur,
             &PredefinedMenuItem::separator(app)?,
+            &report_bug,
             &open,
             &quit,
         ],
@@ -62,6 +67,9 @@ pub fn on_select(app: &AppHandle, id: &str) {
             state.update_settings(|settings| settings.close_on_blur = !settings.close_on_blur);
         }
         item::START_AT_LOGIN => toggle_start_at_login(app),
+        item::REPORT_BUG => {
+            feedback::open_bug_report(app);
+        }
         item::OPEN => window::show(app),
         item::QUIT => app.exit(0),
         _ => logging::warn(&format!("unknown tray menu item {id}")),

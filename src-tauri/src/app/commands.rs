@@ -3,10 +3,10 @@
     reason = "Tauri hands every command argument over by value"
 )]
 
-use serde::Serialize;
 use serde_json::Value;
 use tauri::{AppHandle, State};
 
+use super::command_error::CommandError;
 use crate::economy::ledger::Wallet;
 use crate::persistence::storage;
 use crate::shell::tray;
@@ -14,15 +14,6 @@ use crate::state::AppState;
 use crate::support::logging::{self, Level};
 
 const SAVE_LIMIT_BYTES: usize = 1024 * 1024;
-
-#[derive(Debug, PartialEq, Eq, Serialize)]
-#[serde(rename_all = "kebab-case")]
-pub enum CommandError {
-    InsufficientCoins,
-    SaveTooLarge,
-    SaveUnreadable,
-    SaveNotWritten,
-}
 
 #[tauri::command]
 pub fn wallet(state: State<'_, AppState>) -> Wallet {
@@ -70,18 +61,4 @@ pub fn log(level: &str, message: &str) {
     };
 
     logging::write(level, &format!("ui: {message}"));
-}
-
-#[cfg(test)]
-mod tests {
-    use super::CommandError;
-
-    #[test]
-    fn sends_errors_as_the_strings_the_window_expects() -> Result<(), serde_json::Error> {
-        assert_eq!(
-            serde_json::to_string(&CommandError::InsufficientCoins)?,
-            r#""insufficient-coins""#
-        );
-        Ok(())
-    }
 }
