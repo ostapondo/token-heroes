@@ -36,6 +36,8 @@ struct Usage {
     output: u64,
     #[serde(default, rename = "cache_creation_input_tokens")]
     cache_writes: u64,
+    #[serde(default, rename = "cache_read_input_tokens")]
+    cache_reads: u64,
 }
 
 impl TokenSource for ClaudeCode {
@@ -58,7 +60,8 @@ impl TokenSource for ClaudeCode {
         let tokens = usage
             .input
             .saturating_add(usage.output)
-            .saturating_add(usage.cache_writes);
+            .saturating_add(usage.cache_writes)
+            .saturating_add(usage.cache_reads);
 
         Ok(id.map_or(tokens, |id| memory.message_growth(&id, tokens)))
     }
@@ -74,12 +77,12 @@ mod tests {
     const ANSWER: &str = r#"{"type":"assistant","message":{"id":"msg_1","usage":{"input_tokens":2,"cache_creation_input_tokens":20329,"cache_read_input_tokens":26639,"output_tokens":865}}}"#;
 
     #[test]
-    fn counts_input_output_and_cache_writes_but_not_cache_reads() -> Result<(), serde_json::Error> {
+    fn counts_input_output_and_cache_traffic() -> Result<(), serde_json::Error> {
         let source = ClaudeCode::new(PathBuf::new());
 
         assert_eq!(
             source.tokens_in(ANSWER, &mut Memory::default().at(0))?,
-            2 + 20_329 + 865
+            2 + 20_329 + 26_639 + 865
         );
         Ok(())
     }
@@ -100,7 +103,7 @@ mod tests {
         let mut memory = Memory::default();
         let longer = ANSWER.replace(r#""output_tokens":865"#, r#""output_tokens":1000"#);
 
-        assert_eq!(source.tokens_in(ANSWER, &mut memory.at(0))?, 21_196);
+        assert_eq!(source.tokens_in(ANSWER, &mut memory.at(0))?, 47_835);
         assert_eq!(source.tokens_in(&longer, &mut memory.at(0))?, 135);
         Ok(())
     }

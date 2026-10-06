@@ -7,10 +7,11 @@ use super::memory::StoreCursor;
 use super::store::StoreSource;
 
 const BUSY_WAIT: Duration = Duration::from_millis(500);
-// OpenCode updates a reply in place while it streams; prompts and cache reads are not burned.
+// OpenCode updates a reply in place while it streams; a prompt burns nothing on its own.
 const NEW_REPLIES: &str = "SELECT message.id, message.time_updated,
        coalesce(json_extract(message.data, '$.tokens.input'), 0)
      + coalesce(json_extract(message.data, '$.tokens.output'), 0)
+     + coalesce(json_extract(message.data, '$.tokens.cache.read'), 0)
      + coalesce(json_extract(message.data, '$.tokens.cache.write'), 0),
        coalesce(json_extract(message.data, '$.tokens.reasoning'), 0),
        coalesce(session.version, '')

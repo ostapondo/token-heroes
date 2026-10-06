@@ -8,8 +8,9 @@ use super::source::TokenSource;
 const USAGE_MARKER: &str = "\"usageMetadata\"";
 const REPLY: &str = "assistant";
 
-// Qwen Code logs usage in Gemini's shape on assistant records. Its total minus cached input is
-// right for every provider adapter; candidates and thoughts overlap on some, so are not summed.
+// Qwen Code logs usage in Gemini's shape on assistant records. Its total, which holds the cached
+// input, is right for every provider adapter; candidates and thoughts overlap on some, so are
+// not summed.
 // A branched session copies records with their ids, so a copy is skipped.
 pub struct QwenCode {
     root: PathBuf,
@@ -37,21 +38,17 @@ struct Usage {
     prompt: u64,
     #[serde(default, rename = "candidatesTokenCount")]
     candidates: u64,
-    #[serde(default, rename = "cachedContentTokenCount")]
-    cached: u64,
     #[serde(default, rename = "totalTokenCount")]
     total: u64,
 }
 
 impl Usage {
     const fn burned(&self) -> u64 {
-        let total = if self.total > 0 {
-            self.total
-        } else {
-            self.prompt.saturating_add(self.candidates)
-        };
+        if self.total > 0 {
+            return self.total;
+        }
 
-        total.saturating_sub(self.cached)
+        self.prompt.saturating_add(self.candidates)
     }
 }
 
@@ -87,12 +84,12 @@ mod tests {
     const REPLY: &str = r#"{"uuid":"a1","parentUuid":"9f","sessionId":"3c","type":"assistant","model":"qwen3-coder-plus","usageMetadata":{"promptTokenCount":15234,"candidatesTokenCount":412,"totalTokenCount":15646,"cachedContentTokenCount":12800,"thoughtsTokenCount":0}}"#;
 
     #[test]
-    fn counts_the_total_without_cached_input() -> Result<(), serde_json::Error> {
+    fn counts_the_total_with_cached_input() -> Result<(), serde_json::Error> {
         let source = QwenCode::new(PathBuf::new());
 
         assert_eq!(
             source.tokens_in(REPLY, &mut Memory::default().at(0))?,
-            15_646 - 12_800
+            15_646
         );
         Ok(())
     }

@@ -42,7 +42,8 @@ fn write(connection: &Connection, id: &str, updated: i64, data: &str) -> rusqlit
 }
 
 #[test]
-fn counts_replies_but_not_prompts_or_cache_reads() -> Result<(), Box<dyn std::error::Error>> {
+fn counts_replies_with_their_cache_traffic_but_not_prompts()
+-> Result<(), Box<dyn std::error::Error>> {
     let database = database("1.18.27")?;
     let source = OpenCode::new(database.path.clone());
     let mut cursor = StoreCursor::default();
@@ -50,7 +51,7 @@ fn counts_replies_but_not_prompts_or_cache_reads() -> Result<(), Box<dyn std::er
     write(&database.connection, "msg_1", 10, REPLY)?;
     write(&database.connection, "msg_2", 11, PROMPT)?;
 
-    assert_eq!(source.read_new(&mut cursor, 0)?, 100 + 20 + 5 + 30);
+    assert_eq!(source.read_new(&mut cursor, 0)?, 100 + 20 + 5 + 9_000 + 30);
     assert_eq!(source.read_new(&mut cursor, 0)?, 0);
     Ok(())
 }
@@ -66,7 +67,7 @@ fn credits_only_the_growth_of_a_reply_that_streams() -> Result<(), Box<dyn std::
     assert_eq!(source.read_new(&mut cursor, 0)?, 102);
     write(&database.connection, "msg_1", 12, REPLY)?;
 
-    assert_eq!(source.read_new(&mut cursor, 0)?, 155 - 102);
+    assert_eq!(source.read_new(&mut cursor, 0)?, 9_155 - 102);
     Ok(())
 }
 
@@ -79,7 +80,7 @@ fn does_not_count_reasoning_twice_in_old_sessions() -> Result<(), Box<dyn std::e
 
     assert_eq!(
         source.read_new(&mut StoreCursor::default(), 0)?,
-        100 + 20 + 30
+        100 + 20 + 9_000 + 30
     );
     Ok(())
 }
