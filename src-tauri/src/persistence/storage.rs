@@ -33,17 +33,6 @@ pub fn write_atomic(path: &Path, bytes: &[u8]) -> io::Result<()> {
     fs::rename(&temporary, path)
 }
 
-pub fn remove_with_backup(path: &Path) -> io::Result<()> {
-    for file in [path.to_path_buf(), sibling(path, BACKUP)] {
-        match fs::remove_file(&file) {
-            Err(problem) if problem.kind() != io::ErrorKind::NotFound => return Err(problem),
-            _ => {}
-        }
-    }
-
-    Ok(())
-}
-
 pub fn read_json<T: DeserializeOwned>(path: &Path) -> Option<T> {
     if let Some(value) = parse(path) {
         return Some(value);
@@ -89,7 +78,7 @@ fn sibling(path: &Path, suffix: &str) -> PathBuf {
 
 #[cfg(test)]
 mod tests {
-    use super::{read_json, remove_with_backup, sibling, write_json};
+    use super::{read_json, sibling, write_json};
     use std::fs;
 
     #[test]
@@ -116,21 +105,6 @@ mod tests {
 
         assert_eq!(read_json::<u64>(&path), Some(7));
         assert!(!path.exists());
-        Ok(())
-    }
-
-    #[test]
-    fn removes_a_file_together_with_its_backup() -> std::io::Result<()> {
-        let folder = tempfile::tempdir()?;
-        let path = folder.path().join("sources.json");
-
-        write_json(&path, &1_u64)?;
-        write_json(&path, &2_u64)?;
-        remove_with_backup(&path)?;
-        remove_with_backup(&path)?;
-
-        assert!(!path.exists());
-        assert!(!sibling(&path, "bak").exists());
         Ok(())
     }
 

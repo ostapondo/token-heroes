@@ -42,13 +42,6 @@ impl SeenMessages {
         tokens
     }
 
-    pub fn already_counted(&mut self, id: &str, now: u64) {
-        self.0.entry(id.to_owned()).or_insert(Sighting {
-            counted: u64::MAX,
-            at: now,
-        });
-    }
-
     pub fn forget_before(&mut self, cutoff: u64) {
         self.0.retain(|_, sighting| sighting.at >= cutoff);
     }
@@ -65,12 +58,25 @@ pub struct StoreCursor {
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Reading {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<u64>,
     #[serde(default)]
     pub files: HashMap<PathBuf, FileCursor>,
     #[serde(default)]
     pub seen: SeenMessages,
     #[serde(default)]
     pub stores: HashMap<String, StoreCursor>,
+}
+
+impl Reading {
+    // Positions kept from before a start were placed by a rule that skipped cache reads, so a
+    // start drops them.
+    pub fn starting_at(now: u64) -> Self {
+        Self {
+            started_at: Some(now),
+            ..Self::default()
+        }
+    }
 }
 
 pub struct LineMemory<'reading> {
@@ -104,7 +110,7 @@ mod tests {
         let mut seen = SeenMessages::default();
 
         seen.growth("msg_1", 100, 100);
-        seen.already_counted("msg_2", 200);
+        seen.growth("msg_2", 100, 200);
         seen.forget_before(150);
 
         assert_eq!(seen.growth("msg_1", 100, 300), 100);

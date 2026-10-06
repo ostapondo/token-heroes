@@ -34,22 +34,26 @@ per token. You spend those coins on levels and hires.
 
 The fight never pays you. When the party is stuck on a boss, the answer is to ship more work.
 
-| Agent       | Where it reads                                                  | What counts as burned                                      |
-| ----------- | --------------------------------------------------------------- | ---------------------------------------------------------- |
-| Claude Code | `~/.claude/projects/**/*.jsonl` (`CLAUDE_CONFIG_DIR`)           | input + output + cache writes, not cache reads             |
-| Codex       | `~/.codex/sessions/**/*.jsonl` (`CODEX_HOME`)                   | input − cached input + output                              |
-| Gemini CLI  | `~/.gemini/tmp/**/*.jsonl` (`GEMINI_CLI_HOME`)                  | total − cached input                                       |
-| Qwen Code   | `~/.qwen/projects/**/*.jsonl` (`QWEN_RUNTIME_DIR`, `QWEN_HOME`) | total − cached input                                       |
-| OpenCode    | `~/.local/share/opencode/opencode.db` (`OPENCODE_DB`)           | input + output + reasoning + cache writes, not cache reads |
-| Kilo Code   | `~/.local/share/kilo/kilo.db` (`KILO_DB`)                       | the same as OpenCode, whose fork it is                     |
+| Agent       | Where it reads                                                  | What counts as burned                                   |
+| ----------- | --------------------------------------------------------------- | ------------------------------------------------------- |
+| Claude Code | `~/.claude/projects/**/*.jsonl` (`CLAUDE_CONFIG_DIR`)           | input + output + cache writes + cache reads             |
+| Codex       | `~/.codex/sessions/**/*.jsonl` (`CODEX_HOME`)                   | input, cached input included, + output                  |
+| Gemini CLI  | `~/.gemini/tmp/**/*.jsonl` (`GEMINI_CLI_HOME`)                  | total, cached input included                            |
+| Qwen Code   | `~/.qwen/projects/**/*.jsonl` (`QWEN_RUNTIME_DIR`, `QWEN_HOME`) | total, cached input included                            |
+| OpenCode    | `~/.local/share/opencode/opencode.db` (`OPENCODE_DB`)           | input + output + reasoning + cache writes + cache reads |
+| Kilo Code   | `~/.local/share/kilo/kilo.db` (`KILO_DB`)                       | the same as OpenCode, whose fork it is                  |
 
 Tools that drive these agents, such as T3 Code, are counted through the agent's own logs.
 Cursor, Windsurf, Warp and Aider keep no per-request token counts on disk, so they cannot be
 counted yet.
 
-> [!TIP]
-> On the first launch the host reads the transcripts already on your disk, so your existing history
-> becomes your starting purse.
+Every token an agent sends or receives counts, including the context it reads again from the
+cache on every request, since that is what the agent burns.
+
+> [!NOTE]
+> Counting starts on the first launch: history already on your disk earns nothing, so every
+> player starts with an empty purse. Tokens burned while the game is closed are credited when it
+> opens again.
 
 ## The fight
 

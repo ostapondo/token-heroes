@@ -49,7 +49,22 @@ impl Collector {
         self.stores.iter().map(|store| store.root())
     }
 
+    // Coins are the tokens burned while the game runs, so the first scan only moves every
+    // position to the end of what is already on disk.
     pub fn scan(&self, reading: &mut Reading, now: u64) -> Batch {
+        if reading.started_at.is_some() {
+            return self.read_all(reading, now);
+        }
+        *reading = Reading::starting_at(now);
+        self.read_all(reading, now);
+
+        Batch {
+            tokens: 0,
+            advanced: true,
+        }
+    }
+
+    fn read_all(&self, reading: &mut Reading, now: u64) -> Batch {
         let forgotten = self
             .stores
             .iter()

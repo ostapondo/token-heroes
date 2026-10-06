@@ -62,8 +62,4 @@ impl Paths {
     pub fn settings(&self) -> PathBuf {
         self.data.join("settings.json")
     }
-
-    pub fn legacy_cursors(&self) -> PathBuf {
-        self.data.join("sources.json")
-    }
 }
