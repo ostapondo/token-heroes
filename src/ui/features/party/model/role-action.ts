@@ -1,11 +1,20 @@
 import { heroDamage, heroHeal, heroHp, HeroRole, type HeroStats, type PartyVitals } from '@engine';
 import type { RoleAction } from '../types';
 
-export function roleAction(hero: HeroStats, level: number, party: PartyVitals): RoleAction {
+// Ascension multiplies the party's power; a healer's heal already follows the party's health.
+export function roleAction(
+  hero: HeroStats,
+  level: number,
+  party: PartyVitals,
+  power = 1,
+): RoleAction {
   return {
     role: hero.role,
-    amount: hero.role === HeroRole.Healer ? heroHeal(hero, level, party) : heroDamage(hero, level),
+    amount:
+      hero.role === HeroRole.Healer
+        ? heroHeal(hero, level, party)
+        : Math.round(heroDamage(hero, level) * power),
     seconds: hero.attackInterval,
-    hp: heroHp(hero, level),
+    hp: Math.round(heroHp(hero, level) * power),
   };
 }

@@ -1,4 +1,4 @@
-import { BattlePhase, type PartyState } from '@engine';
+import { ascensionOffer, BattlePhase, type AscensionOffer, type PartyState } from '@engine';
 import type { GameStatus } from '../constants';
 import type { BossStatus, GameState, Income, Notice, WipeStatus } from '../types';
 
@@ -36,3 +36,6 @@ export function selectWipeStatus(state: GameState): WipeStatus {
     secondsLeft: Math.ceil(battle?.phaseLeft ?? 0),
   };
 }
+
+export const selectAscension = (state: GameState): AscensionOffer | null =>
+  state.game ? ascensionOffer(state.game) : null;

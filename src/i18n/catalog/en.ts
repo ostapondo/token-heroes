@@ -43,6 +43,14 @@ export const en = {
   'release.installing': 'Updating…',
   'release.retry': 'Update failed · retry',
 
+  'ascend.button': 'Ascend',
+  'ascend.power': 'Power {power}',
+  'ascend.title': 'Ascend?',
+  'ascend.body': 'The party returns to stage 1 and keeps every hero, level and coin.',
+  'ascend.change': 'Power {from} → {to}',
+  'ascend.confirm': 'Ascend',
+  'ascend.cancel': 'Not yet',
+
   'status.loading': 'Loading…',
   'status.failed': 'The game could not start. Close the window and open it again.',
 
@@ -53,6 +61,7 @@ export const en = {
   'notice.notEnoughCoins': 'Not enough coins. Burn more tokens.',
   'notice.hostUnavailable': 'Could not reach the coin ledger. Try again.',
   'notice.saveFailed': 'Progress could not be saved. Retrying soon.',
+  'notice.ascended': 'Ascended. Your heroes fight with power {power}.',
   'notice.away.one': 'While you were away the party cleared {count} stage.',
   'notice.away.other': 'While you were away the party cleared {count} stages.',
 } as const;

@@ -1,4 +1,6 @@
 import {
+  ascend,
+  ascensionOffer,
   heroById,
   heroLevel,
   hire,
@@ -15,22 +17,21 @@ import {
   type Roster,
 } from '@engine';
 import { t, tCount } from '@i18n';
-import { LogLevel, SpendRefusal, type Host } from '@platform';
+import { LogLevel, type Host } from '@platform';
 import type { Arena } from '@render';
-import { SESSION_TIMING } from '../constants';
 import {
   markFailed,
   markReady,
   receiveTokens,
   replaceGame,
-  replaceWallet,
   showNotice,
 } from '../store/game-actions';
 import { createGameStore, type GameStore } from '../store/game-store';
+import { errorText } from '../model/error-text';
+import { formatPower, partyPowerOf } from '../model/power';
+import { startLoop } from './game-loop';
 import { loadGame } from './load-game';
-
-const describe = (error: unknown): string =>
-  error instanceof Error ? (error.stack ?? error.message) : String(error);
+import { spendCoins } from './spend-coins';
 
 export class GameSession {
   readonly store: GameStore = createGameStore();
@@ -62,7 +63,7 @@ export class GameSession {
       if (level === undefined) return;
       const cost = levelCost(level);
 
-      if (await this.#spend(cost)) {
+      if (await spendCoins(this.#host, this.store, cost)) {
         this.#changeParty((party) => levelUp(party, heroId), heroId);
       }
     });
@@ -73,14 +74,26 @@ export class GameSession {
       const hero = heroById(this.roster, heroId);
 
       if (!isUnlocked(hero, this.store.getState().wallet.burned)) return;
-      if (await this.#spend(hero.hireCost)) {
+      if (await spendCoins(this.#host, this.store, hero.hireCost)) {
         this.#changeParty((party) => hire(party, heroId), heroId);
       }
     });
   };
 
+  readonly ascend = (): void => {
+    const game = this.#game();
+
+    if (!game || !ascensionOffer(game).available) return;
+    const next = ascend(game, this.roster, Date.now());
+
+    replaceGame(this.store, next);
+    this.#arena?.show(next.battle, next.party);
+    showNotice(this.store, t('notice.ascended', { power: formatPower(partyPowerOf(next)) }));
+    this.#guard('Saving the ascension', () => this.save());
+  };
+
   reportError(error: unknown, where: string): void {
-    this.#host.log(LogLevel.Error, `${where}: ${describe(error)}`);
+    this.#host.log(LogLevel.Error, `${where}: ${errorText(error)}`);
   }
 
   attachArena(arena: Arena | null): void {
@@ -112,26 +125,14 @@ export class GameSession {
   }
 
   #run(): void {
-    const tickSeconds = SESSION_TIMING.tickMs / 1000;
-    const ticker = setInterval(() => {
-      this.#play((game) => stepBattle(game.battle, tickSeconds, game.party, this.roster));
-    }, SESSION_TIMING.tickMs);
-    const saver = setInterval(
-      () => this.#guard('Autosave', () => this.save()),
-      SESSION_TIMING.autosaveMs,
-    );
-    const unlisten = this.#host.onWallet((wallet, burnedNow) =>
-      receiveTokens(this.store, wallet, burnedNow),
-    );
-
-    const saveOnHide = () => this.#guard('Saving on hide', () => this.save());
-
-    window.addEventListener('pagehide', saveOnHide);
     this.#stops.push(
-      () => clearInterval(ticker),
-      () => clearInterval(saver),
-      () => window.removeEventListener('pagehide', saveOnHide),
-      unlisten,
+      ...startLoop({
+        host: this.#host,
+        tick: (seconds) =>
+          this.#play((game) => stepBattle(game.battle, seconds, game.party, this.roster)),
+        save: (where) => this.#guard(where, () => this.save()),
+        receive: (wallet, burnedNow) => receiveTokens(this.store, wallet, burnedNow),
+      }),
     );
   }
 
@@ -164,21 +165,6 @@ export class GameSession {
     this.#arena?.show(next.battle, next.party);
     this.#arena?.celebrate(heroId, heroLevel(party, heroId) ?? 1);
     this.#guard('Saving a purchase', () => this.save());
-  }
-
-  async #spend(amount: number): Promise<boolean> {
-    const result = await this.#host.spend(amount);
-
-    if (result.ok) {
-      replaceWallet(this.store, result.wallet);
-
-      return true;
-    }
-    const refused = result.reason === SpendRefusal.Insufficient;
-
-    showNotice(this.store, t(refused ? 'notice.notEnoughCoins' : 'notice.hostUnavailable'));
-
-    return false;
   }
 
   async save(): Promise<void> {
