@@ -1,7 +1,17 @@
 import { CONTENT, toRoster } from '@content';
 import { checkBalance, standardScenarios } from '@balance';
 
-const report = checkBalance(toRoster(CONTENT), standardScenarios(CONTENT));
+const report = checkBalance(toRoster(CONTENT), standardScenarios(toRoster(CONTENT)));
+
+console.log('Pace: burned tokens -> stage (heroes, level)');
+for (const point of report.pace.curve) {
+  console.log(
+    `  ${point.coins.toExponential(1)} -> stage ${point.stage} (${point.heroes}, ${point.level})`,
+  );
+}
+for (const finding of report.pace.findings) {
+  console.log(`  ${finding.passed ? 'pass' : 'FAIL'}  ${finding.rule}: ${finding.detail}`);
+}
 
 for (const verdict of report.verdicts) {
   const stuck = verdict.run.frontier

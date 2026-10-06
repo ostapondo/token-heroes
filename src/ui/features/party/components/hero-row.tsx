@@ -1,3 +1,4 @@
+import { BALANCE } from '@engine';
 import { t, tCount } from '@i18n';
 import { compactNumber } from '@render';
 import { cx } from '@styled/css';
@@ -15,7 +16,9 @@ interface Props {
 export function HeroRow({ row, onLevelUp }: Props) {
   const classes = rowRecipe();
   const cost = compactNumber(row.cost);
-  const milestone = tCount('party.milestone', row.levelsToMilestone);
+  const milestone = tCount('party.milestone', row.levelsToMilestone, undefined, {
+    multiplier: BALANCE.milestoneMultiplier,
+  });
 
   return (
     <li className={cx(panel(), classes.root)}>

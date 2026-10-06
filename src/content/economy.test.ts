@@ -20,7 +20,7 @@ function highestAffordableLevel(coins: number, cost: (level: number) => number):
 describe('economy bounds', () => {
   it.each([1e12, 1e15])('never lets %d coins buy a level near the safe integer limit', (coins) => {
     for (const hero of toRoster(CONTENT).heroes) {
-      const level = highestAffordableLevel(coins, (current) => levelCost(hero, current));
+      const level = highestAffordableLevel(coins, (current) => levelCost(current));
 
       expect(heroDamage(hero, level)).toBeLessThan(Number.MAX_SAFE_INTEGER / HEADROOM);
       expect(heroHp(hero, level)).toBeLessThan(Number.MAX_SAFE_INTEGER / HEADROOM);

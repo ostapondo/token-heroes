@@ -14,20 +14,39 @@ export const BALANCE = {
   strikeCooldown: 0.15,
   ultimateMultiplier: 25,
   tokensPerUltimate: 50_000,
-  healerShare: 0.6,
 
+  // Foes grow alike in health and damage, so a fight at stage 300 asks what one at stage 30 did.
+  foeGrowth: 1.07,
   enemyHpBase: 10,
+  enemyDamageBase: 0.15,
   bossHpMultiplier: 10,
-  hpGrowth: 1.15,
-  enemyDamageBase: 0.5,
-  bossDamageBase: 6,
-  damageGrowth: 1.13,
+  bossDamageBase: 1,
   enemyAttackInterval: 1.6,
   bossAttackInterval: 2.5,
 
+  levelCostBase: 200_000,
   levelCostGrowth: 1.07,
   milestoneEvery: 25,
-  milestoneMultiplier: 2,
+  milestoneMultiplier: 4,
+
+  // A hero's place in the roster sets its strength, price and unlock, so a new hero slots in
+  // after the last one without hand-tuned numbers. Each is stronger per coin than the one before.
+  heroRankGrowth: 1.12,
+  heroFocusLimit: 0.5,
+  starterHeroes: 5,
+  hireCostFirst: 300_000,
+  hireCostGrowth: 2.2,
+  unlockFirst: 50_000_000,
+  unlockGrowth: 2,
+  roles: {
+    striker: { damagePerSecond: 5, hp: 15 },
+    tank: { damagePerSecond: 1.2, hp: 55 },
+    healer: { damagePerSecond: 0, hp: 16 },
+  },
+  // The share of the party's health a first-rank healer restores each second at the party's
+  // level; a healer behind or ahead of the party heals less or more, within these bounds.
+  healShare: 0.02,
+  healLevelFactor: { min: 0.5, max: 1.5 },
 
   offlineCapSeconds: 8 * 60 * 60,
   offlineStepSeconds: 1,

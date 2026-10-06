@@ -1,4 +1,5 @@
-import type { ElementDef } from './model/definitions';
+import { BALANCE } from '@engine';
+import type { ElementDef, HeroDef } from './model/definitions';
 import { CreatureId, ElementId } from './model/ids';
 import { PALETTE_SLOTS, TRANSPARENT_PIXEL, type SpriteDef } from './model/sprite';
 import type { Content } from './registry';
@@ -132,15 +133,23 @@ function artProblems(content: Content): string[] {
   ];
 }
 
-function rosterProblems(content: Content): string[] {
-  const starter = content.heroes[0];
+function designProblems(hero: HeroDef): string[] {
+  const focus = hero.focus ?? 0;
 
+  return [
+    ...(hero.attackInterval > 0 ? [] : [`hero ${hero.id} must attack at a positive interval`]),
+    ...(Math.abs(focus) <= BALANCE.heroFocusLimit
+      ? []
+      : [`hero ${hero.id} focus ${focus} leans past ±${BALANCE.heroFocusLimit}`]),
+  ];
+}
+
+function rosterProblems(content: Content): string[] {
   return [
     ...(content.bosses.length === 0 ? ['there are no bosses'] : []),
     ...(content.enemies.length === 0 ? ['there are no enemies'] : []),
-    ...(starter?.hireCost === 0 && starter.unlockAtTokens === 0
-      ? []
-      : ['the first hero must be free and unlocked from the start']),
+    ...(content.heroes.length === 0 ? ['there are no heroes'] : []),
+    ...content.heroes.flatMap(designProblems),
   ];
 }
 

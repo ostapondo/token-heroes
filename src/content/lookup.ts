@@ -1,4 +1,4 @@
-import type { Roster } from '@engine';
+import { designHero, type Roster } from '@engine';
 import type { BossDef, CreatureDef, ElementDef, EnemyDef, HeroDef } from './model/definitions';
 import type { Content } from './registry';
 
@@ -35,17 +35,7 @@ export function starterHero(content: Content): HeroDef {
 
 export function toRoster(content: Content): Roster {
   return {
-    heroes: content.heroes.map((hero) => ({
-      id: hero.id,
-      role: hero.role,
-      attack: hero.attack,
-      baseDamage: hero.baseDamage,
-      baseHp: hero.baseHp,
-      attackInterval: hero.attackInterval,
-      levelCostBase: hero.levelCostBase,
-      hireCost: hero.hireCost,
-      unlockAtTokens: hero.unlockAtTokens,
-    })),
+    heroes: content.heroes.map((hero) => designHero(hero)),
     bosses: content.bosses.map((boss) => {
       const creature = creatureById(content, boss.creature);
 

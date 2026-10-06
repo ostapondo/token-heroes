@@ -7,12 +7,8 @@ export default defineHero({
   order: 7,
   role: HeroRole.Striker,
   attack: AttackStyle.Slash,
-  baseDamage: 12,
-  baseHp: 30,
   attackInterval: 1.5,
-  levelCostBase: 220,
-  hireCost: 1_000_000,
-  unlockAtTokens: 100_000_000,
+  focus: -0.2,
   sprite: {
     rows: [
       '.ddddd.s',

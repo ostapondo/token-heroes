@@ -49,18 +49,15 @@ export interface EnemyDef {
   readonly sprite: SpriteDef;
 }
 
+// Strength, price and unlock come from the hero's order through @engine's designHero.
 export interface HeroDef {
   readonly id: string;
   readonly name: string;
   readonly order: number;
   readonly role: HeroRole;
   readonly attack: AttackStyle;
-  readonly baseDamage: number;
-  readonly baseHp: number;
   readonly attackInterval: number;
-  readonly levelCostBase: number;
-  readonly hireCost: number;
-  readonly unlockAtTokens: number;
+  readonly focus?: number;
   readonly sprite: SpriteDef;
 }
 

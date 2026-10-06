@@ -1,6 +1,6 @@
 import { BALANCE } from '../balance';
 import { heroDamage, heroHeal, safeAmount } from '../formulas';
-import { partyMaxHp } from '../party';
+import { partyVitals } from '../party';
 import { nextRandom } from '../random';
 import { heroById } from '../roster';
 import {
@@ -77,7 +77,7 @@ function heroesAct(
   roster: Roster,
   events: BattleEvent[],
 ): void {
-  const maxHp = partyMaxHp(party, roster);
+  const vitals = partyVitals(party, roster);
 
   for (const slot of party.heroes) {
     const hero = heroById(roster, slot.heroId);
@@ -85,9 +85,9 @@ function heroesAct(
 
     while (cooldown <= 0 && frontFoe(draft) !== -1) {
       if (hero.role === HeroRole.Healer) {
-        const amount = heroHeal(hero, slot.level);
+        const amount = heroHeal(hero, slot.level, vitals);
 
-        draft.partyHp = Math.min(maxHp, draft.partyHp + amount);
+        draft.partyHp = Math.min(vitals.hp, draft.partyHp + amount);
         events.push({ type: BattleEventType.Heal, source: hero.id, amount });
       } else {
         const [roll, seed] = nextRandom(draft.seed);

@@ -21,11 +21,11 @@ describe('stepBattle', () => {
 
   it('wipes a weak party on a boss and retries the same stage after the respawn delay', () => {
     const party = partyOf(['knight', 1]);
-    const lost = runFor(startStage(5, party, testRoster, fresh), 40, party);
+    const lost = runFor(startStage(50, party, testRoster, fresh), 40, party);
 
     expect(lost.events).toContainEqual({ type: BattleEventType.Wiped, reason: WipeReason.Defeat });
-    expect(lost.events).toContainEqual({ type: BattleEventType.Respawned, stage: 5 });
-    expect(lost.battle.stage).toBe(5);
+    expect(lost.events).toContainEqual({ type: BattleEventType.Respawned, stage: 50 });
+    expect(lost.battle.stage).toBe(50);
   });
 
   it('wipes on the boss timer when the party outlives the boss', () => {

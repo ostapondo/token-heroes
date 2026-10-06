@@ -1,5 +1,7 @@
-import type { Content } from '@content';
-import type { PartyState, Roster } from '@engine';
+import { partyVitals, type PartyState, type Roster } from '@engine';
+import { compact } from './numbers';
+import { PACE_COINS, paceCurve, partyFor, type PacePoint } from './pace';
+import { PACE_RULES } from './pace-rules';
 import { judge, type Finding } from './rules';
 import { heroSheet, stageSheet, type StageSheet } from './sheets';
 import { runParty, type RunOptions, type RunReport } from './simulate';
@@ -25,23 +27,28 @@ export interface Verdict {
 export interface BalanceReport {
   readonly passed: number;
   readonly failed: number;
+  readonly pace: { readonly curve: readonly PacePoint[]; readonly findings: readonly Finding[] };
   readonly verdicts: readonly Verdict[];
 }
 
-// A party grows the way players grow it: the next heroes in hiring order, levelled together.
-const STANDARD = [
-  { heroes: 3, level: 10 },
-  { heroes: 4, level: 25 },
-  { heroes: 5, level: 50 },
-  { heroes: Infinity, level: 100 },
-  { heroes: Infinity, level: 150 },
-] as const;
+function judgePace(roster: Roster): BalanceReport['pace'] {
+  const curve = paceCurve(roster);
+  const findings = PACE_RULES.map((rule) => ({
+    rule: rule.id,
+    threshold: rule.threshold,
+    ...rule.judge(curve, roster),
+  }));
 
-export function standardScenarios(content: Content): Scenario[] {
-  return STANDARD.map(({ heroes, level }) => {
-    const party = content.heroes.slice(0, heroes).map((hero) => ({ heroId: hero.id, level }));
+  return { curve, findings };
+}
 
-    return { name: `${party.length} heroes at level ${level}`, party };
+// The parties a player owns after the burns the pace rules name, so a new hero or a new price
+// changes the parties that are judged.
+export function standardScenarios(roster: Roster): Scenario[] {
+  return PACE_COINS.map((coins) => {
+    const { party } = partyFor(roster, coins);
+
+    return { name: `party after ${compact(coins)} burned tokens`, party: party.heroes };
   });
 }
 
@@ -49,7 +56,10 @@ export function judgeParty(roster: Roster, scenario: Scenario, options: RunOptio
   const party: PartyState = { heroes: scenario.party.map((member) => ({ ...member })) };
   const run = runParty(party, roster, options);
   const frontier = run.frontier ? stageSheet(roster, run.frontier.stage) : null;
-  const heroes = scenario.party.map((member) => heroSheet(roster, member.heroId, member.level));
+  const vitals = partyVitals(party, roster);
+  const heroes = scenario.party.map((member) =>
+    heroSheet(roster, member.heroId, member.level, vitals),
+  );
 
   return {
     scenario: scenario.name,
@@ -62,11 +72,13 @@ export function judgeParty(roster: Roster, scenario: Scenario, options: RunOptio
 
 export function checkBalance(roster: Roster, scenarios: readonly Scenario[]): BalanceReport {
   const verdicts = scenarios.map((scenario) => judgeParty(roster, scenario));
-  const findings = verdicts.flatMap((verdict) => verdict.findings);
+  const pace = judgePace(roster);
+  const findings = [...pace.findings, ...verdicts.flatMap((verdict) => verdict.findings)];
 
   return {
     passed: findings.filter((finding) => finding.passed).length,
     failed: findings.filter((finding) => !finding.passed).length,
+    pace,
     verdicts,
   };
 }

@@ -39,9 +39,14 @@ export function t<Key extends MessageKey>(key: Key, ...args: Arguments<Key>): st
   return format(catalog[key], args[0]);
 }
 
-export function tCount(base: CountedBase, count: number, shown = String(count)): string {
+export function tCount(
+  base: CountedBase,
+  count: number,
+  shown = String(count),
+  extra: Params = {},
+): string {
   const form = pluralRules.select(count) === 'one' ? 'one' : 'other';
   const template = catalog[`${base}.${form}`];
 
-  return format(template, { count: shown });
+  return format(template, { ...extra, count: shown });
 }

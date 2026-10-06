@@ -7,12 +7,7 @@ export default defineHero({
   order: 3,
   role: HeroRole.Tank,
   attack: AttackStyle.Bash,
-  baseDamage: 2,
-  baseHp: 45,
   attackInterval: 1.4,
-  levelCostBase: 60,
-  hireCost: 5_000,
-  unlockAtTokens: 0,
   sprite: {
     rows: [
       '..dddd..',

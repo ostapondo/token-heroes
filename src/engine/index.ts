@@ -3,8 +3,25 @@ export { chargeUltimate, strike, unleashUltimate } from './battle/actions';
 export { foesForStage, isBossStage, upcomingBoss } from './battle/stages';
 export { startStage } from './battle/start';
 export { stepBattle } from './battle/step';
-export { heroDamage, heroHeal, heroHp, levelCost, levelsToMilestone } from './formulas';
-export { heroLevel, hire, isUnlocked, levelUp, partyMaxHp, strikeDamage } from './party';
+export { designHero } from './design';
+export {
+  heroDamage,
+  heroHeal,
+  heroHp,
+  costToLevel,
+  levelCost,
+  levelsToMilestone,
+  type PartyVitals,
+} from './formulas';
+export {
+  heroLevel,
+  hire,
+  isUnlocked,
+  levelUp,
+  partyMaxHp,
+  partyVitals,
+  strikeDamage,
+} from './party';
 export { fastForward } from './progress/offline';
 export { newGame, withProgress, type GameSave } from './progress/save';
 export { saveFromWire } from './progress/save-wire';

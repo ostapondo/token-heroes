@@ -60,7 +60,7 @@ export class GameSession {
       const level = game ? heroLevel(game.party, heroId) : undefined;
 
       if (level === undefined) return;
-      const cost = levelCost(heroById(this.roster, heroId), level);
+      const cost = levelCost(level);
 
       if (await this.#spend(cost)) {
         this.#changeParty((party) => levelUp(party, heroId), heroId);

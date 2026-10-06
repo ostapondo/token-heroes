@@ -1,5 +1,5 @@
 import { CONTENT, toRoster } from '@content';
-import { levelCost, heroById } from '@engine';
+import { levelCost, heroById, partyVitals } from '@engine';
 import { describe, expect, it } from 'vitest';
 import { RECRUITS_SHOWN } from '../constants';
 import { roleAction } from './role-action';
@@ -7,7 +7,7 @@ import { partyRows } from './party-rows';
 
 const roster = toRoster(CONTENT);
 const party = { heroes: [{ heroId: 'wanderer', level: 24 }] };
-const wandererCost = levelCost(heroById(roster, 'wanderer'), 24);
+const wandererCost = levelCost(24);
 
 describe('partyRows', () => {
   it('prices the next level and tracks the way to the next doubling', () => {
@@ -22,7 +22,7 @@ describe('partyRows', () => {
         affordable: true,
         levelsToMilestone: 1,
         milestoneProgress: 24 / 25,
-        action: roleAction(heroById(roster, 'wanderer'), 24),
+        action: roleAction(heroById(roster, 'wanderer'), 24, partyVitals(party, roster)),
       },
     ]);
   });

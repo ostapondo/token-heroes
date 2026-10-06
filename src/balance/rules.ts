@@ -67,10 +67,10 @@ export const RULES: readonly Rule[] = [
     },
   },
   {
-    id: 'party-outlasts-half-the-timer',
-    statement: 'At the boss that stops the party, its health lasts half the boss timer or longer.',
-    why: 'Bosses should be beaten on damage, not one-shot the party before levels matter.',
-    threshold: 0.5,
+    id: 'party-outlasts-the-opening',
+    statement: 'At the boss that stops the party, its health lasts 40% of the timer or longer.',
+    why: 'A damage-heavy boss may cut a fight short to test toughness, never one-shot it.',
+    threshold: 0.4,
     judge({ heroes, frontier }) {
       if (!frontier?.boss || frontier.timeLimit === null) return null;
       const hp = sum(heroes, (sheet) => sheet.hp);

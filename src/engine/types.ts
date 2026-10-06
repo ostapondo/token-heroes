@@ -36,10 +36,10 @@ export interface HeroStats {
   readonly id: string;
   readonly role: HeroRole;
   readonly attack: AttackStyle;
+  readonly attackInterval: number;
+  readonly power: number;
   readonly baseDamage: number;
   readonly baseHp: number;
-  readonly attackInterval: number;
-  readonly levelCostBase: number;
   readonly hireCost: number;
   readonly unlockAtTokens: number;
 }

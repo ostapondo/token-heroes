@@ -15,14 +15,21 @@ import { testRoster } from './testing';
 const knight = heroById(testRoster, 'knight');
 
 describe('hero growth', () => {
-  it('doubles damage at every 25th level', () => {
+  it('multiplies damage at every 25th level', () => {
+    const milestone = BALANCE.milestoneMultiplier;
+
     expect(heroDamage(knight, 24)).toBe(knight.baseDamage * 24);
-    expect(heroDamage(knight, 25)).toBe(knight.baseDamage * 25 * 2);
-    expect(heroDamage(knight, 50)).toBe(knight.baseDamage * 50 * 4);
+    expect(heroDamage(knight, 25)).toBe(knight.baseDamage * 25 * milestone);
+    expect(heroDamage(knight, 50)).toBe(knight.baseDamage * 50 * milestone ** 2);
   });
 
-  it('heals for a share of the damage the hero would deal', () => {
-    expect(heroHeal(knight, 10)).toBe(Math.ceil(heroDamage(knight, 10) * BALANCE.healerShare));
+  it("heals a share of the party's health, more for a healer who keeps up", () => {
+    const party = { hp: 10_000, level: 20 };
+    const atPace = heroHeal(knight, 20, party);
+
+    expect(atPace).toBe(Math.ceil(BALANCE.healShare * knight.power * party.hp));
+    expect(heroHeal(knight, 5, party)).toBe(Math.ceil(atPace * BALANCE.healLevelFactor.min));
+    expect(heroHeal(knight, 200, party)).toBe(Math.ceil(atPace * BALANCE.healLevelFactor.max));
   });
 
   it('counts the levels left to the next doubling', () => {
@@ -31,7 +38,7 @@ describe('hero growth', () => {
   });
 
   it('charges more for every next level', () => {
-    const costs = [1, 10, 50, 100].map((level) => levelCost(knight, level));
+    const costs = [1, 10, 50, 100].map((level) => levelCost(level));
 
     expect(costs).toEqual(costs.toSorted((a, b) => a - b));
     expect(new Set(costs).size).toBe(costs.length);
@@ -62,7 +69,7 @@ describe('number safety', () => {
     for (const level of [1, 400, 30_000, 100_000]) {
       expect(safe(heroDamage(knight, level))).toBe(true);
       expect(safe(heroHp(knight, level))).toBe(true);
-      expect(safe(levelCost(knight, level))).toBe(true);
+      expect(safe(levelCost(level))).toBe(true);
     }
   });
 });

@@ -8,6 +8,7 @@ import {
   HeroRole,
   isBossStage,
   levelCost,
+  type PartyVitals,
   type Roster,
 } from '@engine';
 
@@ -41,11 +42,18 @@ export interface StageSheet {
   readonly damagePerSecond: number;
 }
 
-export function heroSheet(roster: Roster, heroId: string, level: number): HeroSheet {
+// A healer's heal depends on the party it heals; alone, it heals itself at its own level.
+export function heroSheet(
+  roster: Roster,
+  heroId: string,
+  level: number,
+  party?: PartyVitals,
+): HeroSheet {
   const hero = heroById(roster, heroId);
   const healer = hero.role === HeroRole.Healer;
   const hit = healer ? 0 : heroDamage(hero, level);
-  const heal = healer ? heroHeal(hero, level) : 0;
+  const vitals = party ?? { hp: heroHp(hero, level), level };
+  const heal = healer ? heroHeal(hero, level, vitals) : 0;
 
   return {
     heroId,
@@ -57,7 +65,7 @@ export function heroSheet(roster: Roster, heroId: string, level: number): HeroSh
     damagePerSecond: hit / hero.attackInterval,
     healPerSecond: heal / hero.attackInterval,
     hp: heroHp(hero, level),
-    nextLevelCost: levelCost(hero, level),
+    nextLevelCost: levelCost(level),
   };
 }
 

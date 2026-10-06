@@ -7,12 +7,7 @@ export default defineHero({
   order: 9,
   role: HeroRole.Healer,
   attack: AttackStyle.Heal,
-  baseDamage: 8,
-  baseHp: 18,
   attackInterval: 1.8,
-  levelCostBase: 400,
-  hireCost: 5_000_000,
-  unlockAtTokens: 500_000_000,
   sprite: {
     rows: [
       '..ddddjj',

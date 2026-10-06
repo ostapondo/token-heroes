@@ -17,5 +17,6 @@ describe('tCount', () => {
   it('picks the singular and plural forms by count', () => {
     expect(tCount('notice.away', 1)).toBe('While you were away the party cleared 1 stage.');
     expect(tCount('notice.away', 12)).toBe('While you were away the party cleared 12 stages.');
+    expect(tCount('party.milestone', 3, undefined, { multiplier: 4 })).toBe('x4 power in 3 levels');
   });
 });

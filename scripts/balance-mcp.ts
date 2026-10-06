@@ -3,6 +3,7 @@ import {
   checkBalance,
   heroSheet,
   judgeParty,
+  PACE_RULES,
   RULES,
   stageSheet,
   standardScenarios,
@@ -40,7 +41,12 @@ server.registerTool(
   { description: 'The balance rules, why each exists and the threshold it must meet.' },
   () =>
     reply(() =>
-      RULES.map(({ id, statement, why, threshold }) => ({ id, statement, why, threshold })),
+      [...PACE_RULES, ...RULES].map(({ id, statement, why, threshold }) => ({
+        id,
+        statement,
+        why,
+        threshold,
+      })),
     ),
 );
 
@@ -100,10 +106,10 @@ server.registerTool(
   'check_balance',
   {
     description:
-      'Judges the standard parties, from three heroes at level 10 to the full roster at ' +
-      'level 150, against every rule. Run it after any change to heroes, foes or balance.',
+      'Judges the pace of the game and the parties a player owns after an hour, a day, a ' +
+      'month and a year of burned tokens. Run it after any change to heroes, foes or balance.',
   },
-  () => reply(() => checkBalance(roster, standardScenarios(CONTENT))),
+  () => reply(() => checkBalance(roster, standardScenarios(roster))),
 );
 
 await server.connect(new StdioServerTransport());

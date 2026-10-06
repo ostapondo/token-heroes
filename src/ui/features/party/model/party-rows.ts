@@ -5,6 +5,7 @@ import {
   isUnlocked,
   levelCost,
   levelsToMilestone,
+  partyVitals,
   type PartyState,
   type Roster,
 } from '@engine';
@@ -23,9 +24,10 @@ export function partyRows(
   roster: Roster,
   content: Content,
 ): PartyRows {
+  const vitals = partyVitals(party, roster);
   const members = party.heroes.map((slot) => {
     const hero = heroById(roster, slot.heroId);
-    const cost = levelCost(hero, slot.level);
+    const cost = levelCost(slot.level);
     const remaining = levelsToMilestone(slot.level);
 
     return {
@@ -36,22 +38,26 @@ export function partyRows(
       affordable: wealth.balance >= cost,
       levelsToMilestone: remaining,
       milestoneProgress: (BALANCE.milestoneEvery - remaining) / BALANCE.milestoneEvery,
-      action: roleAction(hero, slot.level),
+      action: roleAction(hero, slot.level, vitals),
     };
   });
   const owned = new Set(party.heroes.map((slot) => slot.heroId));
   const recruits = content.heroes
     .filter((hero) => !owned.has(hero.id))
     .slice(0, RECRUITS_SHOWN)
-    .map((hero) => ({
-      heroId: hero.id,
-      name: hero.name,
-      cost: hero.hireCost,
-      unlockAtTokens: hero.unlockAtTokens,
-      unlocked: isUnlocked(hero, wealth.burned),
-      affordable: wealth.balance >= hero.hireCost,
-      action: roleAction(heroById(roster, hero.id), 1),
-    }));
+    .map((hero) => {
+      const stats = heroById(roster, hero.id);
+
+      return {
+        heroId: hero.id,
+        name: hero.name,
+        cost: stats.hireCost,
+        unlockAtTokens: stats.unlockAtTokens,
+        unlocked: isUnlocked(stats, wealth.burned),
+        affordable: wealth.balance >= stats.hireCost,
+        action: roleAction(stats, 1, vitals),
+      };
+    });
 
   return { members, recruits };
 }
