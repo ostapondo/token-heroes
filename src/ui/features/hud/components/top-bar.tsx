@@ -8,6 +8,7 @@ import {
   useGame,
 } from '../../../entities/game';
 import { CoinIcon } from '../../../shared/ui';
+import { Ascension } from './ascension';
 import { topBarRecipe } from './top-bar.recipe';
 
 export function TopBar() {
@@ -19,7 +20,10 @@ export function TopBar() {
 
   return (
     <header className={classes.root}>
-      <span className={classes.stage}>{t('hud.stage', { stage })}</span>
+      <div className={classes.progress}>
+        <span className={classes.stage}>{t('hud.stage', { stage })}</span>
+        <Ascension />
+      </div>
       <div className={classes.purse}>
         <span className={classes.wallet}>
           {income.count > 0 ? (

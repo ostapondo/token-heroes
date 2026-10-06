@@ -24,4 +24,13 @@ describe('roleAction', () => {
     expect(roleAction(shieldbearer, 101, party).amount).toBe(heroDamage(shieldbearer, 101));
     expect(roleAction(shieldbearer, 101, party).role).toBe(HeroRole.Tank);
   });
+
+  it('shows the power an ascension adds', () => {
+    const archer = heroById(roster, 'archer');
+    const plain = roleAction(archer, 40, party);
+    const ascended = roleAction(archer, 40, party, 2.6);
+
+    expect(ascended.amount).toBe(Math.round(heroDamage(archer, 40) * 2.6));
+    expect(ascended.hp).toBeGreaterThan(plain.hp);
+  });
 });

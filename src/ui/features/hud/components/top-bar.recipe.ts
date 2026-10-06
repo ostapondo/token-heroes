@@ -1,7 +1,7 @@
 import { sva } from '@styled/css';
 
 export const topBarRecipe = sva({
-  slots: ['root', 'stage', 'purse', 'wallet', 'income', 'burned'],
+  slots: ['root', 'progress', 'stage', 'purse', 'wallet', 'income', 'burned'],
   base: {
     root: {
       display: 'flex',
@@ -10,6 +10,7 @@ export const topBarRecipe = sva({
       paddingInline: '3.5',
       paddingBlock: '2.5',
     },
+    progress: { display: 'grid', justifyItems: 'start', gap: '1' },
     stage: { textStyle: 'title' },
     purse: { display: 'grid', justifyItems: 'end', gap: '0.5' },
     wallet: { display: 'flex', alignItems: 'center', gap: '2', textStyle: 'label' },

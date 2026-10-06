@@ -6,6 +6,7 @@ import {
   levelCost,
   levelsToMilestone,
   partyVitals,
+  renownPower,
   type PartyState,
   type Roster,
 } from '@engine';
@@ -25,6 +26,7 @@ export function partyRows(
   content: Content,
 ): PartyRows {
   const vitals = partyVitals(party, roster);
+  const power = renownPower(party.renown ?? 0);
   const members = party.heroes.map((slot) => {
     const hero = heroById(roster, slot.heroId);
     const cost = levelCost(slot.level);
@@ -38,7 +40,7 @@ export function partyRows(
       affordable: wealth.balance >= cost,
       levelsToMilestone: remaining,
       milestoneProgress: (BALANCE.milestoneEvery - remaining) / BALANCE.milestoneEvery,
-      action: roleAction(hero, slot.level, vitals),
+      action: roleAction(hero, slot.level, vitals, power),
     };
   });
   const owned = new Set(party.heroes.map((slot) => slot.heroId));
@@ -55,7 +57,7 @@ export function partyRows(
         unlockAtTokens: stats.unlockAtTokens,
         unlocked: isUnlocked(stats, wealth.burned),
         affordable: wealth.balance >= stats.hireCost,
-        action: roleAction(stats, 1, vitals),
+        action: roleAction(stats, 1, vitals, power),
       };
     });
 
