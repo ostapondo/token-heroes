@@ -1,5 +1,6 @@
 import {
   BALANCE,
+  foeDamage,
   foesForStage,
   heroById,
   heroDamage,
@@ -40,6 +41,7 @@ export interface StageSheet {
   readonly foes: readonly FoeSheet[];
   readonly totalHp: number;
   readonly damagePerSecond: number;
+  readonly harshestDamagePerSecond: number;
 }
 
 // A healer's heal depends on the party it heals; alone, it heals itself at its own level.
@@ -78,12 +80,19 @@ export function stageSheet(roster: Roster, stage: number): StageSheet {
     damagePerSecond: foe.damage / foe.attackInterval,
   }));
 
+  const damagePerSecond = foes.reduce((sum, foe) => sum + foe.damagePerSecond, 0);
+  const harshest = Math.max(...roster.bosses.map((boss) => boss.damageScale));
+
   return {
     stage,
     boss: isBossStage(stage),
     timeLimit: isBossStage(stage) ? BALANCE.bossTimeLimit : null,
     foes,
     totalHp: foes.reduce((sum, foe) => sum + foe.hp, 0),
-    damagePerSecond: foes.reduce((sum, foe) => sum + foe.damagePerSecond, 0),
+    damagePerSecond,
+    // The hardest-hitting boss kind at this stage, whichever boss happens to stand here.
+    harshestDamagePerSecond: isBossStage(stage)
+      ? foeDamage(stage, harshest, true) / BALANCE.bossAttackInterval
+      : damagePerSecond,
   };
 }

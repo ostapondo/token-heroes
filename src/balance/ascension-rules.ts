@@ -1,4 +1,4 @@
-import { BALANCE, type PartyState, type Roster } from '@engine';
+import { BALANCE, nextAscensionStage, type PartyState, type Roster } from '@engine';
 import { compact } from './numbers';
 import { stageReached, type PacePoint } from './pace';
 import type { PaceRule } from './pace-rules';
@@ -10,15 +10,16 @@ const deepEnough = (steady: readonly PacePoint[]) =>
 
 const ascended = (party: PartyState, renown: number): PartyState => ({ ...party, renown });
 
-// Ascends every time the party gets deep enough, with no new tokens, until it stops gaining.
+// Ascends at the wall, then again every time the party gets deep enough, with no new tokens,
+// until it can no longer reach the next ascension.
 function ascendUntilDry(party: PartyState, roster: Roster, wall: number): number {
-  let best = wall;
+  let renown = wall;
+  let best = stageReached(ascended(party, renown), roster);
 
-  for (let ascension = 0; ascension < MAX_ASCENSIONS; ascension += 1) {
-    const reached = stageReached(ascended(party, best), roster);
-
-    if (reached < best + BALANCE.ascension.minGain) break;
-    best = reached;
+  for (let ascension = 1; ascension < MAX_ASCENSIONS; ascension += 1) {
+    if (best < nextAscensionStage(renown)) break;
+    renown = best;
+    best = stageReached(ascended(party, renown), roster);
   }
 
   return best - wall;
