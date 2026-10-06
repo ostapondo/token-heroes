@@ -5,11 +5,13 @@ use super::memory::{Reading, StoreCursor};
 use crate::support::logging;
 
 // A source that keeps its sessions in a database rather than in transcript files: it is read
-// as a whole, from the cursor on, whenever anything under its root changes.
+// as a whole, from the cursor on, whenever one of its files in its folder changes.
 pub trait StoreSource: Send {
     fn name(&self) -> &'static str;
 
     fn root(&self) -> &Path;
+
+    fn owns(&self, path: &Path) -> bool;
 
     fn read_new(&self, cursor: &mut StoreCursor, now: u64) -> Result<u64, String>;
 }
@@ -36,3 +38,7 @@ pub fn read_store(source: &dyn StoreSource, reading: &mut Reading, now: u64) -> 
         }
     }
 }
+
+#[cfg(test)]
+#[path = "store_tests.rs"]
+mod tests;

@@ -92,3 +92,11 @@ fn reads_nothing_where_opencode_never_ran() -> Result<(), String> {
     assert_eq!(source.read_new(&mut StoreCursor::default(), 0)?, 0);
     Ok(())
 }
+
+#[test]
+fn owns_its_database_files_but_not_the_snapshots_beside_them() {
+    let source = OpenCode::new(PathBuf::from("/data/opencode/opencode.db"));
+
+    assert!(source.owns(&PathBuf::from("/private/data/opencode/opencode.db-wal")));
+    assert!(!source.owns(&PathBuf::from("/data/opencode/snapshot/abc/index")));
+}

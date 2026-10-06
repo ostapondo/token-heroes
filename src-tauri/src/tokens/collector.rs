@@ -1,6 +1,7 @@
+use std::collections::HashSet;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Seek, SeekFrom};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use super::discovery;
 use super::memory::{FileCursor, LineMemory, Reading};
@@ -40,11 +41,12 @@ impl Collector {
         Self { stores, ..self }
     }
 
-    pub fn roots(&self) -> impl Iterator<Item = &Path> {
-        self.sources
-            .iter()
-            .map(|source| source.root())
-            .chain(self.stores.iter().map(|store| store.root()))
+    pub fn transcript_roots(&self) -> impl Iterator<Item = &Path> {
+        self.sources.iter().map(|source| source.root())
+    }
+
+    pub fn store_folders(&self) -> impl Iterator<Item = &Path> {
+        self.stores.iter().map(|store| store.root())
     }
 
     pub fn scan(&self, reading: &mut Reading, now: u64) -> Batch {
@@ -67,14 +69,22 @@ impl Collector {
             })
     }
 
-    pub fn read(&self, path: &Path, reading: &mut Reading, now: u64) -> Batch {
-        if let Some(store) = self
+    // A database changes several of its files at once, so each store is read once per batch.
+    pub fn read_changed(&self, paths: &HashSet<PathBuf>, reading: &mut Reading, now: u64) -> Batch {
+        let stores = self
             .stores
             .iter()
-            .find(|store| path.starts_with(store.root()))
-        {
-            return read_store(store.as_ref(), reading, now);
-        }
+            .filter(|store| paths.iter().any(|path| store.owns(path)))
+            .fold(Batch::default(), |batch, store| {
+                batch.and(read_store(store.as_ref(), reading, now))
+            });
+
+        paths.iter().fold(stores, |batch, path| {
+            batch.and(self.read(path, reading, now))
+        })
+    }
+
+    pub fn read(&self, path: &Path, reading: &mut Reading, now: u64) -> Batch {
         if !discovery::is_transcript(path) {
             return Batch::default();
         }
@@ -88,9 +98,7 @@ impl Collector {
     // whole history again when it comes back.
     fn forget_deleted(&self, reading: &mut Reading) -> Batch {
         let present: Vec<&Path> = self
-            .sources
-            .iter()
-            .map(|source| source.root())
+            .transcript_roots()
             .filter(|root| root.exists())
             .collect();
         let before = reading.files.len();

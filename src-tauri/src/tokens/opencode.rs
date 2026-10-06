@@ -51,6 +51,18 @@ impl StoreSource for OpenCode {
         self.database.parent().unwrap_or(&self.database)
     }
 
+    // Matched by name, not by folder: the watcher reports real paths behind a symlink.
+    fn owns(&self, path: &Path) -> bool {
+        let named = |path: &Path| {
+            path.file_name()
+                .map(|name| name.to_string_lossy().into_owned())
+        };
+
+        named(path)
+            .zip(named(&self.database))
+            .is_some_and(|(changed, database)| changed.starts_with(&database))
+    }
+
     fn read_new(&self, cursor: &mut StoreCursor, now: u64) -> Result<u64, String> {
         if !self.database.exists() {
             return Ok(0);
