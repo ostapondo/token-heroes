@@ -9,6 +9,7 @@ import {
   type Roster,
 } from '@engine';
 import { RECRUITS_SHOWN } from '../constants';
+import { roleAction } from './role-action';
 import type { PartyRows } from '../types';
 
 interface Wealth {
@@ -23,7 +24,8 @@ export function partyRows(
   content: Content,
 ): PartyRows {
   const members = party.heroes.map((slot) => {
-    const cost = levelCost(heroById(roster, slot.heroId), slot.level);
+    const hero = heroById(roster, slot.heroId);
+    const cost = levelCost(hero, slot.level);
     const remaining = levelsToMilestone(slot.level);
 
     return {
@@ -34,6 +36,7 @@ export function partyRows(
       affordable: wealth.balance >= cost,
       levelsToMilestone: remaining,
       milestoneProgress: (BALANCE.milestoneEvery - remaining) / BALANCE.milestoneEvery,
+      action: roleAction(hero, slot.level),
     };
   });
   const owned = new Set(party.heroes.map((slot) => slot.heroId));
@@ -47,6 +50,7 @@ export function partyRows(
       unlockAtTokens: hero.unlockAtTokens,
       unlocked: isUnlocked(hero, wealth.burned),
       affordable: wealth.balance >= hero.hireCost,
+      action: roleAction(heroById(roster, hero.id), 1),
     }));
 
   return { members, recruits };

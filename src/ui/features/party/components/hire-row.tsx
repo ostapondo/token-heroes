@@ -4,6 +4,7 @@ import { cx } from '@styled/css';
 import { panel, pixelButton } from '@styled/recipes';
 import type { HireRowModel } from '../types';
 import { rowRecipe } from './party.recipe';
+import { RoleLine } from './role-line';
 
 interface Props {
   readonly row: HireRowModel;
@@ -21,6 +22,7 @@ export function HireRow({ row, onHire }: Props) {
     <li className={cx(panel({ outline: 'dashed' }), classes.root)}>
       <div className={classes.body}>
         <span className={classes.name}>{row.name}</span>
+        <RoleLine action={row.action} />
         <span className={classes.note}>{note}</span>
       </div>
       {row.unlocked ? (

@@ -22,6 +22,12 @@ export const en = {
   'ultimate.button': 'ULT',
 
   'party.level': 'Lv {level}',
+  'party.role.striker': 'Striker',
+  'party.role.healer': 'Healer',
+  'party.role.tank': 'Tank',
+  'party.action.striker': 'hits {amount} every {seconds}s',
+  'party.action.healer': 'heals the party {amount} every {seconds}s',
+  'party.action.tank': 'adds {hp} HP to the party, hits {amount}',
   'party.milestone.one': 'x2 damage in {count} level',
   'party.milestone.other': 'x2 damage in {count} levels',
   'party.levelUp': '+1 · {cost}',

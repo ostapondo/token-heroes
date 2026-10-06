@@ -2,6 +2,7 @@ import { CONTENT, toRoster } from '@content';
 import { levelCost, heroById } from '@engine';
 import { describe, expect, it } from 'vitest';
 import { RECRUITS_SHOWN } from '../constants';
+import { roleAction } from './role-action';
 import { partyRows } from './party-rows';
 
 const roster = toRoster(CONTENT);
@@ -21,6 +22,7 @@ describe('partyRows', () => {
         affordable: true,
         levelsToMilestone: 1,
         milestoneProgress: 24 / 25,
+        action: roleAction(heroById(roster, 'wanderer'), 24),
       },
     ]);
   });

@@ -5,6 +5,7 @@ import { panel, pixelButton } from '@styled/recipes';
 import { Meter } from '../../../shared/ui';
 import type { HeroRowModel } from '../types';
 import { rowRecipe } from './party.recipe';
+import { RoleLine } from './role-line';
 
 interface Props {
   readonly row: HeroRowModel;
@@ -23,6 +24,7 @@ export function HeroRow({ row, onLevelUp }: Props) {
           <span className={classes.name}>{row.name}</span>
           <span className={classes.level}>{t('party.level', { level: row.level })}</span>
         </div>
+        <RoleLine action={row.action} />
         <Meter value={row.milestoneProgress} label={milestone} />
         <span className={classes.note}>{milestone}</span>
       </div>
