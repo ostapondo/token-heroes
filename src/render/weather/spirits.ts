@@ -17,6 +17,7 @@ export class Lightning implements Weather {
       this.#flashTime += dt;
       if (this.#flashTime > FLASH_PATTERN.reduce((sum, part) => sum + part, 0))
         this.#flashTime = -1;
+
       return;
     }
     this.#untilStrike -= dt;
@@ -24,6 +25,7 @@ export class Lightning implements Weather {
     this.#untilStrike = randomBetween(...STRIKE_GAP);
     this.#flashTime = 0;
     const start = randomBetween(40, ARENA.width - 40);
+
     this.#bolt = Array.from({ length: BOLT.segments + 1 }, (_, step) =>
       step === 0 ? start : start + randomBetween(-BOLT.sway, BOLT.sway),
     );
@@ -37,6 +39,7 @@ export class Lightning implements Weather {
     context.lineWidth = 2;
     context.beginPath();
     const stepHeight = (ARENA.height * 0.7) / BOLT.segments;
+
     this.#bolt.forEach((x, step) => {
       if (step === 0) context.moveTo(x, 0);
       else context.lineTo(x, step * stepHeight);
@@ -46,6 +49,7 @@ export class Lightning implements Weather {
 
   #lit(): boolean {
     const [on, off] = FLASH_PATTERN;
+
     return this.#flashTime >= 0 && (this.#flashTime < on || this.#flashTime > on + off);
   }
 }
@@ -63,10 +67,12 @@ export class GhostFlames implements Weather {
 
   draw(context: CanvasRenderingContext2D, scene: WeatherScene): void {
     const tall = Math.floor(this.#time / FLAME.flicker) % 2 === 0;
+
     for (const offset of FLAME_OFFSETS) {
       const x = Math.round(scene.focus.x + offset);
       const height = tall ? 8 : 6;
       const base = scene.focus.y;
+
       context.fillStyle = FLAME.body;
       context.fillRect(x, base - height, 4, height);
       context.fillRect(x + 1, base - height - 2, 2, 2);

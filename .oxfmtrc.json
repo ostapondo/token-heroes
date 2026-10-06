@@ -13,6 +13,7 @@
     "src-tauri/icons/",
     "*.lock",
     "pnpm-lock.yaml",
-    "docs/concepts/"
+    "docs/concepts/",
+    "styled-system/"
   ]
 }

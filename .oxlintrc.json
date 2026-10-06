@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["eslint", "typescript", "oxc", "unicorn", "react", "jsx-a11y", "import"],
+  "plugins": ["eslint", "typescript", "oxc", "unicorn", "import"],
   "categories": {
     "correctness": "error",
     "suspicious": "error"
@@ -34,12 +34,6 @@
     ],
     "import/no-cycle": "error",
     "import/no-default-export": "off",
-    "react/rules-of-hooks": "error",
-    "react/exhaustive-deps": "error",
-    "react/jsx-key": "error",
-    "react/button-has-type": "error",
-    "react/no-array-index-key": "error",
-    "react/react-in-jsx-scope": "off",
     "import/no-unassigned-import": [
       "error",
       {
@@ -62,12 +56,19 @@
                   "@platform",
                   "react",
                   "react-dom",
-                  "@tauri-apps/*"
+                  "@tauri-apps/*",
+                  "@i18n"
                 ],
                 "message": "engine holds pure game rules and imports no other layer"
               },
               {
-                "group": ["**/content/**", "**/render/**", "**/platform/**", "**/ui/**"],
+                "group": [
+                  "**/content/**",
+                  "**/render/**",
+                  "**/platform/**",
+                  "**/ui/**",
+                  "**/i18n/**"
+                ],
                 "message": "engine holds pure game rules and imports no other layer"
               }
             ]
@@ -83,11 +84,17 @@
           {
             "patterns": [
               {
-                "group": ["@render", "@platform", "react", "react-dom", "@tauri-apps/*"],
+                "group": ["@render", "@platform", "react", "react-dom", "@tauri-apps/*", "@i18n"],
                 "message": "content is data and may import only @engine"
               },
               {
-                "group": ["**/engine/**", "**/render/**", "**/platform/**", "**/ui/**"],
+                "group": [
+                  "**/engine/**",
+                  "**/render/**",
+                  "**/platform/**",
+                  "**/ui/**",
+                  "**/i18n/**"
+                ],
                 "message": "reach another layer through its alias, never a path behind it"
               }
             ]
@@ -107,7 +114,13 @@
                 "message": "render draws to canvas and knows nothing of React or the host"
               },
               {
-                "group": ["**/engine/**", "**/content/**", "**/platform/**", "**/ui/**"],
+                "group": [
+                  "**/engine/**",
+                  "**/content/**",
+                  "**/platform/**",
+                  "**/ui/**",
+                  "**/i18n/**"
+                ],
                 "message": "reach another layer through its alias, never a path behind it"
               }
             ]
@@ -123,31 +136,17 @@
           {
             "patterns": [
               {
-                "group": ["@content", "@render", "react", "react-dom"],
+                "group": ["@content", "@render", "react", "react-dom", "@i18n"],
                 "message": "platform only talks to the Tauri host"
               },
               {
-                "group": ["**/engine/**", "**/content/**", "**/render/**", "**/ui/**"],
-                "message": "reach another layer through its alias, never a path behind it"
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "files": ["src/ui/**"],
-      "rules": {
-        "eslint/no-restricted-imports": [
-          "error",
-          {
-            "patterns": [
-              {
-                "group": ["@tauri-apps/*"],
-                "message": "talk to the host through @platform"
-              },
-              {
-                "group": ["**/engine/**", "**/content/**", "**/render/**", "**/platform/**"],
+                "group": [
+                  "**/engine/**",
+                  "**/content/**",
+                  "**/render/**",
+                  "**/ui/**",
+                  "**/i18n/**"
+                ],
                 "message": "reach another layer through its alias, never a path behind it"
               }
             ]
@@ -160,7 +159,50 @@
       "rules": {
         "eslint/no-console": "off"
       }
+    },
+    {
+      "files": ["src/platform/last-resort.ts"],
+      "rules": {
+        "eslint/no-console": "off"
+      }
+    },
+    {
+      "files": ["src/i18n/**"],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@engine",
+                  "@content",
+                  "@render",
+                  "@platform",
+                  "react",
+                  "react-dom",
+                  "@tauri-apps/*",
+                  "**/engine/**",
+                  "**/content/**",
+                  "**/render/**",
+                  "**/platform/**",
+                  "**/ui/**"
+                ],
+                "message": "i18n holds only catalogues and the translator"
+              }
+            ]
+          }
+        ]
+      }
     }
   ],
-  "ignorePatterns": ["node_modules/**", "dist/**", "src-tauri/target/**", "src-tauri/gen/**"]
+  "ignorePatterns": [
+    "node_modules/**",
+    "dist/**",
+    "src-tauri/target/**",
+    "src-tauri/gen/**",
+    "styled-system/**",
+    "src/ui/**"
+  ],
+  "extends": ["./.oxlint/strict.json"]
 }

@@ -12,6 +12,7 @@ interface Size {
 
 function inRows(index: number, perRow: number) {
   const back = index >= perRow;
+
   return {
     column: index % perRow,
     feet: back ? ROW.backFeet : ROW.frontFeet,
@@ -21,12 +22,14 @@ function inRows(index: number, perRow: number) {
 
 export function partySlot(index: number, size: Size): Box {
   const { column, feet, shift } = inRows(index, PARTY.perRow);
+
   return { x: PARTY.left + shift + column * PARTY.spacing, y: feet - size.height, ...size };
 }
 
 export function packSlot(index: number, size: Size): Box {
   const { column, feet, shift } = inRows(index, PACK.perRow);
   const left = PACK.right - PACK.perRow * PACK.spacing;
+
   return { x: left + shift + column * PACK.spacing, y: feet - size.height, ...size };
 }
 

@@ -10,6 +10,7 @@ export function pixelColors(sprite: SpriteDef, palette?: Palette): PixelGrid {
     row.split('').map((pixel) => {
       if (pixel === TRANSPARENT_PIXEL) return null;
       const fixed = sprite.fixed?.[pixel];
+
       if (fixed) return fixed;
       if (palette && isSlot(pixel)) return palette[pixel];
       throw new Error(`Pixel "${pixel}" has no colour`);

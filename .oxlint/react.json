@@ -1,0 +1,60 @@
+{
+  "$schema": "../node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "jsx-a11y"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "error",
+    "react/error-boundaries": "error",
+    "react/globals": "error",
+    "react/immutability": "error",
+    "react/incompatible-library": "error",
+    "react/preserve-manual-memoization": "error",
+    "react/purity": "error",
+    "react/refs": "error",
+    "react/set-state-in-effect": "error",
+    "react/set-state-in-render": "error",
+    "react/static-components": "error",
+    "react/unsupported-syntax": "error",
+    "react/use-memo": "error",
+    "react/display-name": "error",
+    "react/jsx-key": "error",
+    "react/jsx-no-comment-textnodes": "error",
+    "react/jsx-no-duplicate-props": "error",
+    "react/jsx-no-target-blank": "error",
+    "react/jsx-no-undef": "error",
+    "react/no-children-prop": "error",
+    "react/no-danger-with-children": "error",
+    "react/no-direct-mutation-state": "error",
+    "react/no-find-dom-node": "error",
+    "react/no-is-mounted": "error",
+    "react/no-render-return-value": "error",
+    "react/no-string-refs": "error",
+    "react/no-unescaped-entities": "error",
+    "react/no-unknown-property": "error",
+    "react/no-unsafe": "error",
+    "react/require-render-return": "error",
+    "react/react-in-jsx-scope": "off",
+    "react/button-has-type": "error",
+    "react/no-array-index-key": "error",
+    "react/jsx-no-constructed-context-values": "error",
+    "react/only-export-components": [
+      "error",
+      {
+        "allowConstantExport": true
+      }
+    ],
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "jsx-a11y/no-noninteractive-tabindex": [
+      "error",
+      {
+        "roles": ["region", "tabpanel"]
+      }
+    ],
+    "jsx-a11y/no-autofocus": [
+      "error",
+      {
+        "ignoreNonDOM": true
+      }
+    ]
+  }
+}

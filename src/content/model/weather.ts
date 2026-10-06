@@ -24,7 +24,9 @@ export const WeatherKind = {
 } as const;
 export type WeatherKind = (typeof WeatherKind)[keyof typeof WeatherKind];
 
-type Tinted = { readonly color: string };
+interface Tinted {
+  readonly color: string;
+}
 
 export type WeatherDef =
   | { readonly kind: typeof WeatherKind.Particles; readonly preset: ParticlePreset }

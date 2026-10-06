@@ -20,6 +20,7 @@ export class LavaFloor implements Weather {
 
   draw(context: CanvasRenderingContext2D): void {
     const top = floorTop();
+
     context.fillStyle = LAVA.surface;
     context.fillRect(0, top, ARENA.width, ARENA.floorHeight);
     context.fillStyle = LAVA.rim;
@@ -30,8 +31,10 @@ export class LavaFloor implements Weather {
     context.fillStyle = LAVA.bubble;
     BUBBLES.forEach((x, index) => {
       const phase = ((this.#time + index * 0.37) % BUBBLE_CYCLE) / BUBBLE_CYCLE;
+
       if (phase > 0.6) return;
       const size = Math.ceil(phase * 5);
+
       context.fillRect(x, top + 6 + (index % 3) * 7 - size, size, size);
     });
   }

@@ -93,7 +93,10 @@ export interface BattleState {
 }
 
 type Event<T extends BattleEventType, Data = object> = Readonly<{ type: T } & Data>;
-type FoeAmount = { foe: number; amount: number };
+interface FoeAmount {
+  foe: number;
+  amount: number;
+}
 
 export type BattleEvent =
   | Event<typeof BattleEventType.Hit, FoeAmount & { source: string; crit: boolean }>

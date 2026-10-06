@@ -17,6 +17,7 @@ export abstract class TimedEffect implements Effect {
 
   update(dt: number): boolean {
     this.#age += dt;
+
     return this.#age < this.#life;
   }
 

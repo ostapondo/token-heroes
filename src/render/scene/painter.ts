@@ -22,6 +22,7 @@ function tintOf(actor: Actor): string | null {
   if (actor.motion.flashing) return TINT.flash;
   if (actor.motion.hurting) return TINT.hurt;
   if (actor.motion.glowing) return TINT.glow;
+
   return null;
 }
 
@@ -60,15 +61,18 @@ export function paintCast(
   cast.foes.forEach((actor, index) => {
     const foe = battle.foes[index];
     const visible = foe && (foe.hp > 0 || actor.motion.fade < 1);
+
     if (visible) paintActor(context, sprites, actor, -1, false);
     if (foe && foe.hp > 0 && !foe.boss) paintHpBar(context, actor, foe.hp / foe.maxHp);
   });
   const fallen = battle.phase === BattlePhase.Wiped;
+
   for (const actor of cast.heroes) paintActor(context, sprites, actor, 1, fallen);
 }
 
 function paintHpBar(context: CanvasRenderingContext2D, actor: Actor, share: number): void {
   const { x, y, width } = actor.box;
+
   context.fillStyle = HP_BAR.empty;
   context.fillRect(x, y - HP_BAR.gap, width, HP_BAR.height);
   context.fillStyle = FX_COLOR.wound;

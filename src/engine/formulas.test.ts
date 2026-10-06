@@ -19,6 +19,7 @@ describe('hero growth', () => {
 
   it('charges more for every next level', () => {
     const costs = [1, 10, 50, 100].map((level) => levelCost(knight, level));
+
     expect(costs).toEqual(costs.toSorted((a, b) => a - b));
     expect(new Set(costs).size).toBe(costs.length);
   });

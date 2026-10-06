@@ -115,12 +115,14 @@ export class Particles implements Weather {
       particle.x += particle.vx * dt;
       particle.y += particle.vy * dt;
       const gone = particle.y < -8 || particle.y > ARENA.height + 8 || particle.x < -8;
+
       if (gone) this.#particles[index] = this.#spawn(false);
     });
   }
 
   draw(context: CanvasRenderingContext2D): void {
     const length = this.#preset.length ?? 0;
+
     for (const particle of this.#particles) {
       context.fillStyle = particle.color;
       context.fillRect(
@@ -135,6 +137,7 @@ export class Particles implements Weather {
   #spawn(anywhere: boolean): Particle {
     const { from, vx, vy, size, colors } = this.#preset;
     const edge = from === Edge.Top ? -4 : ARENA.height + 4;
+
     return {
       x: randomBetween(0, ARENA.width + 40),
       y: anywhere ? randomBetween(0, ARENA.height) : edge,

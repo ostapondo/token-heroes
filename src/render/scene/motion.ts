@@ -47,6 +47,7 @@ export class Motion {
         this.#fraction(MotionCue.Flash) * REACH.knockback) *
       facing;
     const y = bob - this.#fraction(MotionCue.Entering) * REACH.enterDrop;
+
     return { x: Math.round(x), y: Math.round(y) };
   }
 
@@ -77,6 +78,7 @@ export class Motion {
   #swing(cue: MotionCue): number {
     if (!this.#left.has(cue)) return 0;
     const progress = 1 - this.#fraction(cue);
+
     return progress < SWING_PEAK ? progress / SWING_PEAK : (1 - progress) / (1 - SWING_PEAK);
   }
 }

@@ -39,6 +39,7 @@ export class Arena {
 
   constructor(options: ArenaOptions) {
     const context = options.canvas.getContext('2d');
+
     if (!context) throw new Error('Canvas 2D is unavailable');
     this.#options = options;
     this.#context = context;
@@ -48,6 +49,7 @@ export class Arena {
 
   show(battle: BattleState, party: PartyState): void {
     const elementId = upcomingBoss(this.#options.roster, battle.stage).element;
+
     if (this.#element?.id !== elementId) {
       this.#element = elementById(this.#options.content, elementId);
       this.#weather = this.#element.weather.flatMap((def) =>
@@ -60,8 +62,10 @@ export class Arena {
 
   play(events: readonly BattleEvent[]): void {
     const element = this.#element;
+
     if (!element) return;
     const stage = { heroes: this.#cast.heroes, foes: this.#cast.foes, element };
+
     for (const event of events) {
       this.#apply(this.#attempt('battle event', () => this.#director.react(event, stage), null));
     }
@@ -69,12 +73,14 @@ export class Arena {
 
   celebrate(heroId: string, level: number): void {
     const hero = this.#cast.hero(heroId);
+
     if (hero) this.#apply(this.#director.celebrate(hero, level));
   }
 
   resize(cssWidth: number, pixelRatio: number): void {
     const scale = (cssWidth / ARENA.width) * pixelRatio;
     const { canvas } = this.#options;
+
     canvas.width = Math.round(ARENA.width * scale);
     canvas.height = Math.round(ARENA.height * scale);
     this.#context.setTransform(scale, 0, 0, scale, 0, 0);
@@ -93,6 +99,7 @@ export class Arena {
   #frame(dt: number): void {
     const element = this.#element;
     const snapshot = this.#snapshot;
+
     if (!element || !snapshot) return;
     const context = this.#context;
     const actors = [...this.#cast.heroes, ...this.#cast.foes];
@@ -113,6 +120,7 @@ export class Arena {
 
     context.save();
     const jitter = () => Math.round((Math.random() - 0.5) * this.#shake);
+
     context.translate(jitter(), jitter());
     paintBackdrop(context, element);
     this.#drawWeather(WeatherLayer.Back, { focus });
@@ -143,6 +151,7 @@ export class Arena {
       where,
       () => {
         work();
+
         return true;
       },
       false,
@@ -154,6 +163,7 @@ export class Arena {
       return work();
     } catch (error) {
       this.#options.onError(error, where);
+
       return fallback;
     }
   }

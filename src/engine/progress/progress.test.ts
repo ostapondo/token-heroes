@@ -44,6 +44,7 @@ describe('saveFromWire', () => {
 
   it('rejects a save that names a hero the roster lacks', () => {
     const stranger = { ...game, party: partyOf(['ghost', 3]) };
+
     expect(saveFromWire(roundTrip(stranger), testRoster)).toBeNull();
   });
 });

@@ -17,6 +17,7 @@ export class Slash extends TimedEffect {
   draw(context: CanvasRenderingContext2D): void {
     const drawn = Math.ceil(Math.min(this.progress / 0.3, 1) * this.#length);
     const start = { x: this.#at.x + this.#length / 2, y: this.#at.y - this.#length / 2 };
+
     context.save();
     context.globalAlpha = this.progress > 0.6 ? (1 - this.progress) / 0.4 : 1;
     for (let step = 0; step < drawn; step += 1) {
@@ -39,6 +40,7 @@ export class CrossSlash extends TimedEffect {
 
   draw(context: CanvasRenderingContext2D): void {
     const size = Math.round((this.progress < 0.25 ? 0.4 + this.progress * 3.2 : 1.1) * 16);
+
     context.save();
     context.globalAlpha = this.progress > 0.6 ? (1 - this.progress) / 0.4 : 1;
     context.fillStyle = FX_COLOR.steel;
@@ -68,6 +70,7 @@ export class Projectile extends TimedEffect {
     const x = this.#from.x + (this.#to.x - this.#from.x) * this.progress;
     const y = this.#from.y + (this.#to.y - this.#from.y) * this.progress;
     const [head, tail] = this.#colors;
+
     context.fillStyle = tail;
     context.fillRect(Math.round(x) - this.#size * 2, Math.round(y), this.#size * 2, this.#size);
     context.fillStyle = head;
@@ -88,6 +91,7 @@ export class Beam extends TimedEffect {
   draw(context: CanvasRenderingContext2D): void {
     const reach = Math.min(this.progress / 0.5, 1);
     const thickness = this.progress < 0.5 ? 6 : 6 + (this.progress - 0.5) * 24;
+
     context.save();
     context.globalAlpha = this.progress < 0.5 ? 1 : 1 - (this.progress - 0.5) / 0.5;
     context.fillStyle = FX_COLOR.gold;

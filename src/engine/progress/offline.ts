@@ -27,6 +27,7 @@ export function fastForward(
   for (let elapsed = 0; elapsed < total; elapsed += BALANCE.offlineStepSeconds) {
     const dt = Math.min(BALANCE.offlineStepSeconds, total - elapsed);
     const step = stepBattle(current, dt, party, roster);
+
     current = step.battle;
     for (const event of step.events) {
       if (event.type === BattleEventType.StageCleared) stagesCleared += 1;

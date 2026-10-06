@@ -37,7 +37,9 @@ const saveWire = object({
 
 export function saveFromWire(value: unknown, roster: Roster): GameSave | null {
   const parsed = saveWire.safeParse(value);
+
   if (!parsed.success) return null;
   const known = new Set(roster.heroes.map((hero) => hero.id));
+
   return parsed.data.party.heroes.every((slot) => known.has(slot.heroId)) ? parsed.data : null;
 }

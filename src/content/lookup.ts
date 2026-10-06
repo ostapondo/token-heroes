@@ -8,7 +8,9 @@ function findById<T extends { readonly id: string }>(
   kind: string,
 ): T {
   const item = items.find((candidate) => candidate.id === id);
+
   if (!item) throw new Error(`Unknown ${kind} ${id}`);
+
   return item;
 }
 
@@ -25,7 +27,9 @@ export const heroDefById = (content: Content, id: string): HeroDef =>
 
 export function starterHero(content: Content): HeroDef {
   const hero = content.heroes[0];
+
   if (!hero) throw new Error('The content has no heroes');
+
   return hero;
 }
 
@@ -44,6 +48,7 @@ export function toRoster(content: Content): Roster {
     })),
     bosses: content.bosses.map((boss) => {
       const creature = creatureById(content, boss.creature);
+
       return {
         id: boss.id,
         element: boss.element,

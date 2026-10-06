@@ -37,6 +37,7 @@ export function damageFront(
 ): void {
   const index = frontFoe(draft);
   const foe = draft.foes[index];
+
   if (!foe) return;
   foe.hp = Math.max(0, foe.hp - amount);
   events.push(hitEvent(index));
@@ -48,6 +49,7 @@ export function settleClear(draft: BattleDraft, events: BattleEvent[]): boolean 
   draft.phase = BattlePhase.Cleared;
   draft.phaseLeft = BALANCE.advanceDelay;
   events.push({ type: BattleEventType.StageCleared, stage: draft.stage });
+
   return true;
 }
 

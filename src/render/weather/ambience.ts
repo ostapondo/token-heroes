@@ -19,6 +19,7 @@ export class Glow implements Weather {
     const strength = 0.4 + Math.sin(this.#time * 4) * 0.12;
     const { x } = scene.focus;
     const gradient = context.createRadialGradient(x, ARENA.height, 4, x, ARENA.height, 120);
+
     gradient.addColorStop(0, withAlpha(this.#color, strength));
     gradient.addColorStop(1, withAlpha(this.#color, 0));
     context.fillStyle = gradient;
@@ -41,6 +42,7 @@ export class Fog implements Weather {
 
   draw(context: CanvasRenderingContext2D): void {
     const drift = Math.sin(this.#time * 0.5) * 14;
+
     context.fillStyle = withAlpha(this.#color, 0.14);
     context.fillRect(drift - 20, floorTop() - 12, ARENA.width + 40, 26);
     context.fillStyle = withAlpha(this.#color, 0.09);
@@ -73,6 +75,7 @@ export class Pulse implements Weather {
       middle.y,
       width * 0.75,
     );
+
     gradient.addColorStop(0, withAlpha(this.#color, 0));
     gradient.addColorStop(1, withAlpha(this.#color, strength));
     context.fillStyle = gradient;

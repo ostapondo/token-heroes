@@ -1,5 +1,6 @@
 import { heroDefById, type Content, type ElementDef } from '@content';
 import { AttackStyle, BattleEventType, type BattleEvent } from '@engine';
+import { t } from '@i18n';
 import { compactNumber } from '../format';
 import type { Actor } from '../scene/cast';
 import { ARENA, center, floorTop, type Point } from '../scene/geometry';
@@ -10,11 +11,6 @@ import type { Effect } from './effect';
 import { FloatingText, type TextStyle } from './floating-text';
 import { LightPillar, ScreenFlash } from './screen';
 import { Beam, CrossSlash, Projectile, Slash } from './strikes';
-
-export const ARENA_LABEL = {
-  defeated: 'DEFEATED',
-  levelUp: (level: number) => `LV ${level}!`,
-} as const;
 
 const TEXT = {
   hit: { color: FX_COLOR.steel, size: 10 },
@@ -76,6 +72,7 @@ export class Director {
       case BattleEventType.StageStarted:
       case BattleEventType.Respawned:
         for (const foe of stage.foes) foe.motion.cue(MotionCue.Entering);
+
         return NONE;
       case BattleEventType.StageCleared:
       case BattleEventType.Wiped:
@@ -87,10 +84,11 @@ export class Director {
 
   celebrate(hero: Actor, level: number): Reaction {
     hero.motion.cue(MotionCue.Glow);
+
     return {
       effects: [
         new LightPillar(center(hero.box).x, floorTop() + 18),
-        new FloatingText(ARENA_LABEL.levelUp(level), above(hero, 6), TEXT.levelUp),
+        new FloatingText(t('arena.levelUp', { level }), above(hero, 6), TEXT.levelUp),
       ],
       shake: 0,
     };
@@ -99,9 +97,11 @@ export class Director {
   #hit(event: EventOf<typeof BattleEventType.Hit>, stage: Stage): Reaction {
     const foe = stage.foes[event.foe];
     const hero = stage.heroes.find((actor) => actor.id === event.source);
+
     if (!foe || !hero) return NONE;
     foe.motion.cue(MotionCue.Flash);
     const style = heroDefById(this.#content, hero.id).attack;
+
     return {
       effects: [
         ...this.#attack(style, hero, foe, stage.element.accent),
@@ -121,9 +121,11 @@ export class Director {
 
   #strike(event: EventOf<typeof BattleEventType.Strike>, stage: Stage): Reaction {
     const foe = stage.foes[event.foe];
+
     if (!foe) return NONE;
     foe.motion.cue(MotionCue.Flash);
     const at = center(foe.box);
+
     return {
       effects: [
         new CrossSlash(at),
@@ -137,9 +139,11 @@ export class Director {
   #ultimate(event: EventOf<typeof BattleEventType.Ultimate>, stage: Stage): Reaction {
     const foe = stage.foes[event.foe];
     const front = stage.heroes.at(-1);
+
     if (!foe || !front) return NONE;
     foe.motion.cue(MotionCue.Flash);
     const at = center(foe.box);
+
     return {
       effects: [
         new Beam(center(front.box), at),
@@ -153,8 +157,10 @@ export class Director {
 
   #heal(event: EventOf<typeof BattleEventType.Heal>, stage: Stage): Reaction {
     const healer = stage.heroes.find((actor) => actor.id === event.source);
+
     if (!healer) return NONE;
     const text = new FloatingText(`+${compactNumber(event.amount)}`, above(healer), TEXT.heal);
+
     return { effects: [text], shake: 0 };
   }
 
@@ -165,14 +171,17 @@ export class Director {
     const wound = target
       ? [new FloatingText(`-${compactNumber(event.amount)}`, above(target), TEXT.wound)]
       : [];
+
     return { effects: [...wound, new ScreenFlash(stage.element.accent, 0.25, 0.4)], shake: 1 };
   }
 
   #defeated(event: EventOf<typeof BattleEventType.FoeDefeated>, stage: Stage): Reaction {
     const foe = stage.foes[event.foe];
+
     if (!foe) return NONE;
     foe.motion.cue(MotionCue.Dying);
     const accent = stage.element.accent;
+
     if (!event.boss) {
       return {
         effects: [new Sparks(center(foe.box), [accent], { count: 6, reach: 14 })],
@@ -180,10 +189,11 @@ export class Director {
       };
     }
     const banner = { color: accent, size: 24, life: 1.4, rise: 8 };
+
     return {
       effects: [
         new Sparks(center(foe.box), [accent, FX_COLOR.steel], { count: 24, reach: 60 }),
-        new FloatingText(ARENA_LABEL.defeated, BANNER_AT, banner),
+        new FloatingText(t('arena.defeated'), BANNER_AT, banner),
       ],
       shake: 4,
     };
@@ -192,9 +202,11 @@ export class Director {
   #attack(style: AttackStyle, hero: Actor, foe: Actor, accent: string): Effect[] {
     const from = center(hero.box);
     const to = center(foe.box);
+
     switch (style) {
       case AttackStyle.Slash:
         hero.motion.cue(MotionCue.Dash);
+
         return [new Slash(to, accent)];
       case AttackStyle.Arrow:
         return [new Projectile(from, to, [FX_COLOR.wood, FX_COLOR.heal], 1)];

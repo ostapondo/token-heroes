@@ -16,6 +16,7 @@ export {
   WipeReason,
   type BattleEvent,
   type BattleState,
+  type BattleStep,
   type BossStats,
   type FoeStats,
   type HeroStats,

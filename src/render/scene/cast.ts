@@ -26,6 +26,7 @@ export interface Actor {
 
 const scaled = (sprite: SpriteDef, scale: number) => {
   const { width, height } = spriteSize(sprite);
+
   return { width: width * scale, height: height * scale };
 };
 
@@ -60,11 +61,13 @@ export class Cast {
 
   sync(battle: BattleState, party: PartyState, element: ElementDef): void {
     const heroKey = party.heroes.map((slot) => slot.heroId).join('|');
+
     if (heroKey !== this.#heroKey) {
       this.#heroKey = heroKey;
       this.#heroes = party.heroes.map((slot, index) => this.#heroActor(slot.heroId, index));
     }
     const foeKey = [battle.stage, element.id, ...battle.foes.map((foe) => foe.id)].join('|');
+
     if (foeKey !== this.#foeKey) {
       this.#foeKey = foeKey;
       this.#foes = battle.foes.map((foe, index) =>
@@ -75,6 +78,7 @@ export class Cast {
 
   #heroActor(heroId: string, index: number): Actor {
     const sprite = heroDefById(this.#content, heroId).sprite;
+
     return {
       id: heroId,
       key: `hero:${heroId}`,
@@ -88,6 +92,7 @@ export class Cast {
   #bossActor(bossId: string, element: ElementDef): Actor {
     const boss = bossById(this.#content, bossId);
     const sprite = creatureById(this.#content, boss.creature).sprite;
+
     return {
       id: bossId,
       key: `boss:${boss.creature}:${element.id}`,
@@ -100,6 +105,7 @@ export class Cast {
 
   #enemyActor(enemyId: string, index: number, element: ElementDef): Actor {
     const sprite = enemyById(this.#content, enemyId).sprite;
+
     return {
       id: enemyId,
       key: `enemy:${enemyId}:${element.id}`,

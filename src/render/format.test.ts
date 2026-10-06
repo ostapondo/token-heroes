@@ -10,7 +10,9 @@ describe('compactNumber', () => {
     [148_000, '148K'],
     [17_900_000, '17.9M'],
     [1_000_000_000, '1.0B'],
-    [Number.MAX_SAFE_INTEGER, '9007T'],
+    [1_000_000_000_000, '1.0T'],
+    [987_654_321_000_000, '988T'],
+    [Number.MAX_SAFE_INTEGER, '9.0Q'],
   ])('writes %d as %s', (value, text) => {
     expect(compactNumber(value)).toBe(text);
   });

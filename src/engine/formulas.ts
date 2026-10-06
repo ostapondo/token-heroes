@@ -10,11 +10,13 @@ export const safeAmount = (value: number): number =>
 
 export function foeHp(stage: number, scale: number, boss: boolean): number {
   const enemy = grown(BALANCE.enemyHpBase, BALANCE.hpGrowth, stage - 1) * scale;
+
   return safeAmount(boss ? enemy * BALANCE.bossHpMultiplier : enemy);
 }
 
 export function foeDamage(stage: number, scale: number, boss: boolean): number {
   const base = boss ? BALANCE.bossDamageBase : BALANCE.enemyDamageBase;
+
   return safeAmount(grown(base, BALANCE.damageGrowth, stage - 1) * scale);
 }
 

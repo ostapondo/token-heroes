@@ -1,0 +1,35 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../../.oxlintrc.json", "../../.oxlint/react.json"],
+  "ignorePatterns": [],
+  "rules": {
+    "eslint/no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["@tauri-apps/*"],
+            "message": "talk to the host through @platform"
+          },
+          {
+            "group": [
+              "**/engine/**",
+              "**/content/**",
+              "**/render/**",
+              "**/platform/**",
+              "**/i18n/**"
+            ],
+            "message": "reach another layer through its alias, never a path behind it"
+          }
+        ]
+      }
+    ],
+    "react/jsx-no-literals": [
+      "error",
+      {
+        "noStrings": true,
+        "ignoreProps": true
+      }
+    ]
+  }
+}

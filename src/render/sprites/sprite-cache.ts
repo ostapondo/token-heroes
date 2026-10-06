@@ -19,9 +19,12 @@ export class SpriteCache {
 
   #remember(key: string, create: () => HTMLCanvasElement): HTMLCanvasElement {
     const cached = this.#bitmaps.get(key);
+
     if (cached) return cached;
     const bitmap = create();
+
     this.#bitmaps.set(key, bitmap);
+
     return bitmap;
   }
 }
@@ -29,9 +32,11 @@ export class SpriteCache {
 function paint(sprite: SpriteDef, pixels: PixelGrid): HTMLCanvasElement {
   const { width, height } = spriteSize(sprite);
   const canvas = document.createElement('canvas');
+
   canvas.width = width;
   canvas.height = height;
   const context = canvas.getContext('2d');
+
   if (!context) throw new Error('Canvas 2D is unavailable');
 
   pixels.forEach((row, y) => {
@@ -41,5 +46,6 @@ function paint(sprite: SpriteDef, pixels: PixelGrid): HTMLCanvasElement {
       context.fillRect(x, y, 1, 1);
     });
   });
+
   return canvas;
 }

@@ -18,6 +18,7 @@ export function newGame(
   seed: number,
 ): GameSave {
   const party: PartyState = { heroes: [{ heroId: starterHeroId, level: 1 }] };
+
   return {
     version: SAVE_VERSION,
     battle: startStage(1, party, roster, { seed, ultimate: 0 }),

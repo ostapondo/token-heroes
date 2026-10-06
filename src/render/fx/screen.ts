@@ -36,6 +36,7 @@ export class LightPillar extends TimedEffect {
     const height = PILLAR.height * grow;
     const fade = this.progress < 0.25 ? 1 : 1 - (this.progress - 0.25) / 0.75;
     const gradient = context.createLinearGradient(0, this.#floor, 0, this.#floor - height);
+
     gradient.addColorStop(0, withAlpha(PILLAR.color, 0.85 * fade));
     gradient.addColorStop(1, withAlpha(PILLAR.color, 0));
     context.fillStyle = gradient;

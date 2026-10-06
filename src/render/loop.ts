@@ -6,11 +6,13 @@ export function runLoop(frame: (dt: number) => void): () => void {
 
   const tick = (now: number) => {
     const dt = Math.min((now - last) / 1000, MAX_FRAME_SECONDS);
+
     last = now;
     frame(dt);
     handle = requestAnimationFrame(tick);
   };
 
   handle = requestAnimationFrame(tick);
+
   return () => cancelAnimationFrame(handle);
 }

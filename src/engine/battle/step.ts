@@ -25,6 +25,7 @@ export function stepBattle(
   roster: Roster,
 ): BattleStep {
   if (battle.phase === BattlePhase.Fighting) return fight(battle, dt, party, roster);
+
   return battle.phase === BattlePhase.Wiped
     ? afterDelay(battle, dt, party, roster, battle.stage, BattleEventType.Respawned)
     : afterDelay(battle, dt, party, roster, battle.stage + 1, BattleEventType.StageStarted);
@@ -39,19 +40,23 @@ function afterDelay(
   type: typeof BattleEventType.Respawned | typeof BattleEventType.StageStarted,
 ): BattleStep {
   const phaseLeft = battle.phaseLeft - dt;
+
   if (phaseLeft > 0) return { battle: { ...battle, phaseLeft }, events: [] };
+
   return { battle: startStage(stage, party, roster, battle), events: [{ type, stage }] };
 }
 
 function fight(battle: BattleState, dt: number, party: PartyState, roster: Roster): BattleStep {
   const draft = draftOf(battle);
   const events: BattleEvent[] = [];
+
   draft.strikeReadyIn = Math.max(0, draft.strikeReadyIn - dt);
 
   if (isBossStage(draft.stage)) {
     draft.bossTimeLeft -= dt;
     if (draft.bossTimeLeft <= 0) {
       wipe(draft, WipeReason.Timeout, events);
+
       return { battle: draft, events };
     }
   }
@@ -61,6 +66,7 @@ function fight(battle: BattleState, dt: number, party: PartyState, roster: Roste
 
   foesAct(draft, dt, events);
   if (draft.partyHp <= 0) wipe(draft, WipeReason.Defeat, events);
+
   return { battle: draft, events };
 }
 
@@ -72,20 +78,26 @@ function heroesAct(
   events: BattleEvent[],
 ): void {
   const maxHp = partyMaxHp(party, roster);
+
   for (const slot of party.heroes) {
     const hero = heroById(roster, slot.heroId);
     let cooldown = (draft.cooldowns[hero.id] ?? 0) - dt;
+
     while (cooldown <= 0 && frontFoe(draft) !== -1) {
       const power = heroDamage(hero, slot.level);
+
       if (hero.role === HeroRole.Healer) {
         const amount = safeAmount(power * BALANCE.healerShare);
+
         draft.partyHp = Math.min(maxHp, draft.partyHp + amount);
         events.push({ type: BattleEventType.Heal, source: hero.id, amount });
       } else {
         const [roll, seed] = nextRandom(draft.seed);
+
         draft.seed = seed;
         const crit = roll < BALANCE.critChance;
         const amount = crit ? safeAmount(power * BALANCE.critMultiplier) : power;
+
         damageFront(draft, amount, events, (foe) => ({
           type: BattleEventType.Hit,
           source: hero.id,

@@ -56,10 +56,13 @@ export function runFor(
 ): { battle: BattleState; events: BattleEvent[] } {
   let current = battle;
   const events: BattleEvent[] = [];
+
   for (let elapsed = 0; elapsed < seconds - 1e-9; elapsed += dt) {
     const step = stepBattle(current, dt, party, testRoster);
+
     current = step.battle;
     events.push(...step.events);
   }
+
   return { battle: current, events };
 }

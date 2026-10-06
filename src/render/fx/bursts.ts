@@ -28,11 +28,13 @@ export class Sparks extends TimedEffect {
 
   draw(context: CanvasRenderingContext2D): void {
     const distance = this.progress * this.#reach;
+
     context.save();
     context.globalAlpha = 1 - this.progress;
     for (const spark of this.#sparks) {
       const x = this.#at.x + Math.cos(spark.angle) * distance * spark.speed;
       const y = this.#at.y + Math.sin(spark.angle) * distance * spark.speed;
+
       context.fillStyle = spark.color;
       context.fillRect(Math.round(x), Math.round(y), spark.long ? 3 : 2, spark.long ? 1 : 2);
     }
@@ -52,6 +54,7 @@ export class Shockwave extends TimedEffect {
 
   draw(context: CanvasRenderingContext2D): void {
     const half = Math.round(4 + this.progress * 22);
+
     context.save();
     context.globalAlpha = 1 - this.progress;
     context.strokeStyle = this.#color;

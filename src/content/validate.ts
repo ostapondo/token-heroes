@@ -8,11 +8,14 @@ const SLOTS = new Set<string>(PALETTE_SLOTS);
 
 function duplicated(kind: string, values: readonly (string | number)[]): string[] {
   const seen = new Set<string | number>();
+
   return values.flatMap((value) => {
     if (!seen.has(value)) {
       seen.add(value);
+
       return [];
     }
+
     return [`${kind} ${String(value)} is defined twice`];
   });
 }
@@ -27,6 +30,7 @@ function spriteProblems(owner: string, sprite: SpriteDef, recolored: boolean): s
   const problems: string[] = [];
   const fixed = sprite.fixed ?? {};
   const width = sprite.rows[0]?.length ?? 0;
+
   if (width === 0) problems.push(`${owner} sprite has no pixels`);
 
   for (const key of Object.keys(fixed)) {
@@ -41,15 +45,18 @@ function spriteProblems(owner: string, sprite: SpriteDef, recolored: boolean): s
     for (const pixel of row) {
       const known =
         pixel === TRANSPARENT_PIXEL || pixel in fixed || (recolored && SLOTS.has(pixel));
+
       if (!known) problems.push(`${owner} sprite row ${line} uses unknown pixel "${pixel}"`);
     }
   });
+
   return problems;
 }
 
 function elementProblems(element: ElementDef): string[] {
   const owner = `element ${element.id}`;
   const { sky, floor, accent } = element;
+
   return [
     ...colorProblems(`${owner} palette`, element.palette),
     ...colorProblems(owner, { sky, floor, accent }),
@@ -66,6 +73,7 @@ function missingReference(owner: string, kind: string, id: string, known: Set<st
 function sequenceProblems(kind: string, orders: readonly number[]): string[] {
   const present = new Set(orders);
   const expected = Array.from({ length: orders.length }, (_, index) => index + 1);
+
   return [
     ...expected
       .filter((order) => !present.has(order))
@@ -92,6 +100,7 @@ function uniquenessProblems(content: Content): string[] {
 
 function coverageProblems(content: Content): string[] {
   const defined = new Set<string>([...idsOf(content.elements), ...idsOf(content.creatures)]);
+
   return [...Object.values(ElementId), ...Object.values(CreatureId)]
     .filter((id) => !defined.has(id))
     .map((id) => `${id} has an id constant but no definition`);
@@ -100,6 +109,7 @@ function coverageProblems(content: Content): string[] {
 function referenceProblems(content: Content): string[] {
   const elements = new Set(idsOf(content.elements));
   const creatures = new Set(idsOf(content.creatures));
+
   return [
     ...content.enemies.flatMap((enemy) =>
       missingReference(`enemy ${enemy.id}`, 'element', enemy.element, elements),
@@ -124,6 +134,7 @@ function artProblems(content: Content): string[] {
 
 function rosterProblems(content: Content): string[] {
   const starter = content.heroes[0];
+
   return [
     ...(content.bosses.length === 0 ? ['there are no bosses'] : []),
     ...(content.enemies.length === 0 ? ['there are no enemies'] : []),

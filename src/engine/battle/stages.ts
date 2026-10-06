@@ -17,6 +17,7 @@ export function foesForStage(roster: Roster, stage: number): Foe[] {
   if (isBossStage(stage)) {
     const boss = upcomingBoss(roster, stage);
     const hp = foeHp(stage, boss.hpScale, true);
+
     return [
       {
         id: boss.id,
@@ -29,6 +30,7 @@ export function foesForStage(roster: Roster, stage: number): Foe[] {
       },
     ];
   }
+
   return Array.from({ length: BALANCE.packSize }, (_, slot) => {
     const enemy = enemyAt(
       roster,
@@ -36,6 +38,7 @@ export function foesForStage(roster: Roster, stage: number): Foe[] {
     );
     const hp = foeHp(stage, enemy.hpScale, false);
     const interval = BALANCE.enemyAttackInterval * (1 + slot * BALANCE.packAttackStagger);
+
     return {
       id: enemy.id,
       boss: false,

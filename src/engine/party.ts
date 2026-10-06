@@ -7,14 +7,17 @@ export function partyMaxHp(party: PartyState, roster: Roster): number {
     (sum, slot) => sum + heroHp(heroById(roster, slot.heroId), slot.level),
     0,
   );
+
   return safeAmount(total);
 }
 
 export function partyPower(party: PartyState, roster: Roster): number {
   const total = party.heroes.reduce((sum, slot) => {
     const hero = heroById(roster, slot.heroId);
+
     return hero.role === HeroRole.Healer ? sum : sum + heroDamage(hero, slot.level);
   }, 0);
+
   return safeAmount(total);
 }
 
@@ -32,6 +35,7 @@ export function levelUp(party: PartyState, heroId: string): PartyState {
 
 export function hire(party: PartyState, heroId: string): PartyState {
   if (heroLevel(party, heroId) !== undefined) return party;
+
   return { heroes: [...party.heroes, { heroId, level: 1 }] };
 }
 
