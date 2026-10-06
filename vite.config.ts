@@ -13,6 +13,8 @@ export default defineConfig({
       '@content': layer('./src/content/index.ts'),
       '@render': layer('./src/render/index.ts'),
       '@platform': layer('./src/platform/index.ts'),
+      '@i18n': layer('./src/i18n/index.ts'),
+      '@styled': layer('./styled-system'),
     },
   },
   server: {

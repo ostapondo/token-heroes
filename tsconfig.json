@@ -21,7 +21,9 @@
       "@engine": ["./src/engine/index.ts"],
       "@content": ["./src/content/index.ts"],
       "@render": ["./src/render/index.ts"],
-      "@platform": ["./src/platform/index.ts"]
+      "@platform": ["./src/platform/index.ts"],
+      "@i18n": ["./src/i18n/index.ts"],
+      "@styled/*": ["./styled-system/*"]
     }
   },
   "include": ["src"]
