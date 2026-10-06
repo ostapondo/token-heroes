@@ -23,6 +23,7 @@
       "@render": ["./src/render/index.ts"],
       "@platform": ["./src/platform/index.ts"],
       "@i18n": ["./src/i18n/index.ts"],
+      "@balance": ["./src/balance/index.ts"],
       "@styled/*": ["./styled-system/*"]
     }
   },

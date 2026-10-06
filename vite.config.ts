@@ -14,6 +14,7 @@ export default defineConfig({
       '@render': layer('./src/render/index.ts'),
       '@platform': layer('./src/platform/index.ts'),
       '@i18n': layer('./src/i18n/index.ts'),
+      '@balance': layer('./src/balance/index.ts'),
       '@styled': layer('./styled-system'),
     },
   },

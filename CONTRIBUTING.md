@@ -19,8 +19,9 @@ Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
 - **Effects.** Weather kinds, particle presets and combat effects live in `src/render`.
 - **Agents.** The host reads Claude Code and Codex today. Another agent that writes its usage to
   disk can become a new token source.
-- **Balance.** Every number that shapes the fight is in `src/engine/balance.ts`. If the curve
-  feels wrong at stage 200, show us why.
+- **Balance.** Every number that shapes the fight is in `src/engine/balance.ts`. `pnpm balance`
+  plays the real battle and checks the rules in [docs/balance.md](docs/balance.md); agents get
+  the same checks through an MCP server.
 - **Platforms.** Most testing happens on macOS. Reports from Windows and Linux are gold.
 - **Bugs and ideas.** [Open an issue](../../issues/new/choose). A clear report is a
   contribution too.
@@ -112,6 +113,7 @@ A boss is a creature drawn in an element. It needs no sprite of its own.
 3. `order` is the boss's place in the run. Orders must run from 1 to the number of bosses with no
    gaps, so a new boss takes the next number.
 4. Run `pnpm test`, then `pnpm dev` and watch it fight.
+5. Run `pnpm balance` to see how the new boss changes where parties get stuck.
 
 ### Add an enemy
 

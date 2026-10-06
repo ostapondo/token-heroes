@@ -19,7 +19,9 @@
     "knip": "knip",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm knip",
     "panda": "panda codegen",
-    "prepare": "panda codegen"
+    "prepare": "panda codegen",
+    "balance": "vite build -c vite.balance.config.ts && node dist-balance/balance-report.mjs",
+    "balance:mcp": "vite build -c vite.balance.config.ts && node dist-balance/balance-mcp.mjs"
   },
   "dependencies": {
     "@fontsource/jersey-10": "5.3.0",
@@ -31,6 +33,7 @@
     "zustand": "5.0.15"
   },
   "devDependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
     "@pandacss/dev": "2.1.1",
     "@pandacss/preset-base": "2.1.1",
     "@stylistic/eslint-plugin": "5.10.0",

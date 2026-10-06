@@ -9,14 +9,15 @@ tokens to level up.
 TypeScript in `src/` is split into layers. Each layer is reached only through its alias,
 never through a path behind it. `.oxlintrc.json` fails on a crossing.
 
-| Layer          | Alias       | May import                     | Holds                                                       |
-| -------------- | ----------- | ------------------------------ | ----------------------------------------------------------- |
-| `src/engine`   | `@engine`   | nothing                        | game rules: stages, battle, levels, offline progress        |
-| `src/content`  | `@content`  | `@engine`                      | data: sprites, elements, creatures, bosses, enemies, heroes |
-| `src/render`   | `@render`   | `@engine`, `@content`, `@i18n` | canvas drawing, sprite cache, weather and combat effects    |
-| `src/platform` | `@platform` | `@engine`                      | the Tauri host: wallet, saves, events                       |
-| `src/i18n`     | `@i18n`     | nothing                        | the English catalogue, `t()` and `tCount()`                 |
-| `src/ui`       | none        | every alias                    | React screens and the HUD                                   |
+| Layer          | Alias       | May import                     | Holds                                                            |
+| -------------- | ----------- | ------------------------------ | ---------------------------------------------------------------- |
+| `src/engine`   | `@engine`   | nothing                        | game rules: stages, battle, levels, offline progress             |
+| `src/content`  | `@content`  | `@engine`                      | data: sprites, elements, creatures, bosses, enemies, heroes      |
+| `src/render`   | `@render`   | `@engine`, `@content`, `@i18n` | canvas drawing, sprite cache, weather and combat effects         |
+| `src/platform` | `@platform` | `@engine`                      | the Tauri host: wallet, saves, events                            |
+| `src/i18n`     | `@i18n`     | nothing                        | the English catalogue, `t()` and `tCount()`                      |
+| `src/balance`  | `@balance`  | `@engine`, `@content`          | balance sheets, battle runs and rules for `pnpm balance` and MCP |
+| `src/ui`       | none        | every alias                    | React screens and the HUD                                        |
 
 `src-tauri` is the Rust host. It watches agent transcripts, owns the coin ledger, stores
 saves and draws the tray. Game rules never move into Rust.
@@ -69,6 +70,14 @@ to its right, and a feature or entity is reached only through its `index.ts`.
   bone, `x` darkest, `.` transparent. Fixed colours go in the sprite's `fixed` map.
 - An element supplies the palette and the weather. A boss is a creature plus an element.
 - `src/content/validate.test.ts` checks every entity. Fix the content, never the check.
+
+## Balance
+
+- After changing a hero, a foe or `src/engine/balance.ts`, run `pnpm balance` or the
+  `check_balance` tool of the MCP server in `.mcp.json`, and fix what fails.
+- The checks run the real engine. Never copy a formula into `src/balance`; export it from
+  `@engine` instead. The game never imports `@balance`.
+- See `docs/balance.md` for the rules and the tools.
 
 ## Economy
 

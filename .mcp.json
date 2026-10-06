@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "token-heroes-balance": {
+      "command": "pnpm",
+      "args": ["--silent", "balance:mcp"]
+    }
+  }
+}

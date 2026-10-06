@@ -4,16 +4,23 @@
     "lib": ["ES2023"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "types": ["node"],
+    "types": ["node", "vite/client"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@engine": ["./src/engine/index.ts"],
+      "@content": ["./src/content/index.ts"],
+      "@balance": ["./src/balance/index.ts"]
+    },
+    "allowImportingTsExtensions": true
   },
   "include": [
     "vite.config.ts",
+    "vite.balance.config.ts",
     "panda.config.ts",
     "postcss.config.js",
     "src/ui/shared/theme",

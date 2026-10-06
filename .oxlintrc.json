@@ -155,6 +155,33 @@
       }
     },
     {
+      "files": ["src/balance/**"],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@platform", "@render", "@i18n", "react", "react-dom", "@tauri-apps/*"],
+                "message": "balance measures the game rules and content, nothing else"
+              },
+              {
+                "group": [
+                  "**/engine/**",
+                  "**/content/**",
+                  "**/render/**",
+                  "**/platform/**",
+                  "**/ui/**",
+                  "**/i18n/**"
+                ],
+                "message": "reach another layer through its alias, never a path behind it"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "files": ["scripts/**"],
       "rules": {
         "eslint/no-console": "off"
