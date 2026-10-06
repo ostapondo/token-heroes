@@ -1,7 +1,10 @@
 import { startStage } from '../battle/start';
 import type { BattleState, PartyState, Roster } from '../types';
+import { rebalanceParty } from './rebalance';
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
+// Version 1 saves hold levels bought before heroes were designed from their place in the roster.
+export const LEGACY_SAVE_VERSION = 1;
 
 export interface GameSave {
   readonly version: typeof SAVE_VERSION;
@@ -40,5 +43,21 @@ export function withProgress(
     party,
     bestStage: Math.max(save.bestStage, battle.stage),
     savedAt: now,
+  };
+}
+
+export interface StoredSave extends Omit<GameSave, 'version'> {
+  readonly version: typeof SAVE_VERSION | typeof LEGACY_SAVE_VERSION;
+}
+
+export function upgradeSave(stored: StoredSave, roster: Roster, spent: number): GameSave {
+  if (stored.version === SAVE_VERSION) return { ...stored, version: SAVE_VERSION };
+  const party = rebalanceParty(stored.party, roster, spent);
+
+  return {
+    ...stored,
+    version: SAVE_VERSION,
+    party,
+    battle: startStage(stored.battle.stage, party, roster, stored.battle),
   };
 }

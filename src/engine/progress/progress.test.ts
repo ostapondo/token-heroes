@@ -3,7 +3,7 @@ import { BALANCE } from '../balance';
 import { startStage } from '../battle/start';
 import { partyOf, testRoster } from '../testing';
 import { fastForward } from './offline';
-import { newGame } from './save';
+import { newGame, SAVE_VERSION } from './save';
 import { saveFromWire } from './save-wire';
 
 const roundTrip = (value: unknown): unknown => JSON.parse(JSON.stringify(value));
@@ -38,8 +38,8 @@ describe('saveFromWire', () => {
     expect(saveFromWire(roundTrip(game), testRoster)).toEqual(game);
   });
 
-  it('rejects a save from another version', () => {
-    expect(saveFromWire({ ...game, version: 2 }, testRoster)).toBeNull();
+  it('rejects a save from a version this game does not know', () => {
+    expect(saveFromWire({ ...game, version: SAVE_VERSION + 1 }, testRoster)).toBeNull();
   });
 
   it('rejects a save that names a hero the roster lacks', () => {

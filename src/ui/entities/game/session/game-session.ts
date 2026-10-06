@@ -92,10 +92,9 @@ export class GameSession {
 
   async start(): Promise<void> {
     try {
-      const [loaded, wallet] = await Promise.all([
-        loadGame(this.#host, this.roster, this.#starterHeroId, Date.now()),
-        this.#host.wallet(),
-      ]);
+      const wallet = await this.#host.wallet();
+      const moment = { now: Date.now(), spent: wallet.spent };
+      const loaded = await loadGame(this.#host, this.roster, this.#starterHeroId, moment);
 
       markReady(this.store, loaded.game, wallet);
       if (loaded.stagesCleared > 0)

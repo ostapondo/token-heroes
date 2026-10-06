@@ -1,6 +1,16 @@
-import { array, boolean, enum as enumOf, literal, number, object, record, string } from 'zod';
+import {
+  array,
+  boolean,
+  enum as enumOf,
+  literal,
+  number,
+  object,
+  record,
+  string,
+  union,
+} from 'zod';
 import { BattlePhase, type Roster } from '../types';
-import { SAVE_VERSION, type GameSave } from './save';
+import { LEGACY_SAVE_VERSION, SAVE_VERSION, type StoredSave } from './save';
 
 const foeWire = object({
   id: string(),
@@ -26,7 +36,7 @@ const battleWire = object({
 });
 
 const saveWire = object({
-  version: literal(SAVE_VERSION),
+  version: union([literal(SAVE_VERSION), literal(LEGACY_SAVE_VERSION)]),
   battle: battleWire,
   party: object({
     heroes: array(object({ heroId: string(), level: number().int().positive() })).min(1),
@@ -35,7 +45,7 @@ const saveWire = object({
   savedAt: number().nonnegative(),
 });
 
-export function saveFromWire(value: unknown, roster: Roster): GameSave | null {
+export function saveFromWire(value: unknown, roster: Roster): StoredSave | null {
   const parsed = saveWire.safeParse(value);
 
   if (!parsed.success) return null;

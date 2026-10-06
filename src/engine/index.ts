@@ -23,7 +23,7 @@ export {
   strikeDamage,
 } from './party';
 export { fastForward } from './progress/offline';
-export { newGame, withProgress, type GameSave } from './progress/save';
+export { newGame, upgradeSave, withProgress, type GameSave } from './progress/save';
 export { saveFromWire } from './progress/save-wire';
 export { heroById } from './roster';
 export {
