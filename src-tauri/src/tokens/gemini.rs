@@ -9,7 +9,7 @@ const TOKENS_MARKER: &str = "\"tokens\"";
 const REPLY: &str = "gemini";
 
 // Gemini CLI appends a message again when its tokens or tool calls arrive, so a reply is
-// counted once by its id. Its prompt count includes cached input, which is not burned.
+// counted once by its id. Its input count already holds the cached input.
 pub struct GeminiCli {
     root: PathBuf,
 }
@@ -35,8 +35,6 @@ struct Tokens {
     #[serde(default)]
     output: u64,
     #[serde(default)]
-    cached: u64,
-    #[serde(default)]
     thoughts: u64,
     #[serde(default)]
     tool: u64,
@@ -46,16 +44,14 @@ struct Tokens {
 
 impl Tokens {
     const fn burned(&self) -> u64 {
-        let total = if self.total > 0 {
-            self.total
-        } else {
-            self.input
-                .saturating_add(self.output)
-                .saturating_add(self.thoughts)
-                .saturating_add(self.tool)
-        };
+        if self.total > 0 {
+            return self.total;
+        }
 
-        total.saturating_sub(self.cached)
+        self.input
+            .saturating_add(self.output)
+            .saturating_add(self.thoughts)
+            .saturating_add(self.tool)
     }
 }
 
@@ -93,12 +89,12 @@ mod tests {
     const REPLY: &str = r#"{"id":"5f1c","type":"gemini","content":"Done.","tokens":{"input":18342,"output":96,"cached":16210,"thoughts":211,"tool":0,"total":18649},"model":"gemini-2.5-pro"}"#;
 
     #[test]
-    fn counts_the_total_without_cached_input() -> Result<(), serde_json::Error> {
+    fn counts_the_total_with_cached_input() -> Result<(), serde_json::Error> {
         let source = GeminiCli::new(PathBuf::new());
 
         assert_eq!(
             source.tokens_in(REPLY, &mut Memory::default().at(0))?,
-            18_649 - 16_210
+            18_649
         );
         Ok(())
     }

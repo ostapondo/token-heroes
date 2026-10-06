@@ -40,17 +40,15 @@ struct Info {
 struct Usage {
     #[serde(default, rename = "input_tokens")]
     input: u64,
-    #[serde(default, rename = "cached_input_tokens")]
-    cached: u64,
     #[serde(default, rename = "output_tokens")]
     output: u64,
 }
 
+// The input holds the cached input and the output holds the reasoning. An imported session
+// logs only an estimated total, which no request burned.
 impl Usage {
     const fn burned(&self) -> u64 {
-        self.input
-            .saturating_sub(self.cached)
-            .saturating_add(self.output)
+        self.input.saturating_add(self.output)
     }
 }
 
@@ -128,7 +126,7 @@ mod tests {
             count((3_000, 900, 300), (2_000, 500, 200)),
         ];
 
-        assert_eq!(burned(&lines)?, [700, 1_700, 0]);
+        assert_eq!(burned(&lines)?, [1_100, 2_200, 0]);
         Ok(())
     }
 
@@ -140,7 +138,7 @@ mod tests {
             count((4_000, 1_500, 80), (2_000, 500, 30)),
         ];
 
-        assert_eq!(burned(&lines)?, [4_100, 1_050, 1_530]);
+        assert_eq!(burned(&lines)?, [5_100, 2_050, 2_030]);
         Ok(())
     }
 
@@ -151,7 +149,7 @@ mod tests {
             count((1_510_000, 1_405_000, 9_100), (10_000, 5_000, 100)),
         ];
 
-        assert_eq!(burned(&lines)?, [0, 5_100]);
+        assert_eq!(burned(&lines)?, [0, 10_100]);
         Ok(())
     }
 
@@ -163,7 +161,22 @@ mod tests {
             usage(1_000, 400, 100),
         );
 
-        assert_eq!(source.tokens_in(&line, &mut Memory::default().at(0))?, 700);
+        assert_eq!(
+            source.tokens_in(&line, &mut Memory::default().at(0))?,
+            1_100
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn does_not_count_the_estimate_of_an_imported_session() -> Result<(), serde_json::Error> {
+        let estimate =
+            r#"{"input_tokens":0,"cached_input_tokens":0,"output_tokens":0,"total_tokens":845}"#;
+        let line = format!(
+            r#"{{"type":"event_msg","payload":{{"type":"token_count","info":{{"total_token_usage":{estimate},"last_token_usage":{estimate}}}}}}}"#,
+        );
+
+        assert_eq!(burned(&[line])?, [0]);
         Ok(())
     }
 
