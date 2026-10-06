@@ -1,0 +1,35 @@
+import { describe, expect, it } from 'vitest';
+import { foeHp, heroDamage, levelCost, levelsToMilestone } from './formulas';
+import { heroById } from './roster';
+import { testRoster } from './testing';
+
+const knight = heroById(testRoster, 'knight');
+
+describe('hero growth', () => {
+  it('doubles damage at every 25th level', () => {
+    expect(heroDamage(knight, 24)).toBe(knight.baseDamage * 24);
+    expect(heroDamage(knight, 25)).toBe(knight.baseDamage * 25 * 2);
+    expect(heroDamage(knight, 50)).toBe(knight.baseDamage * 50 * 4);
+  });
+
+  it('counts the levels left to the next doubling', () => {
+    expect(levelsToMilestone(24)).toBe(1);
+    expect(levelsToMilestone(25)).toBe(25);
+  });
+
+  it('charges more for every next level', () => {
+    const costs = [1, 10, 50, 100].map((level) => levelCost(knight, level));
+    expect(costs).toEqual(costs.toSorted((a, b) => a - b));
+    expect(new Set(costs).size).toBe(costs.length);
+  });
+});
+
+describe('foe growth', () => {
+  it('gives a boss the HP of an enemy with a tenfold scale', () => {
+    expect(foeHp(20, 1, true)).toBe(foeHp(20, 10, false));
+  });
+
+  it('makes every stage tougher than the last', () => {
+    expect(foeHp(41, 1, false)).toBeGreaterThan(foeHp(40, 1, false));
+  });
+});
