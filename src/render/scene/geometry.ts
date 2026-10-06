@@ -1,4 +1,4 @@
-export const ARENA = { width: 186, height: 170, floorHeight: 30 } as const;
+export const ARENA = { width: 186, height: 170, floorHeight: 40 } as const;
 
 export const SPRITE_SCALE = { hero: 3, enemy: 3, boss: 4 } as const;
 

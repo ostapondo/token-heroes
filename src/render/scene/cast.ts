@@ -13,7 +13,8 @@ import type { BattleState, PartyState } from '@engine';
 import { spriteSize } from '../sprites/pixels';
 import type { SpriteCache } from '../sprites/sprite-cache';
 import { SPRITE_SCALE, type Box } from './geometry';
-import { bossSlot, packSlot, partySlot } from './layout';
+import { partyFormation } from './formation';
+import { bossSlot, packSlot } from './layout';
 import { Motion } from './motion';
 
 export interface Actor {
@@ -68,8 +69,16 @@ export class Cast {
 
     if (heroKey !== this.#heroKey) {
       this.#heroKey = heroKey;
-      this.#heroes = party.heroes.map((slot, index) =>
-        this.#heroActor(slot.heroId, index, party.heroes.length),
+      const heroes = party.heroes.map((slot) => heroDefById(this.#content, slot.heroId));
+      const boxes = partyFormation(
+        heroes.map((hero) => ({
+          attack: hero.attack,
+          size: scaled(hero.sprite, SPRITE_SCALE.hero),
+        })),
+      );
+
+      this.#heroes = heroes.map((hero, index) =>
+        this.#heroActor(hero.id, boxes[index] ?? { x: 0, y: 0, width: 0, height: 0 }),
       );
     }
     const foeKey = [battle.stage, element.id, ...battle.foes.map((foe) => foe.id)].join('|');
@@ -82,7 +91,7 @@ export class Cast {
     }
   }
 
-  #heroActor(heroId: string, index: number, partySize: number): Actor {
+  #heroActor(heroId: string, box: Box): Actor {
     const sprite = heroDefById(this.#content, heroId).sprite;
 
     return {
@@ -92,7 +101,7 @@ export class Cast {
       key: `hero:${heroId}`,
       sprite,
       palette: undefined,
-      box: partySlot(index, partySize, scaled(sprite, SPRITE_SCALE.hero)),
+      box,
       pixel: SPRITE_SCALE.hero,
       motion: this.hero(heroId)?.motion ?? new Motion(),
     };
