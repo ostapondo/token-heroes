@@ -1,6 +1,6 @@
 import { BALANCE } from '../balance';
 import { stepBattle } from '../battle/step';
-import type { BattleState, PartyState, Roster } from '../types';
+import { BattleEventType, type BattleState, type PartyState, type Roster } from '../types';
 
 export interface OfflineReport {
   readonly seconds: number;
@@ -29,8 +29,8 @@ export function fastForward(
     const step = stepBattle(current, dt, party, roster);
     current = step.battle;
     for (const event of step.events) {
-      if (event.type === 'stageCleared') stagesCleared += 1;
-      if (event.type === 'wiped') wipes += 1;
+      if (event.type === BattleEventType.StageCleared) stagesCleared += 1;
+      if (event.type === BattleEventType.Wiped) wipes += 1;
     }
   }
 

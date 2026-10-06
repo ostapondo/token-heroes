@@ -1,8 +1,36 @@
-export const HERO_ROLES = ['striker', 'tank', 'healer'] as const;
-export type HeroRole = (typeof HERO_ROLES)[number];
+type ValueOf<T> = T[keyof T];
 
-export const ATTACK_STYLES = ['slash', 'arrow', 'bash', 'spell', 'heal'] as const;
-export type AttackStyle = (typeof ATTACK_STYLES)[number];
+export const HeroRole = { Striker: 'striker', Tank: 'tank', Healer: 'healer' } as const;
+export type HeroRole = ValueOf<typeof HeroRole>;
+
+export const AttackStyle = {
+  Slash: 'slash',
+  Arrow: 'arrow',
+  Bash: 'bash',
+  Spell: 'spell',
+  Heal: 'heal',
+} as const;
+export type AttackStyle = ValueOf<typeof AttackStyle>;
+
+export const BattlePhase = { Fighting: 'fighting', Wiped: 'wiped', Cleared: 'cleared' } as const;
+export type BattlePhase = ValueOf<typeof BattlePhase>;
+
+export const WipeReason = { Defeat: 'defeat', Timeout: 'timeout' } as const;
+export type WipeReason = ValueOf<typeof WipeReason>;
+
+export const BattleEventType = {
+  Hit: 'hit',
+  Strike: 'strike',
+  Ultimate: 'ultimate',
+  Heal: 'heal',
+  PartyHit: 'partyHit',
+  FoeDefeated: 'foeDefeated',
+  StageCleared: 'stageCleared',
+  StageStarted: 'stageStarted',
+  Wiped: 'wiped',
+  Respawned: 'respawned',
+} as const;
+export type BattleEventType = ValueOf<typeof BattleEventType>;
 
 export interface HeroStats {
   readonly id: string;
@@ -51,9 +79,6 @@ export interface Foe {
   readonly attackIn: number;
 }
 
-export const BATTLE_PHASES = ['fighting', 'wiped', 'cleared'] as const;
-type BattlePhase = (typeof BATTLE_PHASES)[number];
-
 export interface BattleState {
   readonly stage: number;
   readonly phase: BattlePhase;
@@ -67,23 +92,20 @@ export interface BattleState {
   readonly seed: number;
 }
 
+type Event<T extends BattleEventType, Data = object> = Readonly<{ type: T } & Data>;
+type FoeAmount = { foe: number; amount: number };
+
 export type BattleEvent =
-  | {
-      readonly type: 'hit';
-      readonly source: string;
-      readonly foe: number;
-      readonly amount: number;
-      readonly crit: boolean;
-    }
-  | { readonly type: 'strike'; readonly foe: number; readonly amount: number }
-  | { readonly type: 'ultimate'; readonly foe: number; readonly amount: number }
-  | { readonly type: 'heal'; readonly source: string; readonly amount: number }
-  | { readonly type: 'partyHit'; readonly foe: number; readonly amount: number }
-  | { readonly type: 'foeDefeated'; readonly foe: number; readonly boss: boolean }
-  | { readonly type: 'stageCleared'; readonly stage: number }
-  | { readonly type: 'stageStarted'; readonly stage: number }
-  | { readonly type: 'wiped'; readonly reason: 'defeat' | 'timeout' }
-  | { readonly type: 'respawned'; readonly stage: number };
+  | Event<typeof BattleEventType.Hit, FoeAmount & { source: string; crit: boolean }>
+  | Event<typeof BattleEventType.Strike, FoeAmount>
+  | Event<typeof BattleEventType.Ultimate, FoeAmount>
+  | Event<typeof BattleEventType.Heal, { source: string; amount: number }>
+  | Event<typeof BattleEventType.PartyHit, FoeAmount>
+  | Event<typeof BattleEventType.FoeDefeated, { foe: number; boss: boolean }>
+  | Event<typeof BattleEventType.StageCleared, { stage: number }>
+  | Event<typeof BattleEventType.StageStarted, { stage: number }>
+  | Event<typeof BattleEventType.Wiped, { reason: WipeReason }>
+  | Event<typeof BattleEventType.Respawned, { stage: number }>;
 
 export interface BattleStep {
   readonly battle: BattleState;

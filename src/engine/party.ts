@@ -1,19 +1,21 @@
-import { heroDamage, heroHp } from './formulas';
+import { heroDamage, heroHp, safeAmount } from './formulas';
 import { heroById } from './roster';
-import type { HeroStats, PartyState, Roster } from './types';
+import { HeroRole, type HeroStats, type PartyState, type Roster } from './types';
 
 export function partyMaxHp(party: PartyState, roster: Roster): number {
-  return party.heroes.reduce(
+  const total = party.heroes.reduce(
     (sum, slot) => sum + heroHp(heroById(roster, slot.heroId), slot.level),
     0,
   );
+  return safeAmount(total);
 }
 
 export function partyPower(party: PartyState, roster: Roster): number {
-  return party.heroes.reduce((sum, slot) => {
+  const total = party.heroes.reduce((sum, slot) => {
     const hero = heroById(roster, slot.heroId);
-    return hero.role === 'healer' ? sum : sum + heroDamage(hero, slot.level);
+    return hero.role === HeroRole.Healer ? sum : sum + heroDamage(hero, slot.level);
   }, 0);
+  return safeAmount(total);
 }
 
 export function heroLevel(party: PartyState, heroId: string): number | undefined {

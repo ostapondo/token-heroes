@@ -1,7 +1,7 @@
 import { BALANCE } from '../balance';
 import { partyMaxHp } from '../party';
 import { heroById } from '../roster';
-import type { BattleState, PartyState, Roster } from '../types';
+import { BattlePhase, type BattleState, type PartyState, type Roster } from '../types';
 import { foesForStage } from './stages';
 
 export function startStage(
@@ -12,7 +12,7 @@ export function startStage(
 ): BattleState {
   return {
     stage,
-    phase: 'fighting',
+    phase: BattlePhase.Fighting,
     phaseLeft: 0,
     foes: foesForStage(roster, stage),
     partyHp: partyMaxHp(party, roster),

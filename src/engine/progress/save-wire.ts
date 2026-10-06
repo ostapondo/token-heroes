@@ -1,5 +1,5 @@
 import { array, boolean, enum as enumOf, literal, number, object, record, string } from 'zod';
-import { BATTLE_PHASES, type Roster } from '../types';
+import { BattlePhase, type Roster } from '../types';
 import { SAVE_VERSION, type GameSave } from './save';
 
 const foeWire = object({
@@ -14,7 +14,7 @@ const foeWire = object({
 
 const battleWire = object({
   stage: number().int().positive(),
-  phase: enumOf(BATTLE_PHASES),
+  phase: enumOf(BattlePhase),
   phaseLeft: number(),
   foes: array(foeWire),
   partyHp: number(),

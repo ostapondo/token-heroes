@@ -1,9 +1,19 @@
 import { BALANCE } from '../balance';
-import { heroDamage } from '../formulas';
+import { heroDamage, safeAmount } from '../formulas';
 import { partyMaxHp } from '../party';
 import { nextRandom } from '../random';
 import { heroById } from '../roster';
-import type { BattleEvent, BattleState, BattleStep, PartyState, Roster } from '../types';
+import {
+  type BattleEvent,
+  BattleEventType,
+  BattlePhase,
+  type BattleState,
+  type BattleStep,
+  HeroRole,
+  type PartyState,
+  type Roster,
+  WipeReason,
+} from '../types';
 import { damageFront, draftOf, frontFoe, settleClear, wipe, type BattleDraft } from './draft';
 import { isBossStage } from './stages';
 import { startStage } from './start';
@@ -14,10 +24,10 @@ export function stepBattle(
   party: PartyState,
   roster: Roster,
 ): BattleStep {
-  if (battle.phase === 'fighting') return fight(battle, dt, party, roster);
-  return battle.phase === 'wiped'
-    ? afterDelay(battle, dt, party, roster, battle.stage, 'respawned')
-    : afterDelay(battle, dt, party, roster, battle.stage + 1, 'stageStarted');
+  if (battle.phase === BattlePhase.Fighting) return fight(battle, dt, party, roster);
+  return battle.phase === BattlePhase.Wiped
+    ? afterDelay(battle, dt, party, roster, battle.stage, BattleEventType.Respawned)
+    : afterDelay(battle, dt, party, roster, battle.stage + 1, BattleEventType.StageStarted);
 }
 
 function afterDelay(
@@ -26,7 +36,7 @@ function afterDelay(
   party: PartyState,
   roster: Roster,
   stage: number,
-  type: 'respawned' | 'stageStarted',
+  type: typeof BattleEventType.Respawned | typeof BattleEventType.StageStarted,
 ): BattleStep {
   const phaseLeft = battle.phaseLeft - dt;
   if (phaseLeft > 0) return { battle: { ...battle, phaseLeft }, events: [] };
@@ -41,7 +51,7 @@ function fight(battle: BattleState, dt: number, party: PartyState, roster: Roste
   if (isBossStage(draft.stage)) {
     draft.bossTimeLeft -= dt;
     if (draft.bossTimeLeft <= 0) {
-      wipe(draft, 'timeout', events);
+      wipe(draft, WipeReason.Timeout, events);
       return { battle: draft, events };
     }
   }
@@ -50,7 +60,7 @@ function fight(battle: BattleState, dt: number, party: PartyState, roster: Roste
   if (settleClear(draft, events)) return { battle: draft, events };
 
   foesAct(draft, dt, events);
-  if (draft.partyHp <= 0) wipe(draft, 'defeat', events);
+  if (draft.partyHp <= 0) wipe(draft, WipeReason.Defeat, events);
   return { battle: draft, events };
 }
 
@@ -67,17 +77,17 @@ function heroesAct(
     let cooldown = (draft.cooldowns[hero.id] ?? 0) - dt;
     while (cooldown <= 0 && frontFoe(draft) !== -1) {
       const power = heroDamage(hero, slot.level);
-      if (hero.role === 'healer') {
-        const amount = Math.ceil(power * BALANCE.healerShare);
+      if (hero.role === HeroRole.Healer) {
+        const amount = safeAmount(power * BALANCE.healerShare);
         draft.partyHp = Math.min(maxHp, draft.partyHp + amount);
-        events.push({ type: 'heal', source: hero.id, amount });
+        events.push({ type: BattleEventType.Heal, source: hero.id, amount });
       } else {
         const [roll, seed] = nextRandom(draft.seed);
         draft.seed = seed;
         const crit = roll < BALANCE.critChance;
-        const amount = crit ? Math.ceil(power * BALANCE.critMultiplier) : power;
+        const amount = crit ? safeAmount(power * BALANCE.critMultiplier) : power;
         damageFront(draft, amount, events, (foe) => ({
-          type: 'hit',
+          type: BattleEventType.Hit,
           source: hero.id,
           foe,
           amount,
@@ -96,7 +106,7 @@ function foesAct(draft: BattleDraft, dt: number, events: BattleEvent[]): void {
     foe.attackIn -= dt;
     while (foe.attackIn <= 0) {
       draft.partyHp -= foe.damage;
-      events.push({ type: 'partyHit', foe: index, amount: foe.damage });
+      events.push({ type: BattleEventType.PartyHit, foe: index, amount: foe.damage });
       foe.attackIn += foe.attackInterval;
     }
   });

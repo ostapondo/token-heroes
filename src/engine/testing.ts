@@ -1,12 +1,12 @@
 import { stepBattle } from './battle/step';
-import type {
+import {
   AttackStyle,
-  BattleEvent,
-  BattleState,
+  type BattleEvent,
+  type BattleState,
   HeroRole,
-  HeroStats,
-  PartyState,
-  Roster,
+  type HeroStats,
+  type PartyState,
+  type Roster,
 } from './types';
 
 function hero(
@@ -31,9 +31,9 @@ function hero(
 
 export const testRoster: Roster = {
   heroes: [
-    hero('knight', 'striker', 'slash'),
-    hero('cleric', 'healer', 'heal', { baseDamage: 5 }),
-    hero('guard', 'tank', 'bash', { baseDamage: 1, baseHp: 400 }),
+    hero('knight', HeroRole.Striker, AttackStyle.Slash),
+    hero('cleric', HeroRole.Healer, AttackStyle.Heal, { baseDamage: 5 }),
+    hero('guard', HeroRole.Tank, AttackStyle.Bash, { baseDamage: 1, baseHp: 400 }),
   ],
   bosses: [{ id: 'dragon', element: 'fire', hpScale: 1, damageScale: 1 }],
   enemies: [

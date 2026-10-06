@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { foeHp, heroDamage, levelCost, levelsToMilestone } from './formulas';
+import { foeDamage, foeHp, heroDamage, heroHp, levelCost, levelsToMilestone } from './formulas';
 import { heroById } from './roster';
 import { testRoster } from './testing';
 
@@ -31,5 +31,24 @@ describe('foe growth', () => {
 
   it('makes every stage tougher than the last', () => {
     expect(foeHp(41, 1, false)).toBeGreaterThan(foeHp(40, 1, false));
+  });
+});
+
+const safe = (value: number) => Number.isSafeInteger(value) && value > 0;
+
+describe('number safety', () => {
+  it('keeps foes finite and exact on absurd stages', () => {
+    for (const stage of [1, 150, 5_000, 1_000_000]) {
+      expect(safe(foeHp(stage, 1.6, true))).toBe(true);
+      expect(safe(foeDamage(stage, 1.4, true))).toBe(true);
+    }
+  });
+
+  it('keeps heroes finite and exact on absurd levels', () => {
+    for (const level of [1, 400, 30_000, 100_000]) {
+      expect(safe(heroDamage(knight, level))).toBe(true);
+      expect(safe(heroHp(knight, level))).toBe(true);
+      expect(safe(levelCost(knight, level))).toBe(true);
+    }
   });
 });

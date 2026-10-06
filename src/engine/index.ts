@@ -9,14 +9,15 @@ export { newGame, SAVE_VERSION, withProgress, type GameSave } from './progress/s
 export { saveFromWire } from './progress/save-wire';
 export { heroById } from './roster';
 export {
-  ATTACK_STYLES,
-  HERO_ROLES,
-  type AttackStyle,
+  AttackStyle,
+  BattleEventType,
+  BattlePhase,
+  HeroRole,
+  WipeReason,
   type BattleEvent,
   type BattleState,
   type BossStats,
   type FoeStats,
-  type HeroRole,
   type HeroStats,
   type PartyState,
   type Roster,

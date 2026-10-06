@@ -1,5 +1,12 @@
 import { BALANCE } from '../balance';
-import type { BattleEvent, BattleState, Foe } from '../types';
+import {
+  type BattleEvent,
+  BattleEventType,
+  BattlePhase,
+  type BattleState,
+  type Foe,
+  type WipeReason,
+} from '../types';
 
 type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 
@@ -33,24 +40,20 @@ export function damageFront(
   if (!foe) return;
   foe.hp = Math.max(0, foe.hp - amount);
   events.push(hitEvent(index));
-  if (foe.hp === 0) events.push({ type: 'foeDefeated', foe: index, boss: foe.boss });
+  if (foe.hp === 0) events.push({ type: BattleEventType.FoeDefeated, foe: index, boss: foe.boss });
 }
 
 export function settleClear(draft: BattleDraft, events: BattleEvent[]): boolean {
   if (frontFoe(draft) !== -1) return false;
-  draft.phase = 'cleared';
+  draft.phase = BattlePhase.Cleared;
   draft.phaseLeft = BALANCE.advanceDelay;
-  events.push({ type: 'stageCleared', stage: draft.stage });
+  events.push({ type: BattleEventType.StageCleared, stage: draft.stage });
   return true;
 }
 
-export function wipe(
-  draft: BattleDraft,
-  reason: 'defeat' | 'timeout',
-  events: BattleEvent[],
-): void {
-  draft.phase = 'wiped';
+export function wipe(draft: BattleDraft, reason: WipeReason, events: BattleEvent[]): void {
+  draft.phase = BattlePhase.Wiped;
   draft.phaseLeft = BALANCE.respawnDelay;
   draft.partyHp = 0;
-  events.push({ type: 'wiped', reason });
+  events.push({ type: BattleEventType.Wiped, reason });
 }

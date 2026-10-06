@@ -4,6 +4,7 @@ import { partyPower } from '../party';
 import { partyOf, testRoster } from '../testing';
 import { chargeUltimate, strike, unleashUltimate } from './actions';
 import { startStage } from './start';
+import { BattleEventType } from '../types';
 
 const party = partyOf(['knight', 10], ['cleric', 10]);
 const battle = startStage(5, party, testRoster, { seed: 1, ultimate: 0 });
@@ -13,7 +14,7 @@ describe('strike', () => {
     const { events } = strike(battle, party, testRoster);
     const amount = Math.ceil(partyPower(party, testRoster) * BALANCE.strikeShare);
 
-    expect(events).toContainEqual({ type: 'strike', foe: 0, amount });
+    expect(events).toContainEqual({ type: BattleEventType.Strike, foe: 0, amount });
   });
 
   it('ignores a second strike inside the cooldown', () => {
