@@ -125,9 +125,13 @@ export class GameSession {
       receiveTokens(this.store, wallet, burnedNow),
     );
 
+    const saveOnHide = () => this.#guard('Saving on hide', () => this.#save());
+
+    window.addEventListener('pagehide', saveOnHide);
     this.#stops.push(
       () => clearInterval(ticker),
       () => clearInterval(saver),
+      () => window.removeEventListener('pagehide', saveOnHide),
       unlisten,
     );
   }
@@ -160,6 +164,7 @@ export class GameSession {
     replaceGame(this.store, next);
     this.#arena?.show(next.battle, next.party);
     this.#arena?.celebrate(heroId, heroLevel(party, heroId) ?? 1);
+    this.#guard('Saving a purchase', () => this.#save());
   }
 
   async #spend(amount: number): Promise<boolean> {
