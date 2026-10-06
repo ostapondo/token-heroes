@@ -6,7 +6,8 @@ import {
   type PartyState,
   type Roster,
 } from '@engine';
-import { Director, type Reaction } from '../fx/director';
+import { Director } from '../fx/director';
+import type { Reaction } from '../fx/reaction';
 import type { Effect } from '../fx/effect';
 import { runLoop } from '../loop';
 import { SpriteCache } from '../sprites/sprite-cache';

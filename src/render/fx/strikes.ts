@@ -30,20 +30,26 @@ export class Slash extends TimedEffect {
   }
 }
 
+// The player's strike lands on the same spot as the party's hits, so it stays smaller and
+// shorter than they are long enough to be seen beside it.
+const CROSS = { reach: 9, life: 0.35 } as const;
+
 export class CrossSlash extends TimedEffect {
   readonly #at: Point;
+  readonly #color: string;
 
-  constructor(at: Point) {
-    super(0.5);
+  constructor(at: Point, color: string) {
+    super(CROSS.life);
     this.#at = at;
+    this.#color = color;
   }
 
   draw(context: CanvasRenderingContext2D): void {
-    const size = Math.round((this.progress < 0.25 ? 0.4 + this.progress * 3.2 : 1.1) * 16);
+    const size = Math.round((this.progress < 0.25 ? 0.4 + this.progress * 3.2 : 1.1) * CROSS.reach);
 
     context.save();
     context.globalAlpha = this.progress > 0.6 ? (1 - this.progress) / 0.4 : 1;
-    context.fillStyle = FX_COLOR.steel;
+    context.fillStyle = this.#color;
     for (let step = -size; step <= size; step += 1) {
       context.fillRect(this.#at.x + step, this.#at.y + step, 2, 2);
       context.fillRect(this.#at.x + step, this.#at.y - step, 2, 2);

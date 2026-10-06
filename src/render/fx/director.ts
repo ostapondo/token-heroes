@@ -1,4 +1,4 @@
-import { heroDefById, type Content, type ElementDef } from '@content';
+import { heroDefById, type Content } from '@content';
 import { BattleEventType, type BattleEvent } from '@engine';
 import { t } from '@i18n';
 import { compactNumber } from '../format';
@@ -8,38 +8,15 @@ import { MotionCue } from '../scene/motion';
 import { bossAttack } from './boss-attacks';
 import { Sparks } from './bursts';
 import { FX_COLOR } from './colors';
-import type { Effect } from './effect';
 import { FloatingText, type TextStyle } from './floating-text';
+import { NumberTrail } from './number-trail';
+import { NONE, type EventOf, type Reaction, type Stage } from './reaction';
 import { LightPillar, ScreenFlash } from './screen';
 import { heroAttack } from './hero-attacks';
 import { Beam, CrossSlash } from './strikes';
-
-const TEXT = {
-  hit: { color: FX_COLOR.steel, size: 10 },
-  crit: { color: FX_COLOR.crit, size: 14 },
-  strike: { color: FX_COLOR.crit, size: 16 },
-  ultimate: { color: FX_COLOR.holy, size: 18 },
-  heal: { color: FX_COLOR.heal, size: 9 },
-  wound: { color: FX_COLOR.wound, size: 11 },
-  levelUp: { color: FX_COLOR.gold, size: 11, life: 1.3 },
-} as const satisfies Record<string, TextStyle>;
+import { TEXT } from './text-styles';
 
 const BANNER_AT: Point = { x: ARENA.width / 2, y: ARENA.height * 0.35 };
-
-export interface Reaction {
-  readonly effects: readonly Effect[];
-  readonly shake: number;
-}
-
-export interface Stage {
-  readonly heroes: readonly Actor[];
-  readonly foes: readonly Actor[];
-  readonly element: ElementDef;
-}
-
-type EventOf<T extends BattleEvent['type']> = Extract<BattleEvent, { type: T }>;
-
-const NONE: Reaction = { effects: [], shake: 0 };
 
 const above = (actor: Actor, lift = 4): Point => ({
   x: center(actor.box).x,
@@ -52,6 +29,7 @@ function unhandled(event: never): never {
 
 export class Director {
   readonly #content: Content;
+  readonly #trail = new NumberTrail();
 
   constructor(content: Content) {
     this.#content = content;
@@ -115,11 +93,7 @@ export class Director {
           count: 8,
           reach: 18,
         }),
-        new FloatingText(
-          compactNumber(event.amount),
-          above(foe),
-          event.crit ? TEXT.crit : TEXT.hit,
-        ),
+        this.#number(compactNumber(event.amount), above(foe), event.crit ? TEXT.crit : TEXT.hit),
       ],
       shake: event.crit ? 2 : 0,
     };
@@ -134,9 +108,9 @@ export class Director {
 
     return {
       effects: [
-        new CrossSlash(at),
-        new Sparks(at, [FX_COLOR.crit, stage.element.accent], { count: 12, reach: 30 }),
-        new FloatingText(compactNumber(event.amount), above(foe, 10), TEXT.strike),
+        new CrossSlash(at, FX_COLOR.player),
+        new Sparks(at, [FX_COLOR.player, FX_COLOR.steel], { count: 8, reach: 18 }),
+        this.#number(compactNumber(event.amount), above(foe, 10), TEXT.strike),
       ],
       shake: 3,
     };
@@ -155,7 +129,7 @@ export class Director {
         new Beam(center(front.box), at),
         new ScreenFlash(FX_COLOR.holy, 0.9),
         new Sparks(at, [FX_COLOR.holy, FX_COLOR.gold], { count: 16, reach: 40 }),
-        new FloatingText(compactNumber(event.amount), above(foe, 14), TEXT.ultimate),
+        this.#number(compactNumber(event.amount), above(foe, 14), TEXT.ultimate),
       ],
       shake: 4,
     };
@@ -165,7 +139,7 @@ export class Director {
     const healer = stage.heroes.find((actor) => actor.id === event.source);
 
     if (!healer) return NONE;
-    const text = new FloatingText(`+${compactNumber(event.amount)}`, above(healer), TEXT.heal);
+    const text = this.#number(`+${compactNumber(event.amount)}`, above(healer), TEXT.heal);
 
     return { effects: [text], shake: 0 };
   }
@@ -181,7 +155,7 @@ export class Director {
     for (const hero of stage.heroes) hero.motion.cue(MotionCue.Hurt);
     const target = stage.heroes[0];
     const wound = target
-      ? [new FloatingText(`-${compactNumber(event.amount)}`, above(target), TEXT.wound)]
+      ? [this.#number(`-${compactNumber(event.amount)}`, above(target), TEXT.wound)]
       : [];
 
     return {
@@ -212,5 +186,9 @@ export class Director {
       ],
       shake: 4,
     };
+  }
+
+  #number(text: string, at: Point, style: TextStyle): FloatingText {
+    return new FloatingText(text, this.#trail.place(at), style);
   }
 }

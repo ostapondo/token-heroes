@@ -9,4 +9,5 @@ export const FX_COLOR = {
   heal: '#7cc35b',
   wound: '#ff5b4a',
   stone: '#c9ced6',
+  player: '#6fe3ff',
 } as const;
