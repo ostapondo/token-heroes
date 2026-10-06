@@ -6,9 +6,5 @@ import { footerNoteStyle } from './footer-note.recipe';
 export function FooterNote() {
   const burned = useGame(selectBurned);
 
-  return (
-    <footer className={footerNoteStyle}>
-      {t('hud.footer', { burned: compactNumber(burned) })}
-    </footer>
-  );
+  return <p className={footerNoteStyle}>{t('hud.footer', { burned: compactNumber(burned) })}</p>;
 }

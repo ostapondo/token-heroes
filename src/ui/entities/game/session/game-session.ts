@@ -109,7 +109,7 @@ export class GameSession {
 
   stop(): void {
     for (const stop of this.#stops.splice(0)) stop();
-    this.#guard('Saving on exit', () => this.#save());
+    this.#guard('Saving on exit', () => this.save());
   }
 
   #run(): void {
@@ -118,14 +118,14 @@ export class GameSession {
       this.#play((game) => stepBattle(game.battle, tickSeconds, game.party, this.roster));
     }, SESSION_TIMING.tickMs);
     const saver = setInterval(
-      () => this.#guard('Autosave', () => this.#save()),
+      () => this.#guard('Autosave', () => this.save()),
       SESSION_TIMING.autosaveMs,
     );
     const unlisten = this.#host.onWallet((wallet, burnedNow) =>
       receiveTokens(this.store, wallet, burnedNow),
     );
 
-    const saveOnHide = () => this.#guard('Saving on hide', () => this.#save());
+    const saveOnHide = () => this.#guard('Saving on hide', () => this.save());
 
     window.addEventListener('pagehide', saveOnHide);
     this.#stops.push(
@@ -164,7 +164,7 @@ export class GameSession {
     replaceGame(this.store, next);
     this.#arena?.show(next.battle, next.party);
     this.#arena?.celebrate(heroId, heroLevel(party, heroId) ?? 1);
-    this.#guard('Saving a purchase', () => this.#save());
+    this.#guard('Saving a purchase', () => this.save());
   }
 
   async #spend(amount: number): Promise<boolean> {
@@ -182,7 +182,7 @@ export class GameSession {
     return false;
   }
 
-  async #save(): Promise<void> {
+  async save(): Promise<void> {
     const game = this.#game();
 
     if (!game) return;

@@ -31,6 +31,11 @@ export const en = {
   'party.ready': 'Ready to join the party',
   'party.unlocksAt': 'Unlocks at {tokens} burned tokens',
 
+  'release.reportBug': 'Report a bug',
+  'release.update': 'Update to {version}',
+  'release.installing': 'Updating…',
+  'release.retry': 'Update failed · retry',
+
   'status.loading': 'Loading…',
   'status.failed': 'The game could not start. Close the window and open it again.',
 

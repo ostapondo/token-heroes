@@ -4,6 +4,7 @@ import { NoticeToast } from '../features/notices';
 import { ErrorBoundary } from '../shared/ui';
 import { FightScreen } from '../widgets/fight-screen';
 import { appShellStyle } from './app.recipe';
+import { ReleaseProvider } from './providers/release-provider';
 import { SessionProvider } from './providers/session-provider';
 
 function Shell() {
@@ -25,7 +26,9 @@ function Shell() {
 export function App({ host }: { readonly host: Host }) {
   return (
     <SessionProvider host={host}>
-      <Shell />
+      <ReleaseProvider host={host}>
+        <Shell />
+      </ReleaseProvider>
     </SessionProvider>
   );
 }
