@@ -81,9 +81,9 @@ frosted edges and snow for ice, lightning and rain for storms, a summoning ring 
   stored or shown.
 - Nothing leaves your machine. The app has no network client, and its content security policy
   allows only the local Tauri bridge.
-- Everything the game keeps sits in `~/.token-heroes/`: `ledger.json` (coins burned and spent),
-  `save.json` (the party and the stage), `sources.json` (how far each transcript has been read)
-  and `logs/`. The game saves after every purchase and whenever the window hides.
+- Everything the game keeps sits in `~/.token-heroes/`: `ledger.json` (coins burned and spent,
+  saved together with how far each transcript has been read, so a crash never credits a token
+  twice), `save.json` (the party and the stage), `settings.json` and `logs/`. The game saves after every purchase and whenever the window hides.
 - Only the host can add coins. The window can spend them, and the host refuses any spend above
   your balance.
 

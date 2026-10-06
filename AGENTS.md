@@ -40,17 +40,23 @@ to its right, and a feature or entity is reached only through its `index.ts`.
 
 ## Rust host
 
-| Folder         | Holds                                                                      |
-| -------------- | -------------------------------------------------------------------------- |
-| `app/`         | Tauri wiring: setup, managed state, IPC commands, events                   |
-| `tokens/`      | the `TokenSource` trait, Claude Code and Codex readers, collector, watcher |
-| `economy/`     | the ledger and the wallet sent to the UI                                   |
-| `persistence/` | data paths and atomic JSON storage with backups and quarantine             |
-| `shell/`       | tray, game window and their copy                                           |
-| `support/`     | rotating log file, panic hook, number formatting                           |
+| Folder         | Holds                                                                 |
+| -------------- | --------------------------------------------------------------------- |
+| `app/`         | Tauri wiring: setup, IPC commands, events, the crediting loop         |
+| `shell/`       | tray, tray menu, game window and their copy                           |
+| `state/`       | `AppState`: the book (ledger plus transcript positions) and settings  |
+| `tokens/`      | the `TokenSource` trait, Claude Code and Codex readers, the collector |
+| `persistence/` | data paths and atomic JSON storage with backups and quarantine        |
+| `economy/`     | the ledger and the wallet sent to the UI                              |
+| `preferences/` | the tray settings                                                     |
+| `support/`     | rotating log file, panic hook, clock, number formatting               |
 
+- The folders are layers, top to bottom as listed: a module imports only the ones below it.
+  `src/layers.rs` fails on a crossing.
 - A new agent is one `tokens/<agent>.rs` implementing `TokenSource` and one line in
-  `tokens/watcher.rs`.
+  `app/crediting.rs`.
+- Coins and transcript positions are one record in `ledger.json`. Change them together
+  through `AppState::credit`, so a crash rolls both back and nothing is credited twice.
 - Clippy runs `pedantic` and `nursery` with `unwrap`, `expect`, `panic`, indexing, `as`
   casts and reasonless `allow` denied. Return errors, log them and keep running.
 - Never hold the ledger lock across disk writes.

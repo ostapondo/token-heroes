@@ -177,18 +177,19 @@ A token source teaches the host to read another agent's transcripts. It lives in
 ```rust
 pub trait TokenSource: Send {
     fn root(&self) -> &Path;
-    fn tokens_in(&self, line: &str, memory: &mut FileMemory) -> Result<u64, serde_json::Error>;
+    fn tokens_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<u64, serde_json::Error>;
 }
 ```
 
 - `root` is the folder to watch. The collector reads every `.jsonl` file below it, a line at a
   time, and remembers how far it got.
 - `tokens_in` returns the tokens burned by one line. Skip lines without usage cheaply, before
-  parsing JSON. `FileMemory` helps with agents that repeat a message while streaming
-  (`first_sighting`) or log running totals (`last_total`).
+  parsing JSON. `LineMemory` helps with agents that write one message on several lines or in
+  several files (`message_growth`) and with agents that log a running total
+  (`cursor.running_total`).
 - Count only tokens the agent truly spent. Cache reads, for example, are not counted.
 - Resolve the root in `src-tauri/src/persistence/paths.rs`, honouring the agent's own home
-  variable if it has one, and register the source in `src-tauri/src/tokens/watcher.rs`.
+  variable if it has one, and register the source in `src-tauri/src/app/crediting.rs`.
 - Add unit tests with real transcript lines, like those in `claude.rs` and `codex.rs`. Strip any
   personal content from them first.
 
