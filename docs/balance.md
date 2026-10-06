@@ -39,9 +39,9 @@ hero, boss or tweak keeps the game in shape without hand-tuned stats.
   and healers.
 - **Levels cost 7% more each, and every 25th level multiplies a hero's power by 4.** Together
   with the foes' growth this keeps each stage only a little dearer than the last, forever.
-- **Ascension trades the stage for power.** From stage 60 the party may return to stage 1 with
-  every hero, level and coin, its power multiplied by the deepest stage reached over 50. A power
-  law grows slower than the foes, so ascending again without new tokens soon stops paying.
+- **Ascension trades the stage for power.** From stage 100 the party may return to stage 1
+  with every hero, level and coin; its power becomes the deepest stage reached over 50. The next
+  ascension opens a quarter deeper than the last, which costs months of tokens, so it stays rare.
 - **Healers restore a share of the party's health**, more when they keep up with the party's
   level, so healing scales with everything else instead of falling behind.
 
@@ -80,14 +80,15 @@ the current set.
 | `ascension-pays-at-the-wall`    | ascending at the wall carries the party at least 5 stages past it    |
 | `ascension-runs-dry`            | ascending again and again without new tokens gains at most 25 stages |
 
-| Party rule                   | The party passes when                                     |
-| ---------------------------- | --------------------------------------------------------- |
-| `healers-keep-up`            | its healing undoes at least 20% of the frontier's damage  |
-| `party-outlasts-the-opening` | its health lasts 40% of the frontier boss timer or longer |
-| `bosses-are-the-wall`        | it gets stuck on a boss, never on a pack                  |
-| `strikers-pull-weight`       | every striker deals at least 5% of the party's damage     |
-| `tanks-hold-the-line`        | every tank holds at least 15% of the party's health       |
-| `no-wipes-before-the-wall`   | it wipes at most once on the stages it goes on to clear   |
+| Party rule                   | The party passes when                                      |
+| ---------------------------- | ---------------------------------------------------------- |
+| `healers-keep-up`            | its healing undoes at least 20% of the frontier's damage   |
+| `bosses-still-threaten`      | the hardest-hitting boss kind still outdamages its healing |
+| `party-outlasts-the-opening` | its health lasts 40% of the frontier boss timer or longer  |
+| `bosses-are-the-wall`        | it gets stuck on a boss, never on a pack                   |
+| `strikers-pull-weight`       | every striker deals at least 5% of the party's damage      |
+| `tanks-hold-the-line`        | every tank holds at least 15% of the party's health        |
+| `no-wipes-before-the-wall`   | it wipes at most once on the stages it goes on to clear    |
 
 A test adds three made-up heroes after the last one and checks every pace rule still passes, so
 the model is known to hold as the roster grows.
