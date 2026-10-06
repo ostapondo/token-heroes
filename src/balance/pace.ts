@@ -42,7 +42,7 @@ export function partyFor(roster: Roster, coins: number): PartyState {
   return { heroes: owned.map((hero) => ({ heroId: hero.id, level })) };
 }
 
-function stageReached(party: PartyState, roster: Roster): number {
+export function stageReached(party: PartyState, roster: Roster): number {
   const run = runParty(party, roster);
 
   return run.frontier?.stage ?? run.fromStage + run.stagesCleared;

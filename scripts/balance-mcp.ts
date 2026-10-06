@@ -1,5 +1,6 @@
 import { CONTENT, toRoster } from '@content';
 import {
+  ASCENSION_RULES,
   checkBalance,
   heroSheet,
   judgeParty,
@@ -42,12 +43,14 @@ server.registerTool(
   { description: 'The balance rules, why each exists and the threshold it must meet.' },
   () =>
     reply(() =>
-      [...PACE_RULES, ...PLAY_RULES, ...RULES].map(({ id, statement, why, threshold }) => ({
-        id,
-        statement,
-        why,
-        threshold,
-      })),
+      [...PACE_RULES, ...PLAY_RULES, ...ASCENSION_RULES, ...RULES].map(
+        ({ id, statement, why, threshold }) => ({
+          id,
+          statement,
+          why,
+          threshold,
+        }),
+      ),
     ),
 );
 
