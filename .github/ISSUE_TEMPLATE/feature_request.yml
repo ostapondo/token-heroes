@@ -1,0 +1,29 @@
+name: Idea
+description: A mechanic, a screen, a new agent to read or anything else you'd like to see.
+labels: [idea]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What would you add or change, and what would it feel like to play?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: The problem it solves or the fun it adds.
+  - type: checkboxes
+    id: economy
+    attributes:
+      label: Economy
+      options:
+        - label: The idea never pays coins for fighting. Coins come only from burned tokens.
+          required: true
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Help
+      options:
+        - label: I'd like to build this myself.

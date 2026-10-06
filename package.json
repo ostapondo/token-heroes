@@ -2,6 +2,7 @@
   "name": "token-heroes",
   "private": true,
   "version": "0.1.0",
+  "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@10.31.0",
   "scripts": {

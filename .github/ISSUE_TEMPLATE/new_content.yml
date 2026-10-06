@@ -1,0 +1,38 @@
+name: New boss, enemy, hero or element
+description: Propose a piece of content, or claim one to draw.
+labels: [content]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind
+      options: [Boss, Enemy, Hero, Element]
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      placeholder: Thunder Golem
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: |
+        Boss: its creature and element. Enemy: its element and look.
+        Hero: its role, attack and the gap it fills. Element: its palette and weather.
+    validations:
+      required: true
+  - type: textarea
+    id: sketch
+    attributes:
+      label: Sketch
+      description: A drawing, a reference image or the sprite rows, if you have them.
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Help
+      options:
+        - label: I'll open the pull request for this.

@@ -1,0 +1,41 @@
+name: Bug report
+description: Something broke, looks wrong or counts the wrong number of tokens.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time. A clear report is half the fix.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to make it happen again
+      placeholder: |
+        1. Open the tray window
+        2. Reach stage 25
+        3. …
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [macOS, Windows, Linux]
+    validations:
+      required: true
+  - type: dropdown
+    id: agents
+    attributes:
+      label: Agents you use
+      multiple: true
+      options: [Claude Code, Codex, Other]
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Logs live in `~/.token-heroes/logs/`. Remove anything private before pasting.
+      render: text

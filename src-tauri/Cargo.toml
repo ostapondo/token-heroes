@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "An endless tray RPG powered by the tokens your coding agents burn"
 edition = "2024"
 rust-version = "1.85"
+license = "MIT"
 
 [lib]
 name = "token_heroes_lib"
