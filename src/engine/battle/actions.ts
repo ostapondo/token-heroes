@@ -1,6 +1,6 @@
 import { BALANCE } from '../balance';
 import { safeAmount } from '../formulas';
-import { partyPower } from '../party';
+import { partyPower, strikeDamage } from '../party';
 import {
   type BattleEvent,
   BattleEventType,
@@ -17,7 +17,7 @@ export function strike(battle: BattleState, party: PartyState, roster: Roster): 
     return { battle, events: [] };
   const draft = draftOf(battle);
   const events: BattleEvent[] = [];
-  const amount = safeAmount(partyPower(party, roster) * BALANCE.strikeShare);
+  const amount = strikeDamage(party, roster);
 
   damageFront(draft, amount, events, (foe) => ({ type: BattleEventType.Strike, foe, amount }));
   draft.strikeReadyIn = BALANCE.strikeCooldown;
