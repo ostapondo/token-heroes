@@ -93,7 +93,9 @@ build is a 3.6 MB app (a 1.75 MB `.dmg`), and it idles in the tray at about 58 M
 
 ## Run it
 
-There are no prebuilt releases yet, so you build from source. You need:
+There are no prebuilt releases yet, so you build from source. Once releases ship, the game
+offers each new version in its footer and installs it in one click. **Report a bug** in the
+footer or the tray menu opens an issue with your version filled in. You need:
 
 - [Node.js](https://nodejs.org) 22 or newer and [pnpm](https://pnpm.io) 10
   (`corepack enable` picks the pinned version)

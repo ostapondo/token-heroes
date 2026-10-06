@@ -226,3 +226,17 @@ one strong accent per element, chunky readable silhouettes.
 - Coding agents are welcome. Review what yours wrote as if you wrote it yourself.
 
 By contributing you agree that your work is released under the [MIT License](LICENSE).
+
+## Releasing
+
+Maintainers ship a release from a tag, and every installed copy offers it in the footer.
+
+1. Raise the version in `package.json`, `src-tauri/Cargo.toml` and `src-tauri/tauri.conf.json`.
+2. Tag the commit `v<version>` and push the tag. The release workflow builds macOS and Windows
+   installers, signs the update bundles and drafts a GitHub release with `latest.json`.
+3. Read the draft, then publish it. The game checks
+   `releases/latest/download/latest.json` at launch and every six hours.
+
+The workflow needs two repository secrets: `TAURI_SIGNING_PRIVATE_KEY` and
+`TAURI_SIGNING_PRIVATE_KEY_PASSWORD`. The matching public key is in `tauri.conf.json`. An update
+signed with any other key is refused, so keep the private key backed up.
