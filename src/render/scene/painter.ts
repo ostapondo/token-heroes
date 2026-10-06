@@ -18,6 +18,8 @@ export function paintBackdrop(context: CanvasRenderingContext2D, element: Elemen
   context.fillRect(0, floorTop(), ARENA.width, 1);
 }
 
+const bottom = (actor: Actor): number => actor.box.y + actor.box.height;
+
 function tintOf(actor: Actor): string | null {
   if (actor.motion.flashing) return TINT.flash;
   if (actor.motion.hurting) return TINT.hurt;
@@ -62,16 +64,20 @@ export function paintCast(
   cast: { heroes: readonly Actor[]; foes: readonly Actor[] },
   battle: BattleState,
 ): void {
-  cast.foes.forEach((actor, index) => {
-    const foe = battle.foes[index];
+  const foes = cast.foes
+    .map((actor, index) => ({ actor, foe: battle.foes[index] }))
+    .toSorted((left, right) => bottom(left.actor) - bottom(right.actor));
+
+  foes.forEach(({ actor, foe }) => {
     const visible = foe && (foe.hp > 0 || actor.motion.fade < 1);
 
     if (visible) paintActor(context, sprites, actor, -1, false);
     if (foe && foe.hp > 0 && !foe.boss) paintHpBar(context, actor, foe.hp / foe.maxHp);
   });
   const fallen = battle.phase === BattlePhase.Wiped;
+  const farthestFirst = cast.heroes.toSorted((left, right) => bottom(left) - bottom(right));
 
-  for (const actor of cast.heroes) paintActor(context, sprites, actor, 1, fallen);
+  for (const actor of farthestFirst) paintActor(context, sprites, actor, 1, fallen);
 }
 
 function paintHpBar(context: CanvasRenderingContext2D, actor: Actor, share: number): void {

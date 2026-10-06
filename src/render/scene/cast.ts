@@ -68,7 +68,9 @@ export class Cast {
 
     if (heroKey !== this.#heroKey) {
       this.#heroKey = heroKey;
-      this.#heroes = party.heroes.map((slot, index) => this.#heroActor(slot.heroId, index));
+      this.#heroes = party.heroes.map((slot, index) =>
+        this.#heroActor(slot.heroId, index, party.heroes.length),
+      );
     }
     const foeKey = [battle.stage, element.id, ...battle.foes.map((foe) => foe.id)].join('|');
 
@@ -80,7 +82,7 @@ export class Cast {
     }
   }
 
-  #heroActor(heroId: string, index: number): Actor {
+  #heroActor(heroId: string, index: number, partySize: number): Actor {
     const sprite = heroDefById(this.#content, heroId).sprite;
 
     return {
@@ -90,7 +92,7 @@ export class Cast {
       key: `hero:${heroId}`,
       sprite,
       palette: undefined,
-      box: partySlot(index, scaled(sprite, SPRITE_SCALE.hero)),
+      box: partySlot(index, partySize, scaled(sprite, SPRITE_SCALE.hero)),
       pixel: SPRITE_SCALE.hero,
       motion: this.hero(heroId)?.motion ?? new Motion(),
     };
