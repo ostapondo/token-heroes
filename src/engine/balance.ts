@@ -51,10 +51,11 @@ export const BALANCE = {
   healShare: 0.0045,
   healLevelFactor: { min: 0, max: 1.5 },
 
-  // Ascending sends the party back to stage 1: its heroes grow by the deepest stage reached over
-  // the base stage. The first ascension opens at minStage and each next one a quarter deeper than
-  // the last, which costs months of tokens, so ascending stays a rare event, not a routine.
-  ascension: { minStage: 100, depthStep: 1.25, baseStage: 50, exponent: 1 },
+  // Ascending starts the game over: every hero back to level 1, the party back to stage 1, with
+  // power from the deepest stage reached over the base stage. Levels bought with tokens are not
+  // refunded, so the power must pay them back within a fraction of the tokens they took. The
+  // first ascension opens at minStage and each next one a quarter deeper, so it stays rare.
+  ascension: { minStage: 100, depthStep: 1.25, baseStage: 50, exponent: 2 },
 
   offlineCapSeconds: 8 * 60 * 60,
   offlineStepSeconds: 1,
