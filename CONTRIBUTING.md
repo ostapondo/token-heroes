@@ -197,6 +197,11 @@ pub trait TokenSource: Send {
 - Add unit tests with real transcript lines, like those in `claude.rs` and `codex.rs`. Strip any
   personal content from them first.
 
+An agent that keeps its sessions in a database instead implements `StoreSource`, like
+`opencode.rs`: it names itself, watches a folder and reads every new reply since its cursor's
+watermark. A reply that grows while it streams is credited only for its growth, through the
+cursor's `seen` messages. Register it with `with_stores` in `src-tauri/src/app/crediting.rs`.
+
 ## Sprites
 
 A sprite is a list of equal-width strings, one character per pixel.
