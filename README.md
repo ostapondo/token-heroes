@@ -107,9 +107,21 @@ build is a 3.6 MB app (a 1.75 MB `.dmg`), and it idles in the tray at about 58 M
 
 ## Run it
 
-There are no prebuilt releases yet, so you build from source. Once releases ship, the game
-offers each new version in its footer and installs it in one click. **Report a bug** in the
-footer or the tray menu opens an issue with your version filled in. You need:
+Download the installer for your system from the
+[latest release](https://github.com/ostapondo/token-heroes/releases/latest):
+
+- **macOS:** open the `.dmg` and drag Token Heroes to Applications. The app is not notarised
+  yet, so macOS blocks its first launch; run this once and open it again:
+  `xattr -dr com.apple.quarantine "/Applications/Token Heroes.app"`
+- **Windows:** run the `-setup.exe`. SmartScreen does not know the app yet: choose
+  **More info**, then **Run anyway**.
+
+After that the game offers each new version in its footer and installs it in one click.
+**Report a bug** in the footer or the tray menu opens an issue with your version filled in.
+
+### Build from source
+
+You need:
 
 - [Node.js](https://nodejs.org) 22 or newer and [pnpm](https://pnpm.io) 10
   (`corepack enable` picks the pinned version)
@@ -200,7 +212,8 @@ docs/         concept boards and the art in this README
 The game runs end to end today: the watcher, the ledger, the battle, the heroes and the saves.
 Next up:
 
-- [ ] Prebuilt installers for macOS, Windows and Linux
+- [x] Installers for macOS and Windows
+- [ ] A Linux build, a notarised macOS app and a signed Windows installer
 - [ ] More agents as token sources: Copilot CLI, Goose, Cline, Roo Code, Amp
 - [ ] The remaining 42 creature × element bosses
 - [ ] A second language
