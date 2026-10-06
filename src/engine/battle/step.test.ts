@@ -10,11 +10,13 @@ const fresh = { seed: 7, ultimate: 0 };
 describe('stepBattle', () => {
   it('clears a pack and starts the next stage after the advance delay', () => {
     const party = partyOf(['knight', 200]);
-    const cleared = runFor(startStage(1, party, testRoster, fresh), 10, party);
+    const { events } = runFor(startStage(1, party, testRoster, fresh), 10, party);
+    const cleared = events.findIndex((event) => event.type === BattleEventType.StageCleared);
+    const started = events.findIndex((event) => event.type === BattleEventType.StageStarted);
 
-    expect(cleared.events.some((event) => event.type === BattleEventType.StageCleared)).toBe(true);
-    expect(cleared.battle.stage).toBe(2);
-    expect(cleared.events).toContainEqual({ type: BattleEventType.StageStarted, stage: 2 });
+    expect(cleared).toBeGreaterThanOrEqual(0);
+    expect(started).toBeGreaterThan(cleared);
+    expect(events[started]).toEqual({ type: BattleEventType.StageStarted, stage: 2 });
   });
 
   it('wipes a weak party on a boss and retries the same stage after the respawn delay', () => {

@@ -2,7 +2,7 @@ import { BALANCE } from '../balance';
 import { stepBattle } from '../battle/step';
 import { BattleEventType, type BattleState, type PartyState, type Roster } from '../types';
 
-export interface OfflineReport {
+interface OfflineReport {
   readonly seconds: number;
   readonly stagesCleared: number;
   readonly wipes: number;

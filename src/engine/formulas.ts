@@ -20,7 +20,7 @@ export function foeDamage(stage: number, scale: number, boss: boolean): number {
   return safeAmount(grown(base, BALANCE.damageGrowth, stage - 1) * scale);
 }
 
-export function milestoneBonus(level: number): number {
+function milestoneBonus(level: number): number {
   return BALANCE.milestoneMultiplier ** Math.floor(level / BALANCE.milestoneEvery);
 }
 

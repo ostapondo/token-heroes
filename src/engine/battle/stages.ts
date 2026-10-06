@@ -9,6 +9,12 @@ export function isBossStage(stage: number): boolean {
   return stage % BALANCE.bossEvery === 0;
 }
 
+export function packSize(stage: number): number {
+  const { first, max, growEvery } = BALANCE.packSize;
+
+  return Math.min(max, first + Math.floor((stage - 1) / growEvery));
+}
+
 export function upcomingBoss(roster: Roster, stage: number): BossStats {
   return bossAt(roster, Math.ceil(stage / BALANCE.bossEvery) - 1);
 }
@@ -31,7 +37,7 @@ export function foesForStage(roster: Roster, stage: number): Foe[] {
     ];
   }
 
-  return Array.from({ length: BALANCE.packSize }, (_, slot) => {
+  return Array.from({ length: packSize(stage) }, (_, slot) => {
     const enemy = enemyAt(
       roster,
       stage * ENEMY_PICK_STRIDE.perStage + slot * ENEMY_PICK_STRIDE.perSlot,
