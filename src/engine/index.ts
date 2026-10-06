@@ -1,6 +1,7 @@
 export { BALANCE } from './balance';
 export { chargeUltimate, strike, unleashUltimate } from './battle/actions';
-export { upcomingBoss } from './battle/stages';
+export { foesForStage, isBossStage, upcomingBoss } from './battle/stages';
+export { startStage } from './battle/start';
 export { stepBattle } from './battle/step';
 export { heroDamage, heroHeal, heroHp, levelCost, levelsToMilestone } from './formulas';
 export { heroLevel, hire, isUnlocked, levelUp, partyMaxHp, strikeDamage } from './party';
@@ -19,4 +20,5 @@ export {
   type HeroStats,
   type PartyState,
   type Roster,
+  WipeReason,
 } from './types';
