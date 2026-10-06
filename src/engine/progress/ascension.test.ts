@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { BALANCE } from '../balance';
 import { partyMaxHp, strikeDamage } from '../party';
 import { partyOf, testRoster } from '../testing';
-import { ascend, ascensionOffer } from './ascension';
+import { ascend, ascensionOffer, nextAscensionStage } from './ascension';
 import { newGame } from './save';
 
 const atStage = (bestStage: number) => ({
@@ -36,10 +36,18 @@ describe('ascension', () => {
     expect(partyMaxHp(renowned, testRoster)).toBeGreaterThan(partyMaxHp(party, testRoster));
   });
 
-  it('gives nothing to ascend again without going deeper', () => {
+  it('opens the next ascension only a quarter deeper than the last', () => {
     const once = ascend(atStage(130), testRoster, 5);
 
     expect(ascensionOffer(once).available).toBe(false);
     expect(ascend(once, testRoster, 6)).toBe(once);
+    expect(ascensionOffer({ ...once, bestStage: 162 }).available).toBe(false);
+    expect(ascensionOffer({ ...once, bestStage: 163 }).available).toBe(true);
+  });
+
+  it('steps from stage 100 a quarter deeper each time', () => {
+    const steps = [0, 100, 125, 157].map(nextAscensionStage);
+
+    expect(steps).toEqual([100, 125, 157, 197]);
   });
 });
