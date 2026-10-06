@@ -1,6 +1,7 @@
 mod app;
 mod economy;
 mod persistence;
+mod preferences;
 mod shell;
 mod support;
 mod tokens;

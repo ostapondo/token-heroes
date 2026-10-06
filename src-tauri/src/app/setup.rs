@@ -16,11 +16,8 @@ pub fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
 
     logging::init(&paths.logs);
     logging::info("Token Heroes started");
-    let state = AppState::load(paths);
-    let balance = state.wallet().balance;
-
-    app.manage(state);
-    tray::create(app.handle(), balance)?;
+    app.manage(AppState::load(paths));
+    tray::create(app.handle())?;
     watcher::start(app.handle().clone());
 
     Ok(())

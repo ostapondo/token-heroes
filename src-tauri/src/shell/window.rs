@@ -1,4 +1,6 @@
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder, WindowEvent};
+
+use crate::app::state::AppState;
 use tauri_plugin_positioner::{Position, WindowExt};
 
 use super::copy;
@@ -39,7 +41,13 @@ pub fn show(app: &AppHandle) {
             let closer = window.clone();
 
             window.on_window_event(move |event| {
-                if matches!(event, WindowEvent::Focused(false)) {
+                let closes_on_blur = closer
+                    .app_handle()
+                    .state::<AppState>()
+                    .settings()
+                    .close_on_blur;
+
+                if closes_on_blur && matches!(event, WindowEvent::Focused(false)) {
                     close(&closer);
                 }
             });

@@ -27,7 +27,7 @@ pub fn spend(app: AppHandle, state: State<'_, AppState>, amount: u64) -> Result<
         .spend(amount)
         .map_err(|_| INSUFFICIENT_COINS.to_owned())?;
 
-    tray::show_balance(&app, wallet.balance);
+    tray::refresh_balance(&app);
 
     Ok(wallet)
 }

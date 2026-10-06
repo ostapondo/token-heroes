@@ -15,7 +15,7 @@ struct WalletChange {
 }
 
 pub fn wallet_changed(app: &AppHandle, wallet: Wallet, burned_now: u64) {
-    tray::show_balance(app, wallet.balance);
+    tray::refresh_balance(app);
     if let Err(problem) = app.emit(WALLET_CHANGED, WalletChange { wallet, burned_now }) {
         logging::warn(&format!("could not announce the wallet: {problem}"));
     }

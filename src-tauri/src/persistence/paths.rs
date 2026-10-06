@@ -35,6 +35,10 @@ impl Paths {
         self.data.join("save.json")
     }
 
+    pub fn settings(&self) -> PathBuf {
+        self.data.join("settings.json")
+    }
+
     pub fn cursors(&self) -> PathBuf {
         self.data.join("sources.json")
     }
