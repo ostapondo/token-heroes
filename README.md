@@ -54,6 +54,9 @@ The fight never pays you. When the party is stuck on a boss, the answer is to sh
 - **Milestones.** Every 25 levels a hero's damage and health grow fourfold.
 - **Wipes are gentle.** If the party falls, it is back in 10 seconds. Levels and coins stay.
 - **Offline progress.** Close the window and the party keeps fighting for up to 8 hours.
+- **Ascension.** Stuck past stage 60? Ascend: the party starts again at stage 1 with every
+  hero, level and coin, and fights with more power the deeper it has been. You confirm first and
+  see the change, for example power ×1.0 → ×2.6.
 
 All of these numbers live in one file, [`src/engine/balance.ts`](src/engine/balance.ts).
 
