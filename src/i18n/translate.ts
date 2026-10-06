@@ -1,7 +1,7 @@
 import { en } from './catalog/en';
 
 export type MessageKey = keyof typeof en;
-export type Catalog = Readonly<Record<MessageKey, string>>;
+type Catalog = Readonly<Record<MessageKey, string>>;
 
 type Placeholders<Template> = Template extends `${string}{${infer Name}}${infer Rest}`
   ? Name | Placeholders<Rest>
@@ -22,7 +22,7 @@ type CountedBase = {
     : never;
 }[MessageKey];
 
-export const LOCALE = 'en';
+const LOCALE = 'en';
 
 const catalog: Catalog = en;
 const pluralRules = new Intl.PluralRules(LOCALE);

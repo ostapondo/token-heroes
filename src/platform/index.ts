@@ -7,4 +7,4 @@ export function connectHost(): Host {
   return isTauri() ? tauriHost() : browserHost();
 }
 
-export { LogLevel, SpendRefusal, type Host, type SpendResult, type Wallet } from './host';
+export { LogLevel, SpendRefusal, type Host, type Wallet } from './host';

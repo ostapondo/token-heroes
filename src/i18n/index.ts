@@ -1,1 +1,1 @@
-export { LOCALE, t, tCount, type Catalog, type MessageKey } from './translate';
+export { t, tCount } from './translate';

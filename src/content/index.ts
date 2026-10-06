@@ -7,15 +7,7 @@ export {
   starterHero,
   toRoster,
 } from './lookup';
-export {
-  CreatureAttack,
-  type BossDef,
-  type CreatureDef,
-  type ElementDef,
-  type EnemyDef,
-  type HeroDef,
-} from './model/definitions';
-export { CreatureId, ElementId } from './model/ids';
+export type { ElementDef } from './model/definitions';
 export { PALETTE_SLOTS, TRANSPARENT_PIXEL, type Palette, type SpriteDef } from './model/sprite';
 export { ParticlePreset, WeatherKind, type WeatherDef } from './model/weather';
 export { CONTENT, type Content } from './registry';

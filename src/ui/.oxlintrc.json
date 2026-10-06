@@ -31,5 +31,179 @@
         "ignoreProps": true
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["shared/**"],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@tauri-apps/*"],
+                "message": "talk to the host through @platform"
+              },
+              {
+                "group": [
+                  "**/engine/**",
+                  "**/content/**",
+                  "**/render/**",
+                  "**/platform/**",
+                  "**/i18n/**"
+                ],
+                "message": "reach another layer through its alias, never a path behind it"
+              },
+              {
+                "group": [
+                  "**/entities",
+                  "**/entities/**",
+                  "**/features",
+                  "**/features/**",
+                  "**/widgets",
+                  "**/widgets/**",
+                  "**/app/**"
+                ],
+                "message": "import only from a lower layer: app \u2192 widgets \u2192 features \u2192 entities \u2192 shared"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["entities/**"],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@tauri-apps/*"],
+                "message": "talk to the host through @platform"
+              },
+              {
+                "group": [
+                  "**/engine/**",
+                  "**/content/**",
+                  "**/render/**",
+                  "**/platform/**",
+                  "**/i18n/**"
+                ],
+                "message": "reach another layer through its alias, never a path behind it"
+              },
+              {
+                "group": [
+                  "**/features",
+                  "**/features/**",
+                  "**/widgets",
+                  "**/widgets/**",
+                  "**/app/**"
+                ],
+                "message": "import only from a lower layer: app \u2192 widgets \u2192 features \u2192 entities \u2192 shared"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["features/**"],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@tauri-apps/*"],
+                "message": "talk to the host through @platform"
+              },
+              {
+                "group": [
+                  "**/engine/**",
+                  "**/content/**",
+                  "**/render/**",
+                  "**/platform/**",
+                  "**/i18n/**"
+                ],
+                "message": "reach another layer through its alias, never a path behind it"
+              },
+              {
+                "group": ["**/widgets", "**/widgets/**", "**/app/**"],
+                "message": "import only from a lower layer: app \u2192 widgets \u2192 features \u2192 entities \u2192 shared"
+              },
+              {
+                "group": ["../../*/**", "!../../../**", "**/entities/*/**"],
+                "message": "reach another feature or entity through its index.ts"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["widgets/**"],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@tauri-apps/*"],
+                "message": "talk to the host through @platform"
+              },
+              {
+                "group": [
+                  "**/engine/**",
+                  "**/content/**",
+                  "**/render/**",
+                  "**/platform/**",
+                  "**/i18n/**"
+                ],
+                "message": "reach another layer through its alias, never a path behind it"
+              },
+              {
+                "group": ["**/app/**"],
+                "message": "import only from a lower layer: app \u2192 widgets \u2192 features \u2192 entities \u2192 shared"
+              },
+              {
+                "group": ["**/features/*/**", "**/entities/*/**"],
+                "message": "reach a feature or entity through its index.ts"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/**"],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@tauri-apps/*"],
+                "message": "talk to the host through @platform"
+              },
+              {
+                "group": [
+                  "**/engine/**",
+                  "**/content/**",
+                  "**/render/**",
+                  "**/platform/**",
+                  "**/i18n/**"
+                ],
+                "message": "reach another layer through its alias, never a path behind it"
+              },
+              {
+                "group": ["**/features/*/**", "**/entities/*/**", "**/widgets/*/**"],
+                "message": "reach a layer through its index.ts"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }
