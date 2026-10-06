@@ -25,12 +25,7 @@ export {
   strikeDamage,
   ultimateDamage,
 } from './party';
-export {
-  ascend,
-  ascensionOffer,
-  nextAscensionStage,
-  type AscensionOffer,
-} from './progress/ascension';
+export { ascend, ascensionOffer, type AscensionOffer } from './progress/ascension';
 export { fastForward } from './progress/offline';
 export { newGame, upgradeSave, withProgress, type GameSave } from './progress/save';
 export { saveFromWire } from './progress/save-wire';

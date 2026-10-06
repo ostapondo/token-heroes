@@ -6,6 +6,7 @@ import type { GameSave } from './save';
 
 export interface AscensionOffer {
   readonly available: boolean;
+  readonly nextStage: number;
   readonly power: number;
   readonly nextPower: number;
 }
@@ -22,6 +23,7 @@ export function ascensionOffer(save: GameSave): AscensionOffer {
 
   return {
     available: save.bestStage >= nextAscensionStage(renown),
+    nextStage: nextAscensionStage(renown),
     power: renownPower(renown),
     nextPower: renownPower(Math.max(renown, save.bestStage)),
   };
@@ -29,7 +31,10 @@ export function ascensionOffer(save: GameSave): AscensionOffer {
 
 export function ascend(save: GameSave, roster: Roster, now: number): GameSave {
   if (!ascensionOffer(save).available) return save;
-  const party = { ...save.party, renown: save.bestStage };
+  const party = {
+    heroes: save.party.heroes.map((slot) => ({ ...slot, level: 1 })),
+    renown: save.bestStage,
+  };
 
   return {
     ...save,

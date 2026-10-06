@@ -17,13 +17,14 @@ describe('ascension', () => {
     expect(ascensionOffer(atStage(BALANCE.ascension.minStage)).available).toBe(true);
   });
 
-  it('sends the party back to stage 1 with every hero, level and its new power', () => {
+  it('starts over at stage 1 with every hero back at level 1 and the new power', () => {
     const before = atStage(130);
     const after = ascend(before, testRoster, 5);
 
     expect(after.battle.stage).toBe(1);
     expect(after.bestStage).toBe(130);
-    expect(after.party.heroes).toEqual(before.party.heroes);
+    expect(after.party.heroes.map((slot) => slot.heroId)).toEqual(['knight', 'cleric']);
+    expect(after.party.heroes.every((slot) => slot.level === 1)).toBe(true);
     expect(after.party.renown).toBe(130);
     expect(ascensionOffer(before).nextPower).toBeGreaterThan(ascensionOffer(before).power);
   });
