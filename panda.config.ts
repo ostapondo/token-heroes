@@ -30,5 +30,11 @@ export default defineConfig({
       userSelect: 'none',
       overflow: 'hidden',
     },
+    '::-webkit-scrollbar': { width: '1.5', height: '1.5' },
+    '::-webkit-scrollbar-track': { background: 'ground' },
+    '::-webkit-scrollbar-thumb': { background: 'edge', borderRadius: 0 },
+    '::-webkit-scrollbar-thumb:hover': { background: 'inkDim' },
+    '::-webkit-scrollbar-button': { display: 'none' },
+    '::-webkit-scrollbar-corner': { background: 'ground' },
   },
 });
