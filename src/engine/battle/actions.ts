@@ -1,6 +1,5 @@
 import { BALANCE } from '../balance';
-import { safeAmount } from '../formulas';
-import { partyPower, strikeDamage } from '../party';
+import { strikeDamage, ultimateDamage } from '../party';
 import {
   type BattleEvent,
   BattleEventType,
@@ -34,7 +33,7 @@ export function unleashUltimate(
   if (battle.phase !== BattlePhase.Fighting || battle.ultimate < 1) return { battle, events: [] };
   const draft = draftOf(battle);
   const events: BattleEvent[] = [];
-  const amount = safeAmount(partyPower(party, roster) * BALANCE.ultimateMultiplier);
+  const amount = ultimateDamage(party, roster);
 
   damageFront(draft, amount, events, (foe) => ({ type: BattleEventType.Ultimate, foe, amount }));
   draft.ultimate = 0;

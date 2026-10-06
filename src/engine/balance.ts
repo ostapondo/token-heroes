@@ -12,8 +12,10 @@ export const BALANCE = {
   critMultiplier: 2.5,
   strikeShare: 0.5,
   strikeCooldown: 0.15,
-  ultimateMultiplier: 25,
-  tokensPerUltimate: 50_000,
+  // An ultimate is a burst worth under ten seconds of the party's damage, earned by about an
+  // hour of agent work, so it rescues a close fight without skipping the wall.
+  ultimateMultiplier: 7,
+  tokensPerUltimate: 1_000_000,
 
   // Foes grow alike in health and damage, so a fight at stage 300 asks what one at stage 30 did.
   foeGrowth: 1.07,
@@ -44,9 +46,10 @@ export const BALANCE = {
     healer: { damagePerSecond: 0, hp: 16 },
   },
   // The share of the party's health a first-rank healer restores each second at the party's
-  // level; a healer behind or ahead of the party heals less or more, within these bounds.
+  // level. A healer heals in proportion to its level against the party's, up to the cap, so a
+  // neglected healer cannot keep healing for free.
   healShare: 0.02,
-  healLevelFactor: { min: 0.5, max: 1.5 },
+  healLevelFactor: { min: 0, max: 1.5 },
 
   offlineCapSeconds: 8 * 60 * 60,
   offlineStepSeconds: 1,
