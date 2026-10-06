@@ -104,9 +104,9 @@ impl Crediting {
             }
         }
         let now = clock::unix_seconds();
-        let batch = pending.iter().fold(Batch::default(), |batch, path| {
-            batch.and(self.collector.read(path, &mut self.reading, now))
-        });
+        let batch = self
+            .collector
+            .read_changed(&pending, &mut self.reading, now);
 
         self.commit(batch, now);
         if self.last_scan.elapsed() >= self.rescan_every {
@@ -155,9 +155,17 @@ fn subscribe(collector: &Collector, sender: mpsc::Sender<PathBuf>) -> Option<Rec
         }
     };
 
-    for root in collector.roots() {
+    // A database sits beside folders it does not read, such as OpenCode's project snapshots.
+    let transcripts = collector
+        .transcript_roots()
+        .map(|root| (root, RecursiveMode::Recursive));
+    let stores = collector
+        .store_folders()
+        .map(|folder| (folder, RecursiveMode::NonRecursive));
+
+    for (root, mode) in transcripts.chain(stores) {
         if root.exists()
-            && let Err(problem) = watcher.watch(root, RecursiveMode::Recursive)
+            && let Err(problem) = watcher.watch(root, mode)
         {
             logging::warn(&format!("cannot watch {}: {problem}", root.display()));
         }
