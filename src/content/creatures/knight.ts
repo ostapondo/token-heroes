@@ -1,9 +1,10 @@
-import { defineCreature } from '../model/definitions';
+import { CreatureAttack, defineCreature } from '../model/definitions';
+import { CreatureId } from '../model/ids';
 
 export default defineCreature({
-  id: 'knight',
+  id: CreatureId.Knight,
   name: 'Skeleton Knight',
-  attack: 'lunge',
+  attack: CreatureAttack.Lunge,
   hpScale: 1.0,
   damageScale: 1.1,
   sprite: {

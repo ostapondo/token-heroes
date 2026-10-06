@@ -1,11 +1,12 @@
+import { AttackStyle, HeroRole } from '@engine';
 import { defineHero } from '../model/definitions';
 
 export default defineHero({
   id: 'wanderer',
   name: 'Wanderer',
   order: 1,
-  role: 'striker',
-  attack: 'slash',
+  role: HeroRole.Striker,
+  attack: AttackStyle.Slash,
   baseDamage: 5,
   baseHp: 20,
   attackInterval: 1.0,

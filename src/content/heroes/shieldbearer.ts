@@ -1,11 +1,12 @@
+import { AttackStyle, HeroRole } from '@engine';
 import { defineHero } from '../model/definitions';
 
 export default defineHero({
   id: 'shieldbearer',
   name: 'Shieldbearer',
   order: 3,
-  role: 'tank',
-  attack: 'bash',
+  role: HeroRole.Tank,
+  attack: AttackStyle.Bash,
   baseDamage: 2,
   baseHp: 45,
   attackInterval: 1.4,

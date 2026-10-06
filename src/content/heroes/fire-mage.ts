@@ -1,11 +1,12 @@
+import { AttackStyle, HeroRole } from '@engine';
 import { defineHero } from '../model/definitions';
 
 export default defineHero({
   id: 'fire-mage',
   name: 'Fire Mage',
   order: 5,
-  role: 'striker',
-  attack: 'spell',
+  role: HeroRole.Striker,
+  attack: AttackStyle.Spell,
   baseDamage: 9,
   baseHp: 12,
   attackInterval: 2.0,

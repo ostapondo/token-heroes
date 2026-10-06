@@ -1,9 +1,10 @@
 import { defineEnemy } from '../model/definitions';
+import { ElementId } from '../model/ids';
 
 export default defineEnemy({
   id: 'frost-spirit',
   name: 'Frost Spirit',
-  element: 'ice',
+  element: ElementId.Ice,
   hpScale: 0.7,
   damageScale: 1.1,
   sprite: {

@@ -1,9 +1,10 @@
 import { defineBoss } from '../model/definitions';
+import { CreatureId, ElementId } from '../model/ids';
 
 export default defineBoss({
   id: 'broodmother',
   name: 'Broodmother',
   order: 6,
-  creature: 'spider',
-  element: 'venom',
+  creature: CreatureId.Spider,
+  element: ElementId.Venom,
 });

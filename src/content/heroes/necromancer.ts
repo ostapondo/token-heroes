@@ -1,11 +1,12 @@
+import { AttackStyle, HeroRole } from '@engine';
 import { defineHero } from '../model/definitions';
 
 export default defineHero({
   id: 'necromancer',
   name: 'Necromancer',
   order: 9,
-  role: 'healer',
-  attack: 'heal',
+  role: HeroRole.Healer,
+  attack: AttackStyle.Heal,
   baseDamage: 8,
   baseHp: 18,
   attackInterval: 1.8,

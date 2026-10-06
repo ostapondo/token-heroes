@@ -1,7 +1,9 @@
 import { defineElement } from '../model/definitions';
+import { ElementId } from '../model/ids';
+import { ParticlePreset, WeatherKind } from '../model/weather';
 
 export default defineElement({
-  id: 'blood',
+  id: ElementId.Blood,
   name: 'Blood',
   status: 'CURSED',
   palette: { a: '#8e0f1a', b: '#4a060c', c: '#ff7a3d', e: '#ffd23f', h: '#e8d9c0', x: '#120406' },
@@ -9,8 +11,8 @@ export default defineElement({
   floor: '#2a070a',
   accent: '#e0252f',
   weather: [
-    { kind: 'summoning-ring' },
-    { kind: 'pulse', color: '#e0252f' },
-    { kind: 'particles', preset: 'ash' },
+    { kind: WeatherKind.SummoningRing },
+    { kind: WeatherKind.Pulse, color: '#e0252f' },
+    { kind: WeatherKind.Particles, preset: ParticlePreset.Ash },
   ],
 });

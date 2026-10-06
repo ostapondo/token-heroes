@@ -1,9 +1,10 @@
 import { defineEnemy } from '../model/definitions';
+import { ElementId } from '../model/ids';
 
 export default defineEnemy({
   id: 'skeleton',
   name: 'Skeleton',
-  element: 'bone',
+  element: ElementId.Bone,
   hpScale: 1.0,
   damageScale: 1.0,
   sprite: {

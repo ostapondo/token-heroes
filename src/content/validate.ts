@@ -1,4 +1,5 @@
 import type { ElementDef } from './model/definitions';
+import { CreatureId, ElementId } from './model/ids';
 import { PALETTE_SLOTS, TRANSPARENT_PIXEL, type SpriteDef } from './model/sprite';
 import type { Content } from './registry';
 
@@ -62,16 +63,38 @@ function missingReference(owner: string, kind: string, id: string, known: Set<st
   return known.has(id) ? [] : [`${owner} names ${kind} ${id}, which does not exist`];
 }
 
+function sequenceProblems(kind: string, orders: readonly number[]): string[] {
+  const present = new Set(orders);
+  const expected = Array.from({ length: orders.length }, (_, index) => index + 1);
+  return [
+    ...expected
+      .filter((order) => !present.has(order))
+      .map((order) => `${kind} order ${order} is missing; orders must run 1 to ${orders.length}`),
+    ...orders
+      .filter((order) => !Number.isInteger(order) || order < 1 || order > orders.length)
+      .map((order) => `${kind} order ${order} is outside 1 to ${orders.length}`),
+  ];
+}
+
 function uniquenessProblems(content: Content): string[] {
   return [
     ...duplicated('element', idsOf(content.elements)),
     ...duplicated('creature', idsOf(content.creatures)),
     ...duplicated('boss', idsOf(content.bosses)),
     ...duplicated('boss order', ordersOf(content.bosses)),
+    ...sequenceProblems('boss', ordersOf(content.bosses)),
     ...duplicated('enemy', idsOf(content.enemies)),
     ...duplicated('hero', idsOf(content.heroes)),
     ...duplicated('hero order', ordersOf(content.heroes)),
+    ...sequenceProblems('hero', ordersOf(content.heroes)),
   ];
+}
+
+function coverageProblems(content: Content): string[] {
+  const defined = new Set<string>([...idsOf(content.elements), ...idsOf(content.creatures)]);
+  return [...Object.values(ElementId), ...Object.values(CreatureId)]
+    .filter((id) => !defined.has(id))
+    .map((id) => `${id} has an id constant but no definition`);
 }
 
 function referenceProblems(content: Content): string[] {
@@ -113,6 +136,7 @@ function rosterProblems(content: Content): string[] {
 export function validateContent(content: Content): string[] {
   return [
     ...uniquenessProblems(content),
+    ...coverageProblems(content),
     ...referenceProblems(content),
     ...artProblems(content),
     ...rosterProblems(content),

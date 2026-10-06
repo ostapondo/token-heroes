@@ -1,9 +1,10 @@
 import { defineEnemy } from '../model/definitions';
+import { ElementId } from '../model/ids';
 
 export default defineEnemy({
   id: 'cave-bat',
   name: 'Cave Bat',
-  element: 'shadow',
+  element: ElementId.Shadow,
   hpScale: 0.6,
   damageScale: 0.8,
   sprite: {

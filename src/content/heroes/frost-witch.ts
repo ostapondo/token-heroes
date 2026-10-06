@@ -1,11 +1,12 @@
+import { AttackStyle, HeroRole } from '@engine';
 import { defineHero } from '../model/definitions';
 
 export default defineHero({
   id: 'frost-witch',
   name: 'Frost Witch',
   order: 8,
-  role: 'striker',
-  attack: 'spell',
+  role: HeroRole.Striker,
+  attack: AttackStyle.Spell,
   baseDamage: 10,
   baseHp: 14,
   attackInterval: 1.2,

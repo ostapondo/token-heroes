@@ -1,9 +1,10 @@
 import type { AttackStyle, HeroRole } from '@engine';
+import type { CreatureId, ElementId } from './ids';
 import type { Palette, SpriteDef } from './sprite';
 import type { WeatherDef } from './weather';
 
 export interface ElementDef {
-  readonly id: string;
+  readonly id: ElementId;
   readonly name: string;
   readonly status: string;
   readonly palette: Palette;
@@ -13,11 +14,17 @@ export interface ElementDef {
   readonly weather: readonly WeatherDef[];
 }
 
-export const CREATURE_ATTACKS = ['breath', 'lunge', 'slam', 'scythe', 'spit'] as const;
-export type CreatureAttack = (typeof CREATURE_ATTACKS)[number];
+export const CreatureAttack = {
+  Breath: 'breath',
+  Lunge: 'lunge',
+  Slam: 'slam',
+  Scythe: 'scythe',
+  Spit: 'spit',
+} as const;
+export type CreatureAttack = (typeof CreatureAttack)[keyof typeof CreatureAttack];
 
 export interface CreatureDef {
-  readonly id: string;
+  readonly id: CreatureId;
   readonly name: string;
   readonly attack: CreatureAttack;
   readonly hpScale: number;
@@ -29,14 +36,14 @@ export interface BossDef {
   readonly id: string;
   readonly name: string;
   readonly order: number;
-  readonly creature: string;
-  readonly element: string;
+  readonly creature: CreatureId;
+  readonly element: ElementId;
 }
 
 export interface EnemyDef {
   readonly id: string;
   readonly name: string;
-  readonly element: string;
+  readonly element: ElementId;
   readonly hpScale: number;
   readonly damageScale: number;
   readonly sprite: SpriteDef;
