@@ -2,7 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { LogLevel, SpendRefusal, type Host, type SpendResult, type Wallet } from './host';
 import { lastResort } from './last-resort';
-import { walletChangeFromWire, walletFromWire } from './wire';
+import { updateOfferFromWire, walletChangeFromWire, walletFromWire } from './wire';
 
 const HostCommand = {
   Wallet: 'wallet',
@@ -10,6 +10,9 @@ const HostCommand = {
   LoadSave: 'load_save',
   WriteSave: 'write_save',
   Log: 'log',
+  CheckUpdate: 'check_update',
+  InstallUpdate: 'install_update',
+  ReportBug: 'report_bug',
 } as const;
 
 const HostEvent = { WalletChanged: 'wallet-changed' } as const;
@@ -74,6 +77,36 @@ export function tauriHost(): Host {
       invoke(HostCommand.Log, { level, message }).catch((error: unknown) =>
         lastResort(message, error),
       );
+    },
+
+    async checkForUpdate() {
+      try {
+        return updateOfferFromWire(await invoke(HostCommand.CheckUpdate));
+      } catch {
+        return null;
+      }
+    },
+
+    async installUpdate() {
+      try {
+        await invoke(HostCommand.InstallUpdate);
+
+        return true;
+      } catch (error) {
+        report('Installing the update failed', error);
+
+        return false;
+      }
+    },
+
+    async reportBug() {
+      try {
+        await invoke(HostCommand.ReportBug);
+
+        return true;
+      } catch {
+        return false;
+      }
     },
   };
 }

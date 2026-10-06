@@ -14,6 +14,11 @@ export type SpendResult =
 export const LogLevel = { Info: 'info', Warn: 'warn', Error: 'error' } as const;
 export type LogLevel = (typeof LogLevel)[keyof typeof LogLevel];
 
+export interface UpdateOffer {
+  readonly version: string;
+  readonly notes: string | null;
+}
+
 export type WalletListener = (wallet: Wallet, burnedNow: number) => void;
 
 export interface Host {
@@ -23,4 +28,7 @@ export interface Host {
   loadSave(): Promise<unknown>;
   writeSave(save: unknown): Promise<void>;
   log(level: LogLevel, message: string): void;
+  checkForUpdate(): Promise<UpdateOffer | null>;
+  installUpdate(): Promise<boolean>;
+  reportBug(): Promise<boolean>;
 }

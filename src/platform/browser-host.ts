@@ -2,6 +2,8 @@ import { SpendRefusal, type Host, type Wallet, type WalletListener } from './hos
 import { lastResort } from './last-resort';
 
 const SAVE_KEY = 'token-heroes.save';
+const BUG_REPORT_URL =
+  'https://github.com/ostapondo/token-heroes/issues/new?template=bug_report.yml';
 const FAKE_AGENT = { startBurned: 17_900_000, everyMs: 2_500, min: 2_000, max: 12_000 } as const;
 
 function readStoredSave(): unknown {
@@ -65,6 +67,16 @@ export function browserHost(): Host {
 
     log(level, message) {
       lastResort(`${level}: ${message}`);
+    },
+
+    checkForUpdate: () => Promise.resolve(null),
+
+    installUpdate: () => Promise.resolve(false),
+
+    reportBug() {
+      window.open(BUG_REPORT_URL, '_blank', 'noopener');
+
+      return Promise.resolve(true);
     },
   };
 }
