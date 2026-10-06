@@ -83,8 +83,8 @@ describe('a growing roster', () => {
   const grown = { ...roster, heroes: [...roster.heroes, ...newcomers] };
 
   it('keeps every pace rule when new heroes join after the last one', () => {
-    const curve = paceCurve(grown);
-    const failed = PACE_RULES.map((rule) => ({ id: rule.id, ...rule.judge(curve, grown) })).filter(
+    const context = { roster: grown, steady: paceCurve(grown), greedy: [] };
+    const failed = PACE_RULES.map((rule) => ({ id: rule.id, ...rule.judge(context) })).filter(
       (finding) => !finding.passed,
     );
 

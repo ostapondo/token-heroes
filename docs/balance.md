@@ -48,23 +48,31 @@ A run starts a party at stage 1 and plays the real battle in quarter-second step
 that wipes the party twice in a row is its **frontier**, the place a player with that party is
 stuck. Every party rule is measured there, because that is where the player spends their time.
 
-The judged parties are the ones a player owns after an hour, a day, a week, a month, a season,
-a year and ten years of burned tokens: the heroes their burn has unlocked, hired once a hire
-costs a quarter of what they have burned, levelled together. A new hero joins them on its own.
+Two players are modelled. The **even** player hires the heroes their burn has unlocked once a
+hire costs a quarter of what they have burned, and levels the party together. The
+**best-upgrade** player always buys whatever moves the party furthest per coin, including hiring
+a hero and bringing it up to the party's level in one go. The pace rules hold the even player to
+the targets and the best-upgrade player close to it, so no single way of spending wins by far.
+The judged parties are the even player's after an hour, a day, a week, a month, a season, a year
+and ten years of burned tokens. A new hero joins both players on its own.
 
 ## Rules
 
-The rules live in [`src/balance/pace-rules.ts`](../src/balance/pace-rules.ts) and
+The rules live in [`src/balance/pace-rules.ts`](../src/balance/pace-rules.ts),
+[`src/balance/play-rules.ts`](../src/balance/play-rules.ts) and
 [`src/balance/rules.ts`](../src/balance/rules.ts); `balance_rules` and `pnpm balance` always show
 the current set.
 
-| Pace rule                       | Passes when                                                  |
-| ------------------------------- | ------------------------------------------------------------ |
-| `first-hour-feels-fast`         | 1M burned tokens reach stage 15 to 35                        |
-| `first-day-reaches-mid-game`    | 10M burned tokens reach stage 40 to 60                       |
-| `first-month-reaches-stage-100` | 300M burned tokens reach stage 90 to 120                     |
-| `progress-never-stalls`         | late in the game, ten times more tokens still buy 35+ stages |
-| `rarer-heroes-are-upgrades`     | every hero is worth 5% more per coin than the hero before it |
+| Pace rule                       | Passes when                                                    |
+| ------------------------------- | -------------------------------------------------------------- |
+| `first-hour-feels-fast`         | 1M burned tokens reach stage 15 to 35                          |
+| `first-day-reaches-mid-game`    | 10M burned tokens reach stage 40 to 60                         |
+| `first-month-reaches-stage-100` | 300M burned tokens reach stage 90 to 120                       |
+| `progress-never-stalls`         | late in the game, ten times more tokens still buy 35+ stages   |
+| `rarer-heroes-are-upgrades`     | every hero is worth 5% more per coin than the hero before it   |
+| `no-dominant-strategy`          | a best-upgrade player stays within 15 stages of an even one    |
+| `active-play-is-a-bonus`        | clicking twice a second gains at most 15 stages                |
+| `ultimate-is-a-boost`           | one ultimate takes at most a quarter of the wall boss's health |
 
 | Party rule                   | The party passes when                                     |
 | ---------------------------- | --------------------------------------------------------- |

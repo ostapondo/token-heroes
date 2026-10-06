@@ -4,6 +4,7 @@ import {
   heroSheet,
   judgeParty,
   PACE_RULES,
+  PLAY_RULES,
   RULES,
   stageSheet,
   standardScenarios,
@@ -41,7 +42,7 @@ server.registerTool(
   { description: 'The balance rules, why each exists and the threshold it must meet.' },
   () =>
     reply(() =>
-      [...PACE_RULES, ...RULES].map(({ id, statement, why, threshold }) => ({
+      [...PACE_RULES, ...PLAY_RULES, ...RULES].map(({ id, statement, why, threshold }) => ({
         id,
         statement,
         why,

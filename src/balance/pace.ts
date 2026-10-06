@@ -3,10 +3,11 @@ import { runParty } from './simulate';
 
 export interface PacePoint {
   readonly coins: number;
-  readonly heroes: number;
-  readonly level: number;
+  readonly party: PartyState;
   readonly stage: number;
 }
+
+export type Player = (roster: Roster, coins: number) => PartyState;
 
 // Lifetime burns that stand for a first hour, day, week, month, season, year and beyond for a
 // player whose agents burn about ten million tokens a day.
@@ -20,7 +21,7 @@ const costToReach = (hero: HeroStats, level: number): number => hero.hireCost + 
 
 // A player who hires the heroes their burn has unlocked, in roster order, and levels the
 // whole party together. Not optimal, but a steady and honest stand-in for real play.
-export function partyFor(roster: Roster, coins: number): { party: PartyState; level: number } {
+export function partyFor(roster: Roster, coins: number): PartyState {
   const owned: HeroStats[] = [];
   let hired = 0;
 
@@ -38,23 +39,21 @@ export function partyFor(roster: Roster, coins: number): { party: PartyState; le
     level += 1;
   }
 
-  return { party: { heroes: owned.map((hero) => ({ heroId: hero.id, level })) }, level };
+  return { heroes: owned.map((hero) => ({ heroId: hero.id, level })) };
 }
 
-function stageFor(roster: Roster, coins: number): PacePoint {
-  const { party, level } = partyFor(roster, coins);
+function stageReached(party: PartyState, roster: Roster): number {
   const run = runParty(party, roster);
 
-  return {
-    coins,
-    heroes: party.heroes.length,
-    level,
-    stage: run.frontier?.stage ?? run.fromStage + run.stagesCleared,
-  };
+  return run.frontier?.stage ?? run.fromStage + run.stagesCleared;
 }
 
-export function paceCurve(roster: Roster): PacePoint[] {
-  return PACE_COINS.map((coins) => stageFor(roster, coins));
+export function paceCurve(roster: Roster, player: Player = partyFor): PacePoint[] {
+  return PACE_COINS.map((coins) => {
+    const party = player(roster, coins);
+
+    return { coins, party, stage: stageReached(party, roster) };
+  });
 }
 
 export const outputPerCoin = (roster: Roster, heroId: string, coins: number) => {

@@ -35,6 +35,10 @@ export function strikeDamage(party: PartyState, roster: Roster): number {
   return safeAmount(partyPower(party, roster) * BALANCE.strikeShare);
 }
 
+export function ultimateDamage(party: PartyState, roster: Roster): number {
+  return safeAmount(partyPower(party, roster) * BALANCE.ultimateMultiplier);
+}
+
 export function heroLevel(party: PartyState, heroId: string): number | undefined {
   return party.heroes.find((slot) => slot.heroId === heroId)?.level;
 }

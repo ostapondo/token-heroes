@@ -49,7 +49,8 @@ The fight never pays you. When the party is stuck on a boss, the answer is to sh
   a boss with a 30-second timer.
 - **Auto battle.** Heroes attack on their own. Crits land 10% of the time for 2.5× damage.
 - **Tap to strike.** Click the arena to hit the front foe for half your party's power.
-- **Ultimate.** Every 50,000 burned tokens charge one ultimate worth 25× your party's power.
+- **Ultimate.** About an hour of agent work (a million burned tokens) charges one ultimate worth
+  roughly ten seconds of your party's damage.
 - **Milestones.** Every 25 levels a hero's damage and health grow fourfold.
 - **Wipes are gentle.** If the party falls, it is back in 10 seconds. Levels and coins stay.
 - **Offline progress.** Close the window and the party keeps fighting for up to 8 hours.

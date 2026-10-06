@@ -28,7 +28,7 @@ describe('hero growth', () => {
     const atPace = heroHeal(knight, 20, party);
 
     expect(atPace).toBe(Math.ceil(BALANCE.healShare * knight.power * party.hp));
-    expect(heroHeal(knight, 5, party)).toBe(Math.ceil(atPace * BALANCE.healLevelFactor.min));
+    expect(heroHeal(knight, 5, party)).toBe(Math.ceil((atPace * 5) / party.level));
     expect(heroHeal(knight, 200, party)).toBe(Math.ceil(atPace * BALANCE.healLevelFactor.max));
   });
 

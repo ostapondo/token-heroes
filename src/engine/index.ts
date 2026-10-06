@@ -21,6 +21,7 @@ export {
   partyMaxHp,
   partyVitals,
   strikeDamage,
+  ultimateDamage,
 } from './party';
 export { fastForward } from './progress/offline';
 export { newGame, upgradeSave, withProgress, type GameSave } from './progress/save';
