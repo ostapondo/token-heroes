@@ -4,6 +4,7 @@ import {
   enemyById,
   heroDefById,
   type Content,
+  type CreatureAttack,
   type ElementDef,
   type Palette,
   type SpriteDef,
@@ -18,6 +19,7 @@ import { Motion } from './motion';
 export interface Actor {
   readonly id: string;
   readonly boss: boolean;
+  readonly attack: CreatureAttack | null;
   readonly key: string;
   readonly sprite: SpriteDef;
   readonly palette: Palette | undefined;
@@ -84,6 +86,7 @@ export class Cast {
     return {
       id: heroId,
       boss: false,
+      attack: null,
       key: `hero:${heroId}`,
       sprite,
       palette: undefined,
@@ -95,11 +98,13 @@ export class Cast {
 
   #bossActor(bossId: string, element: ElementDef): Actor {
     const boss = bossById(this.#content, bossId);
-    const sprite = creatureById(this.#content, boss.creature).sprite;
+    const creature = creatureById(this.#content, boss.creature);
+    const { sprite } = creature;
 
     return {
       id: bossId,
       boss: true,
+      attack: creature.attack,
       key: `boss:${boss.creature}:${element.id}`,
       sprite,
       palette: element.palette,
@@ -115,6 +120,7 @@ export class Cast {
     return {
       id: enemyId,
       boss: false,
+      attack: null,
       key: `enemy:${enemyId}:${element.id}`,
       sprite,
       palette: element.palette,

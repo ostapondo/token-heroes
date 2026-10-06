@@ -5,6 +5,7 @@ import { compactNumber } from '../format';
 import type { Actor } from '../scene/cast';
 import { ARENA, center, floorTop, type Point } from '../scene/geometry';
 import { MotionCue } from '../scene/motion';
+import { bossAttack } from './boss-attacks';
 import { Shockwave, Sparks } from './bursts';
 import { FX_COLOR } from './colors';
 import type { Effect } from './effect';
@@ -166,15 +167,22 @@ export class Director {
 
   #partyHit(event: EventOf<typeof BattleEventType.PartyHit>, stage: Stage): Reaction {
     const attacker = stage.foes[event.foe];
+    const accent = stage.element.accent;
+    const signature = attacker?.attack
+      ? bossAttack(attacker.attack, attacker, stage.heroes, accent)
+      : { effects: [], shake: 1 };
 
-    attacker?.motion.cue(attacker.boss ? MotionCue.Lunge : MotionCue.Hop);
+    if (!attacker?.attack) attacker?.motion.cue(MotionCue.Hop);
     for (const hero of stage.heroes) hero.motion.cue(MotionCue.Hurt);
     const target = stage.heroes[0];
     const wound = target
       ? [new FloatingText(`-${compactNumber(event.amount)}`, above(target), TEXT.wound)]
       : [];
 
-    return { effects: [...wound, new ScreenFlash(stage.element.accent, 0.25, 0.4)], shake: 1 };
+    return {
+      effects: [...signature.effects, ...wound, new ScreenFlash(accent, 0.25, 0.4)],
+      shake: signature.shake,
+    };
   }
 
   #defeated(event: EventOf<typeof BattleEventType.FoeDefeated>, stage: Stage): Reaction {
