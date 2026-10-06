@@ -7,6 +7,9 @@ mod state;
 mod support;
 mod tokens;
 
+#[cfg(test)]
+mod layers;
+
 use tauri_plugin_autostart::MacosLauncher;
 
 use crate::app::{commands, setup};
