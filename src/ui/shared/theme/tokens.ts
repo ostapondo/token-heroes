@@ -38,6 +38,7 @@ export const tokens = defineTokens({
     touch: { value: '44px' },
     button: { value: '84px' },
     bossPanel: { value: '200px' },
+    partyPanel: { value: '132px' },
   },
 });
 

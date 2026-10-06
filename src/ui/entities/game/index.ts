@@ -9,6 +9,7 @@ export {
   selectIncome,
   selectNotice,
   selectParty,
+  selectPartyHp,
   selectStage,
   selectStatus,
   selectUltimatePercent,

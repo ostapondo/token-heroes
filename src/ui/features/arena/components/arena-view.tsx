@@ -5,6 +5,7 @@ import { useSession } from '../../../entities/game';
 import { useArena } from '../hooks/use-arena';
 import { arenaViewRecipe } from './arena-view.recipe';
 import { BossBar } from './boss-bar';
+import { PartyBar } from './party-bar';
 import { WipeOverlay } from './wipe-overlay';
 
 const ASPECT_RATIO = { aspectRatio: `${ARENA.width} / ${ARENA.height}` } as const;
@@ -20,6 +21,7 @@ export function ArenaView() {
     <div className={classes.root}>
       <canvas ref={canvasRef} className={classes.canvas} style={ASPECT_RATIO} />
       <BossBar />
+      <PartyBar />
       <WipeOverlay />
       <button
         type="button"

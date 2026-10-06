@@ -7,6 +7,8 @@ export const en = {
   'arena.strike': 'Strike the front foe',
   'arena.bossTimer': '{element} · {seconds}s',
   'arena.bossHp': '{hp} / {maxHp}',
+  'arena.partyHealth': 'Party health',
+  'arena.partyHp': 'HP {hp} / {maxHp}',
   'arena.defeated': 'DEFEATED',
   'arena.levelUp': 'LV {level}!',
   'arena.joined': 'JOINED!',

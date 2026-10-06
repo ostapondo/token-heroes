@@ -9,6 +9,7 @@ export const selectBalance = (state: GameState): number => state.wallet.balance;
 export const selectBurned = (state: GameState): number => state.wallet.burned;
 export const selectStage = (state: GameState): number => state.game?.battle.stage ?? 1;
 export const selectParty = (state: GameState): PartyState | undefined => state.game?.party;
+export const selectPartyHp = (state: GameState): number => state.game?.battle.partyHp ?? 0;
 
 export const selectUltimatePercent = (state: GameState): number =>
   Math.floor((state.game?.battle.ultimate ?? 0) * 100);
