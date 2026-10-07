@@ -14,8 +14,8 @@ Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Ways to help
 
-- **Content.** Bosses, enemies, heroes and elements are plain data files. Of the 72 creature ×
-  element bosses, 30 exist. The other 42 are waiting for a name.
+- **Content.** Bosses, enemies, heroes and elements are plain data files. Every one of the 72
+  creature × element pairings has a boss; a new creature or element opens more.
 - **Effects.** Weather kinds, particle presets and combat effects live in `src/render`.
 - **Agents.** The host reads Claude Code, Codex, Gemini CLI, Qwen Code, OpenCode and Kilo Code
   today. Copilot CLI, Goose, Cline, Roo Code and Amp also write their usage to disk and are
@@ -95,7 +95,8 @@ declined, however fun it is. The game exists to turn real work into progress.
 A boss is a creature drawn in an element. It needs no sprite of its own.
 
 1. Pick a creature and an element that no boss in `src/content/bosses` uses yet. Each pairing
-   should appear once.
+   appears once, and the content check fails on a repeat. All 72 pairings are taken, so a new
+   boss comes with a new creature or element.
 2. Create `src/content/bosses/<id>.ts`:
 
    ```ts
@@ -103,10 +104,10 @@ A boss is a creature drawn in an element. It needs no sprite of its own.
    import { CreatureId, ElementId } from '../model/ids';
 
    export default defineBoss({
-     id: 'thunder-golem',
-     name: 'Thunder Golem',
-     order: 31,
-     creature: CreatureId.Golem,
+     id: 'storm-treant',
+     name: 'Storm Treant',
+     order: 73,
+     creature: CreatureId.Treant,
      element: ElementId.Storm,
    });
    ```
@@ -172,7 +173,8 @@ An element supplies a palette, the sky, floor and accent colours and a list of w
 3. Build its weather from the existing `WeatherKind` and `ParticlePreset` values in
    `src/content/model/weather.ts`. A new kind of weather also needs a renderer in
    `src/render/weather`.
-4. An element is only seen on a boss or an enemy, so add at least one of those too.
+4. An element is only seen on a boss or an enemy. Give it a boss for every creature, so each
+   creature still appears in every element.
 
 ### Add a token source
 
