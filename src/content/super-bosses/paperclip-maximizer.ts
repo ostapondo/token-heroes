@@ -1,0 +1,46 @@
+import { SuperBossTier } from '@engine';
+import { CreatureAttack, defineSuperBoss } from '../model/definitions';
+import { LairId } from '../model/ids';
+
+export default defineSuperBoss({
+  id: 'paperclip-maximizer',
+  name: 'Paperclip Maximizer',
+  tier: SuperBossTier.Strong,
+  order: 4,
+  lair: LairId.Foundry,
+  attack: CreatureAttack.Spit,
+  hpScale: 1.0,
+  damageScale: 1.2,
+  palette: { a: '#b8c0c8', b: '#6a747e', c: '#f0f4f8', e: '#ff3a2a', h: '#ffd24a', x: '#1a1e24' },
+  sprite: {
+    rows: [
+      '.......cccccc.......',
+      '.....ccaaaaaaaa.....',
+      '....caaa....aaab....',
+      '...caa........aab...',
+      '..caa..........aab..',
+      '..ca............ab..',
+      '.caa....cccc....aab.',
+      '.ca....caaaab....ab.',
+      '.ca...caaxxaab...ab.',
+      '.ca...caxxxxab...ab.',
+      '.ca...caexxeab...ab.',
+      '.ca...caexxeab...ab.',
+      '.ca...caxxxxab...ab.',
+      '.ca...caxhhxab...ab.',
+      '.ca...caxxxxab...ab.',
+      '.ca...ca....ab...ab.',
+      '.ca...ca....ab...ab.',
+      '.ca...ca....ab...ab.',
+      '.ca...ca.........ab.',
+      '.ca...ca.........ab.',
+      '.ca...ca.........ab.',
+      '.ca...ca.........ab.',
+      '.cc...caa.......abb.',
+      '.......ca.......ab..',
+      '.......baaa...aabb..',
+      '........bbaaaaabb...',
+      '..........bbbbb.....',
+    ],
+  },
+});

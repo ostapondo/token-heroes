@@ -19,4 +19,10 @@ export const bossBarRecipe = sva({
     name: { textStyle: 'heading' },
     hp: { textStyle: 'small' },
   },
+  variants: {
+    superBoss: {
+      true: { tag: { background: 'var(--accent)', color: 'void', textShadow: 'none' } },
+      false: {},
+    },
+  },
 });

@@ -37,6 +37,11 @@ hero, boss or tweak keeps the game in shape without hand-tuned stats.
   boss before the boss kills it, so its damage times its toughness has to beat the boss's health
   times the boss's damage. Damage and health count alike: a stronger hit ends the fight before
   the party runs out of health.
+- **Super bosses move the wall, not the pace.** On every 50th stage a medium super boss stands
+  where the boss would, on every 100th a strong one. Each fights like a boss 5 or 10 stages
+  deeper, with more of that lead in health so the fight lasts longer. The party stops on the
+  super boss instead of a few stages later and then clears those stages at once, so the tokens
+  to reach any later stage stay the same.
 - **Foes grow alike in health and damage**, 7% a stage, so that product grows by the same factor
   every stage and the fight at the wall lasts about as long at stage 300 as at stage 30: half a
   minute to a minute and a half.

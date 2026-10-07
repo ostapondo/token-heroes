@@ -7,6 +7,8 @@ export const en = {
 
   'arena.strike': 'Strike the front foe',
   'arena.bossHp': '{hp} / {maxHp}',
+  'arena.superBoss.medium': 'SUPER BOSS',
+  'arena.superBoss.strong': 'ULTRA BOSS',
   'arena.partyHealth': 'Party health',
   'arena.partyHp': 'HP {hp} / {maxHp}',
   'arena.defeated': 'DEFEATED',

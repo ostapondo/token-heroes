@@ -1,8 +1,10 @@
 export {
   bossById,
+  bossCard,
   creatureById,
   elementById,
   enemyById,
+  findSuperBoss,
   heroDefById,
   starterHero,
   toRoster,

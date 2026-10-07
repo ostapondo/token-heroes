@@ -36,6 +36,10 @@ export const testRoster: Roster = {
     hero('guard', HeroRole.Tank, AttackStyle.Bash, { baseDamage: 1, baseHp: 400 }),
   ],
   bosses: [{ id: 'dragon', element: 'fire', hpScale: 1, damageScale: 1 }],
+  superBosses: {
+    medium: [{ id: 'thief', element: 'vault', hpScale: 1, damageScale: 1 }],
+    strong: [{ id: 'gate', element: 'bastion', hpScale: 1, damageScale: 1 }],
+  },
   enemies: [
     { id: 'bat', hpScale: 1, damageScale: 1 },
     { id: 'rat', hpScale: 1, damageScale: 1 },

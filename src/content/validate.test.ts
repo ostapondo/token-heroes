@@ -1,3 +1,4 @@
+import { SuperBossTier } from '@engine';
 import { describe, expect, it } from 'vitest';
 import { defineBoss, defineEnemy } from './model/definitions';
 import { CreatureId, ElementId } from './model/ids';
@@ -15,6 +16,8 @@ function replaceLastBoss(id: string, order: number): Content {
   };
 }
 
+const ofTier = (tier: SuperBossTier) => CONTENT.superBosses.filter((boss) => boss.tier === tier);
+
 describe('validateContent', () => {
   it('finds no problems in the shipped content', () => {
     expect(validateContent(CONTENT)).toEqual([]);
@@ -24,6 +27,26 @@ describe('validateContent', () => {
     expect(CONTENT.creatures).toHaveLength(8);
     expect(CONTENT.elements).toHaveLength(9);
     expect(CONTENT.bosses).toHaveLength(72);
+  });
+
+  it('ships four super bosses of each tier, each in a lair of its own', () => {
+    expect(ofTier(SuperBossTier.Medium)).toHaveLength(4);
+    expect(ofTier(SuperBossTier.Strong)).toHaveLength(4);
+    expect(CONTENT.lairs).toHaveLength(8);
+  });
+
+  it('reports a super boss that takes a boss id and another super boss lair', () => {
+    const [first, second, ...rest] = CONTENT.superBosses;
+
+    if (!first || !second) throw new Error('The content has too few super bosses');
+    const thief = { ...second, id: 'archfiend', lair: first.lair };
+    const content: Content = { ...CONTENT, superBosses: [first, thief, ...rest] };
+
+    expect(validateContent(content)).toEqual([
+      'super boss archfiend shares its id with a boss',
+      `lair of a super boss ${first.lair} is defined twice`,
+      `lair ${second.lair} has no super boss`,
+    ]);
   });
 
   it('ships twelve enemies and fourteen heroes', () => {

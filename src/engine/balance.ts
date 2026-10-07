@@ -21,6 +21,13 @@ export const BALANCE = {
   enemyHpBase: 10,
   enemyDamageBase: 0.15,
   bossHpMultiplier: 22,
+  // A super boss stands where the boss would on every 50th stage, a stronger one on every 100th.
+  // It fights like a boss as many stages deeper as its leads average, so the wall moves onto it
+  // and the stages it skips go by quickly. More of the lead is health, so the fight lasts longer.
+  superBosses: {
+    medium: { every: 50, hpLead: 7, damageLead: 3 },
+    strong: { every: 100, hpLead: 14, damageLead: 6 },
+  },
   bossDamageBase: 1.2,
   enemyAttackInterval: 1.6,
   bossAttackInterval: 2.5,

@@ -1,29 +1,32 @@
-import { bossById, CONTENT, elementById } from '@content';
+import { bossCard, CONTENT } from '@content';
 import { t } from '@i18n';
 import { compactNumber } from '@render';
 import type { CSSProperties } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { selectBossStatus, useGame } from '../../../entities/game';
 import { Meter } from '../../../shared/ui';
+import { SUPER_BOSS_TAG } from '../constants';
 import { bossBarRecipe } from './boss-bar.recipe';
 
 export function BossBar() {
   const status = useGame(useShallow(selectBossStatus));
-  const classes = bossBarRecipe();
 
   if (!status) return null;
-  const boss = bossById(CONTENT, status.bossId);
-  const element = elementById(CONTENT, boss.element);
+  const card = bossCard(CONTENT, status.bossId);
+  const { element } = card;
+  const classes = bossBarRecipe({ superBoss: card.tier !== null });
   const accent: CSSProperties & Record<'--accent', string> = { '--accent': element.accent };
 
   return (
     <div className={classes.root} style={accent}>
-      <span className={classes.tag}>{element.name.toUpperCase()}</span>
+      <span className={classes.tag}>
+        {card.tier ? t(SUPER_BOSS_TAG[card.tier]) : element.name.toUpperCase()}
+      </span>
       <div className={classes.panel}>
-        <span className={classes.name}>{boss.name}</span>
+        <span className={classes.name}>{card.name}</span>
         <Meter
           value={status.hp / status.maxHp}
-          label={boss.name}
+          label={card.name}
           tone="accent"
           size="framed"
           accent={element.accent}

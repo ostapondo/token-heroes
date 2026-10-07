@@ -1,4 +1,11 @@
-import type { BossDef, CreatureDef, ElementDef, EnemyDef, HeroDef } from './model/definitions';
+import type {
+  BossDef,
+  CreatureDef,
+  ElementDef,
+  EnemyDef,
+  HeroDef,
+  SuperBossDef,
+} from './model/definitions';
 
 type Modules<T> = Record<string, { readonly default: T }>;
 
@@ -15,6 +22,8 @@ export interface Content {
   readonly elements: readonly ElementDef[];
   readonly creatures: readonly CreatureDef[];
   readonly bosses: readonly BossDef[];
+  readonly lairs: readonly ElementDef[];
+  readonly superBosses: readonly SuperBossDef[];
   readonly enemies: readonly EnemyDef[];
   readonly heroes: readonly HeroDef[];
 }
@@ -26,6 +35,10 @@ export const CONTENT: Content = {
   ),
   bosses: byOrder(
     collect(import.meta.glob<{ default: BossDef }>('./bosses/*.ts', { eager: true })),
+  ),
+  lairs: collect(import.meta.glob<{ default: ElementDef }>('./lairs/*.ts', { eager: true })),
+  superBosses: byOrder(
+    collect(import.meta.glob<{ default: SuperBossDef }>('./super-bosses/*.ts', { eager: true })),
   ),
   enemies: collect(import.meta.glob<{ default: EnemyDef }>('./enemies/*.ts', { eager: true })),
   heroes: byOrder(
