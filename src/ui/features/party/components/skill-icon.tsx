@@ -18,9 +18,12 @@ interface Props {
 export function SkillIcon({ chip, open, onToggle, preview = false }: Props) {
   const classes = skillIconRecipe({ open });
   const canvas = useRef<HTMLCanvasElement>(null);
-  const readyIn = useGame(selectSkillReadyIn(chip.id));
   const locked = chip.locked || preview;
-  const cover = locked ? 0 : chargeCover(readyIn, chip.cooldown, ICON_PIXELS);
+  const selectReadyIn = selectSkillReadyIn(chip.id);
+  // The cover moves a whole icon pixel at a time, so the icon renders only when it does.
+  const cover = useGame((state) =>
+    locked ? 0 : chargeCover(selectReadyIn(state), chip.cooldown, ICON_PIXELS),
+  );
 
   useEffect(() => {
     const context = canvas.current?.getContext('2d');
