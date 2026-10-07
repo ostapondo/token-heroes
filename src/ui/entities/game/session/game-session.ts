@@ -41,6 +41,9 @@ export class GameSession {
   readonly #host: Host;
   readonly #starterHeroId: string;
   readonly #stops: (() => void)[] = [];
+  // Strict mode starts, stops and starts again before the first start has loaded, so only the
+  // latest start may run the loop.
+  #starts = 0;
   #arena: Arena | null = null;
 
   constructor(host: Host, roster: Roster, starterHeroId: string) {
@@ -106,22 +109,27 @@ export class GameSession {
   }
 
   async start(): Promise<void> {
+    this.#starts += 1;
+    const attempt = this.#starts;
+
     try {
       const wallet = await this.#host.wallet();
       const moment = { now: Date.now(), spent: wallet.spent };
       const loaded = await loadGame(this.#host, this.roster, this.#starterHeroId, moment);
 
+      if (attempt !== this.#starts) return;
       markReady(this.store, loaded.game, wallet);
       if (loaded.stagesCleared > 0)
         showNotice(this.store, tCount('notice.away', loaded.stagesCleared));
       this.#run();
     } catch (error) {
       this.reportError(error, 'Starting the game');
-      markFailed(this.store);
+      if (attempt === this.#starts) markFailed(this.store);
     }
   }
 
   stop(): void {
+    this.#starts += 1;
     for (const stop of this.#stops.splice(0)) stop();
     this.#guard('Saving on exit', () => this.save());
   }
