@@ -1,6 +1,7 @@
 import { defineElement } from '../model/definitions';
 import { ElementId } from '../model/ids';
 import { LitterShape, SceneryKind } from '../model/scenery';
+import { DeathKind } from '../model/death';
 import { ParticlePreset, WeatherKind } from '../model/weather';
 
 const STONE = '#241a07';
@@ -59,6 +60,7 @@ export default defineElement({
       },
     ],
   },
+  death: DeathKind.Gold,
   weather: [
     { kind: WeatherKind.Glow, color: '#ffd36a' },
     { kind: WeatherKind.Particles, preset: ParticlePreset.Coins },

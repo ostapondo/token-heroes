@@ -70,8 +70,9 @@ to its right, and a feature or entity is reached only through its `index.ts`.
   and unlock come from its `order` through `designHero`; never write hero numbers by hand.
 - Sprites are rows of palette slots: `a` body, `b` shade, `c` light, `e` eyes, `h` horns or
   bone, `x` darkest, `.` transparent. Fixed colours go in the sprite's `fixed` map.
-- An element supplies the palette, the weather and the backdrop: sky and ground bands plus
-  scenery pieces painted far to near. A boss is a creature plus an element.
+- An element supplies the palette, the weather, the backdrop (sky and ground bands plus scenery
+  pieces painted far to near) and the `death` that fells a party in it. A boss is a creature plus
+  an element.
 - `src/render/backdrop/readability.test.ts` measures every backdrop: the horizon at 1.5:1 or
   more and at most 5% of a sprite's outline lost against it. Fix the colours, never the check.
 - `src/content/validate.test.ts` checks every entity. Fix the content, never the check.

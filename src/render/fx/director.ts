@@ -15,6 +15,7 @@ import { SkillDirector } from './skill-director';
 import { LightPillar, ScreenFlash } from './screen';
 import { heroAttack } from './hero-attacks';
 import { Beam, CrossSlash } from './strikes';
+import { revival } from './revival';
 import { TEXT } from './text-styles';
 import { Twists } from './twists';
 
@@ -55,10 +56,13 @@ export class Director {
       case BattleEventType.FoeDefeated:
         return this.#defeated(event, stage);
       case BattleEventType.StageStarted:
-      case BattleEventType.Respawned:
         for (const foe of stage.foes) foe.motion.cue(MotionCue.Entering);
 
         return NONE;
+      case BattleEventType.Respawned:
+        for (const foe of stage.foes) foe.motion.cue(MotionCue.Entering);
+
+        return revival(stage);
       case BattleEventType.Mechanic:
         return this.#twists.react(event, stage);
       case BattleEventType.Skill:

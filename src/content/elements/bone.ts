@@ -1,6 +1,7 @@
 import { defineElement } from '../model/definitions';
 import { ElementId } from '../model/ids';
 import { LitterShape, SceneryKind } from '../model/scenery';
+import { DeathKind } from '../model/death';
 import { ParticlePreset, WeatherKind } from '../model/weather';
 
 const GRAVE = '#06100d';
@@ -100,6 +101,7 @@ export default defineElement({
       },
     ],
   },
+  death: DeathKind.Bones,
   weather: [
     { kind: WeatherKind.GhostFlames },
     { kind: WeatherKind.Particles, preset: ParticlePreset.Wisps },

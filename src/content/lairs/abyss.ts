@@ -1,6 +1,7 @@
 import { defineLair } from '../model/definitions';
 import { LairId } from '../model/ids';
 import { PoolMotion, SceneryKind } from '../model/scenery';
+import { DeathKind } from '../model/death';
 import { ParticlePreset, WeatherKind } from '../model/weather';
 
 export default defineLair({
@@ -65,6 +66,7 @@ export default defineLair({
       { kind: SceneryKind.Reflection, color: '#ffd84a' },
     ],
   },
+  death: DeathKind.Sink,
   weather: [
     { kind: WeatherKind.Fog, color: '#7ab0a0' },
     { kind: WeatherKind.Lightning },

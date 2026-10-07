@@ -1,6 +1,7 @@
 import { defineLair } from '../model/definitions';
 import { LairId } from '../model/ids';
 import { SceneryKind } from '../model/scenery';
+import { DeathKind } from '../model/death';
 import { ParticlePreset, WeatherKind } from '../model/weather';
 
 export default defineLair({
@@ -37,6 +38,7 @@ export default defineLair({
       { kind: SceneryKind.Tiles, rows: 9, spacing: 20, line: '#2a7a44', shine: '#3ad06a' },
     ],
   },
+  death: DeathKind.Shock,
   weather: [
     { kind: WeatherKind.Pulse, color: '#3ad06a' },
     { kind: WeatherKind.Particles, preset: ParticlePreset.Motes },
