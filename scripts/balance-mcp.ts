@@ -7,6 +7,8 @@ import {
   PACE_RULES,
   PLAY_RULES,
   RULES,
+  SKILL_PACE_RULES,
+  SKILL_RULES,
   stageSheet,
   standardScenarios,
 } from '@balance';
@@ -43,14 +45,19 @@ server.registerTool(
   { description: 'The balance rules, why each exists and the threshold it must meet.' },
   () =>
     reply(() =>
-      [...PACE_RULES, ...PLAY_RULES, ...ASCENSION_RULES, ...RULES].map(
-        ({ id, statement, why, threshold }) => ({
-          id,
-          statement,
-          why,
-          threshold,
-        }),
-      ),
+      [
+        ...PACE_RULES,
+        ...PLAY_RULES,
+        ...ASCENSION_RULES,
+        ...SKILL_PACE_RULES,
+        ...RULES,
+        ...SKILL_RULES,
+      ].map(({ id, statement, why, threshold }) => ({
+        id,
+        statement,
+        why,
+        threshold,
+      })),
     ),
 );
 

@@ -3,16 +3,32 @@ import {
   foeDamage,
   foesForStage,
   healerWeight,
+  heroAttack,
   heroById,
   heroDamage,
   heroHp,
   heroMend,
   type HeroRole,
+  type HeroStats,
   isBossStage,
   levelCost,
+  levelOfRank,
   type PartyVitals,
   type Roster,
+  skillHitPerCast,
+  skillRank,
+  skillShare,
 } from '@engine';
+
+interface SkillSheet {
+  readonly id: string;
+  readonly rank: number;
+  // Damage a cast lands on the front foe, null for a skill that deals none.
+  readonly hit: number | null;
+  // Of the hero's base output, the share this skill delivers.
+  readonly share: number;
+  readonly nextRankAt: number;
+}
 
 export interface HeroSheet {
   readonly heroId: string;
@@ -24,6 +40,7 @@ export interface HeroSheet {
   readonly damagePerSecond: number;
   readonly hp: number;
   readonly nextLevelCost: number;
+  readonly skills: readonly SkillSheet[];
 }
 
 interface FoeSheet {
@@ -43,6 +60,20 @@ export interface StageSheet {
   readonly harshestDamagePerSecond: number;
 }
 
+function skillSheets(hero: HeroStats, level: number): SkillSheet[] {
+  return hero.skills.map((skill) => {
+    const rank = skillRank(level, skill.lag);
+
+    return {
+      id: skill.id,
+      rank,
+      hit: skillHitPerCast(hero, skill, level),
+      share: skillShare(hero, skill, level),
+      nextRankAt: levelOfRank(rank + 1, skill.lag),
+    };
+  });
+}
+
 // A healer's share depends on the party it heals; alone, it heals itself at its own level.
 export function heroSheet(
   roster: Roster,
@@ -51,7 +82,6 @@ export function heroSheet(
   party?: PartyVitals,
 ): HeroSheet {
   const hero = heroById(roster, heroId);
-  const hit = heroDamage(hero, level);
   const vitals = party ?? {
     hp: heroHp(hero, level),
     level,
@@ -62,12 +92,13 @@ export function heroSheet(
     heroId,
     role: hero.role,
     level,
-    hit,
+    hit: heroAttack(hero, level),
     mend: heroMend(hero, level, vitals),
     interval: hero.attackInterval,
-    damagePerSecond: hit / hero.attackInterval,
+    damagePerSecond: heroDamage(hero, level) / hero.attackInterval,
     hp: heroHp(hero, level),
     nextLevelCost: levelCost(level),
+    skills: skillSheets(hero, level),
   };
 }
 

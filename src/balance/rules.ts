@@ -179,8 +179,8 @@ export const RULES: readonly Rule[] = [
   },
 ];
 
-export function judge(situation: Situation): Finding[] {
-  return RULES.flatMap((rule) => {
+export function judge(situation: Situation, extra: readonly Rule[] = []): Finding[] {
+  return [...RULES, ...extra].flatMap((rule) => {
     const verdict = rule.judge(situation);
 
     return verdict ? [{ rule: rule.id, threshold: rule.threshold, ...verdict }] : [];

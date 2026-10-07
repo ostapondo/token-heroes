@@ -29,8 +29,11 @@ export interface RunReport {
   readonly wipesBeforeFrontier: number;
   readonly secondsSimulated: number;
   readonly damageDealt: number;
+  readonly skillDamage: number;
   readonly healingDone: number;
   readonly damageTaken: number;
+  // Casts of each hero's skills in the fight that stopped the party.
+  readonly frontierCasts: Readonly<Record<string, number>>;
 }
 
 // The game ticks every 0.1 s; a quarter second keeps runs of hours fast and changes no outcome
@@ -43,8 +46,10 @@ interface Tally {
   stagesCleared: number;
   wipes: number;
   damageDealt: number;
+  skillDamage: number;
   healingDone: number;
   damageTaken: number;
+  casts: Record<string, number>;
 }
 
 function count(tally: Tally, event: BattleEvent): void {
@@ -54,6 +59,19 @@ function count(tally: Tally, event: BattleEvent): void {
     case BattleEventType.Ultimate:
       tally.damageDealt += event.amount;
       break;
+    case BattleEventType.SkillTick:
+      tally.damageDealt += event.amount;
+      tally.skillDamage += event.amount;
+      break;
+    case BattleEventType.Skill: {
+      const dealt = event.hits.reduce((sum, hit) => sum + hit.amount, 0);
+
+      tally.damageDealt += dealt;
+      tally.skillDamage += dealt;
+      tally.healingDone += event.heal ?? 0;
+      tally.casts[event.source] = (tally.casts[event.source] ?? 0) + 1;
+      break;
+    }
     case BattleEventType.Heal:
       tally.healingDone += event.amount;
       break;
@@ -66,9 +84,11 @@ function count(tally: Tally, event: BattleEvent): void {
     case BattleEventType.Wiped:
       tally.wipes += 1;
       break;
-    case BattleEventType.FoeDefeated:
     case BattleEventType.StageStarted:
     case BattleEventType.Respawned:
+      tally.casts = {};
+      break;
+    case BattleEventType.FoeDefeated:
     case BattleEventType.Mechanic:
       break;
   }
@@ -89,8 +109,10 @@ export function runParty(party: PartyState, roster: Roster, options: RunOptions 
     stagesCleared: 0,
     wipes: 0,
     damageDealt: 0,
+    skillDamage: 0,
     healingDone: 0,
     damageTaken: 0,
+    casts: {},
   };
   let battle = startStage(fromStage, party, roster, { seed: 1, ultimate: 0 });
   let elapsed = 0;
@@ -137,7 +159,9 @@ export function runParty(party: PartyState, roster: Roster, options: RunOptions 
     wipesBeforeFrontier: tally.wipes - (frontier ? ATTEMPTS_BEFORE_STUCK : 0),
     secondsSimulated: elapsed,
     damageDealt: tally.damageDealt,
+    skillDamage: tally.skillDamage,
     healingDone: tally.healingDone,
     damageTaken: tally.damageTaken,
+    frontierCasts: frontier ? tally.casts : {},
   };
 }
