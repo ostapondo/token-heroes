@@ -12,15 +12,6 @@ export class SpriteCache {
     return this.#remember(key, () => paint(sprite, pixelColors(sprite, palette)));
   }
 
-  silhouette(key: string, sprite: SpriteDef, color: string, palette?: Palette): HTMLCanvasElement {
-    return this.#remember(`${key}#${color}`, () =>
-      paint(
-        sprite,
-        pixelColors(sprite, palette).map((row) => row.map((pixel) => (pixel ? color : null))),
-      ),
-    );
-  }
-
   // The sprite in one flat colour with no outline, for a copy laid over the sprite itself.
   ghost(key: string, sprite: SpriteDef, color: string, palette?: Palette): HTMLCanvasElement {
     return this.#remember(`${key}~${color}`, () =>
