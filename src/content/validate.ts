@@ -11,6 +11,7 @@ import {
 import type { BossDef, HeroDef } from './model/definitions';
 import { CreatureId, ElementId } from './model/ids';
 import type { Content } from './registry';
+import { skillProblems } from './validate-skills';
 import { superBossProblems } from './validate-super-bosses';
 
 const pairingsOf = (bosses: readonly BossDef[]) =>
@@ -88,5 +89,6 @@ export function validateContent(content: Content): string[] {
     ...artProblems(content),
     ...rosterProblems(content),
     ...superBossProblems(content),
+    ...skillProblems(content),
   ];
 }

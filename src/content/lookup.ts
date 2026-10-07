@@ -7,6 +7,7 @@ import type {
   HeroDef,
   SuperBossDef,
 } from './model/definitions';
+import type { SkillDef } from './model/skill';
 import type { Content } from './registry';
 
 function findById<T extends { readonly id: string }>(
@@ -31,6 +32,13 @@ export const enemyById = (content: Content, id: string): EnemyDef =>
   findById(content.enemies, id, 'enemy');
 export const heroDefById = (content: Content, id: string): HeroDef =>
   findById(content.heroes, id, 'hero');
+export const skillDefById = (content: Content, id: string): SkillDef =>
+  findById(content.skills, id, 'skill');
+// A hero's skills in the order they open.
+export const skillsOf = (content: Content, heroId: string): readonly SkillDef[] =>
+  content.skills
+    .filter((skill) => skill.hero === heroId)
+    .toSorted((left, right) => left.slot - right.slot);
 export const findSuperBoss = (content: Content, id: string): SuperBossDef | undefined =>
   content.superBosses.find((boss) => boss.id === id);
 
@@ -76,7 +84,7 @@ const superBossesOf = (content: Content, tier: SuperBossTier): BossStats[] =>
 
 export function toRoster(content: Content): Roster {
   return {
-    heroes: content.heroes.map((hero) => designHero(hero)),
+    heroes: content.heroes.map((hero) => designHero(hero, skillsOf(content, hero.id))),
     bosses: content.bosses.map((boss) => {
       const creature = creatureById(content, boss.creature);
 
