@@ -1,0 +1,48 @@
+import { SuperBossTier } from '@engine';
+import { CreatureAttack, defineSuperBoss } from '../model/definitions';
+import { LairId } from '../model/ids';
+
+export default defineSuperBoss({
+  id: 'rate-limiter',
+  name: 'Rate Limiter',
+  tier: SuperBossTier.Strong,
+  order: 1,
+  lair: LairId.Bastion,
+  attack: CreatureAttack.Slam,
+  hpScale: 1.6,
+  damageScale: 0.75,
+  palette: { a: '#5c6470', b: '#353b45', c: '#a4aeba', e: '#ff3030', h: '#c8a050', x: '#14171c' },
+  sprite: {
+    rows: [
+      '........hhhh........',
+      '......hhhhhhhh......',
+      '.....baaaaaaaab.....',
+      '.....bxaxaxaxab.....',
+      '.....beaxaeaxab.....',
+      '.....bxaxaxaxab.....',
+      '.....baaaaaaaab.....',
+      '......bbbbbbbb......',
+      '.bbbbaaaaaaaaaabbbb.',
+      'baaaabhhhhhhhhbaaaab',
+      'bahhabhrrrrrrhbahhab',
+      'baaaabxhrrrrhxbaaaab',
+      'baaaabxxhrrhxxbaaaab',
+      'baaaabxxxhrhxxbaaaab',
+      'baaaabxxhcrhxxbaaaab',
+      'baaaabxhccrchxbaaaab',
+      'baaaabhcrrrrchbaaaab',
+      'baaaabhhhhhhhhbaaaab',
+      'baaaabbbbbbbbbbaaaab',
+      'bcccbaaaaaaaaaabcccb',
+      'bcccb.aaa..aaa.bcccb',
+      '.bbb..aaa..aaa..bbb.',
+      '..c...aaa..aaa...c..',
+      '..x...bbb..bbb...x..',
+      '..c...aaa..aaa...c..',
+      '..x..aaaa..aaaa..x..',
+      '..c..aaaa..aaaa..c..',
+      '.ccc.bbbb..bbbb.ccc.',
+    ],
+    fixed: { r: '#ff4040' },
+  },
+});

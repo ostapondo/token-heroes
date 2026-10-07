@@ -1,4 +1,4 @@
-import type { BossStats, FoeStats, HeroStats, Roster } from './types';
+import type { BossStats, FoeStats, HeroStats, Roster, SuperBossTier } from './types';
 
 function cycled<T>(items: readonly T[], index: number, kind: string): T {
   const item = items[((index % items.length) + items.length) % items.length];
@@ -18,6 +18,10 @@ export function heroById(roster: Roster, id: string): HeroStats {
 
 export function bossAt(roster: Roster, round: number): BossStats {
   return cycled(roster.bosses, round, 'bosses');
+}
+
+export function superBossAt(roster: Roster, tier: SuperBossTier, round: number): BossStats {
+  return cycled(roster.superBosses[tier], round, `${tier} super bosses`);
 }
 
 export function enemyAt(roster: Roster, index: number): FoeStats {

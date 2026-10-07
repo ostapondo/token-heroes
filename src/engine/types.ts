@@ -12,6 +12,9 @@ export const AttackStyle = {
 } as const;
 export type AttackStyle = ValueOf<typeof AttackStyle>;
 
+export const SuperBossTier = { Medium: 'medium', Strong: 'strong' } as const;
+export type SuperBossTier = ValueOf<typeof SuperBossTier>;
+
 export const BattlePhase = { Fighting: 'fighting', Wiped: 'wiped', Cleared: 'cleared' } as const;
 export type BattlePhase = ValueOf<typeof BattlePhase>;
 
@@ -54,6 +57,7 @@ export interface BossStats extends FoeStats {
 export interface Roster {
   readonly heroes: readonly HeroStats[];
   readonly bosses: readonly BossStats[];
+  readonly superBosses: Readonly<Record<SuperBossTier, readonly BossStats[]>>;
   readonly enemies: readonly FoeStats[];
 }
 

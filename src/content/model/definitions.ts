@@ -1,11 +1,11 @@
-import type { AttackStyle, HeroRole } from '@engine';
-import type { CreatureId, ElementId } from './ids';
+import type { AttackStyle, HeroRole, SuperBossTier } from '@engine';
+import type { CreatureId, ElementId, LairId } from './ids';
 import type { BackdropDef } from './scenery';
 import type { Palette, SpriteDef } from './sprite';
 import type { WeatherDef } from './weather';
 
 export interface ElementDef {
-  readonly id: ElementId;
+  readonly id: ElementId | LairId;
   readonly name: string;
   readonly status: string;
   readonly palette: Palette;
@@ -40,6 +40,21 @@ export interface BossDef {
   readonly element: ElementId;
 }
 
+// A super boss is drawn in its own colours and fights in its own lair. Its tier sets the stages
+// it stands on and its order its turn among the super bosses of that tier.
+export interface SuperBossDef {
+  readonly id: string;
+  readonly name: string;
+  readonly tier: SuperBossTier;
+  readonly order: number;
+  readonly lair: LairId;
+  readonly attack: CreatureAttack;
+  readonly hpScale: number;
+  readonly damageScale: number;
+  readonly palette: Palette;
+  readonly sprite: SpriteDef;
+}
+
 export interface EnemyDef {
   readonly id: string;
   readonly name: string;
@@ -61,8 +76,11 @@ export interface HeroDef {
   readonly sprite: SpriteDef;
 }
 
-export const defineElement = (element: ElementDef): ElementDef => element;
+export const defineElement = (element: ElementDef & { readonly id: ElementId }): ElementDef =>
+  element;
+export const defineLair = (lair: ElementDef & { readonly id: LairId }): ElementDef => lair;
 export const defineCreature = (creature: CreatureDef): CreatureDef => creature;
 export const defineBoss = (boss: BossDef): BossDef => boss;
+export const defineSuperBoss = (boss: SuperBossDef): SuperBossDef => boss;
 export const defineEnemy = (enemy: EnemyDef): EnemyDef => enemy;
 export const defineHero = (hero: HeroDef): HeroDef => hero;

@@ -1,18 +1,17 @@
 import {
   CONTENT,
   TRANSPARENT_PIXEL,
-  bossById,
-  creatureById,
   enemyById,
   toRoster,
   type ElementDef,
   type SpriteDef,
 } from '@content';
-import { BALANCE, foesForStage } from '@engine';
+import { BALANCE, foesForStage, upcomingBoss } from '@engine';
 import { describe, expect, it } from 'vitest';
 import { partyFormation } from '../scene/formation';
 import type { Box } from '../scene/geometry';
 import { bossSlot, packSlot } from '../scene/layout';
+import { bossLook } from '../scene/looks';
 import { spriteSize } from '../sprites/pixels';
 import { SPRITE_OUTLINE } from '../sprites/sprite-cache';
 import type { Pixels } from './pixels';
@@ -24,6 +23,9 @@ import { contrast } from './tone';
 const LOST_OUTLINE = 1.25;
 const MOST_LOST = 0.05;
 const LEAST_HORIZON = 1.5;
+// A party this small keeps the close camera, which draws a super boss tallest.
+const SMALL_PARTY = 5;
+const LAST_STAGE = 1000;
 const roster = toRoster(CONTENT);
 
 interface Figure {
@@ -38,6 +40,13 @@ const scaled = (sprite: SpriteDef, scale: number) => {
   return { width: width * scale, height: height * scale };
 };
 
+function firstBossStage(element: ElementDef): number {
+  for (let stage: number = BALANCE.bossEvery; stage <= LAST_STAGE; stage += BALANCE.bossEvery) {
+    if (upcomingBoss(roster, stage).element === element.id) return stage;
+  }
+  throw new Error(`No boss fights in ${element.id} before stage ${LAST_STAGE}`);
+}
+
 function fight(element: ElementDef, partySize: number, boss: boolean): Figure[] {
   const heroes = CONTENT.heroes.slice(0, partySize);
   const { camera, boxes } = partyFormation(
@@ -47,11 +56,10 @@ function fight(element: ElementDef, partySize: number, boss: boolean): Figure[] 
       sprite: spriteSize(hero.sprite),
     })),
   );
-  const round = roster.bosses.findIndex((candidate) => candidate.element === element.id);
-  const stage = (round + 1) * BALANCE.bossEvery - (boss ? 0 : 1);
+  const stage = firstBossStage(element) - (boss ? 0 : 1);
   const foes = foesForStage(roster, stage).map((foe, index): Figure => {
     if (foe.boss) {
-      const sprite = creatureById(CONTENT, bossById(CONTENT, foe.id).creature).sprite;
+      const { sprite } = bossLook(CONTENT, foe.id, element);
 
       return { sprite, box: bossSlot(scaled(sprite, camera.scale.boss)), scale: camera.scale.boss };
     }
@@ -118,7 +126,7 @@ function horizonContrast(pixels: Pixels): number {
   return edges[Math.floor(edges.length / 2)] ?? 1;
 }
 
-describe.each(CONTENT.elements)('the $id backdrop', (element) => {
+describe.each([...CONTENT.elements, ...CONTENT.lairs])('the $id backdrop', (element) => {
   const { pixels } = paintScenery(element.backdrop);
 
   it('shows where the ground meets the sky', () => {
@@ -133,5 +141,13 @@ describe.each(CONTENT.elements)('the $id backdrop', (element) => {
     expect(lostOutline(pixels, fight(element, CONTENT.heroes.length, true))).toBeLessThanOrEqual(
       MOST_LOST,
     );
+  });
+});
+
+describe.each(CONTENT.lairs)('the $id lair', (lair) => {
+  it('keeps the outline of a small party and its super boss readable', () => {
+    const { pixels } = paintScenery(lair.backdrop);
+
+    expect(lostOutline(pixels, fight(lair, SMALL_PARTY, true))).toBeLessThanOrEqual(MOST_LOST);
   });
 });

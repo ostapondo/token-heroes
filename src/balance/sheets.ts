@@ -89,9 +89,10 @@ export function stageSheet(roster: Roster, stage: number): StageSheet {
     foes,
     totalHp: foes.reduce((sum, foe) => sum + foe.hp, 0),
     damagePerSecond,
-    // The hardest-hitting boss kind at this stage, whichever boss happens to stand here.
+    // The hardest-hitting boss kind at this stage, whichever boss happens to stand here; a super
+    // boss always stands on its stage and leads it, so it can only hit harder.
     harshestDamagePerSecond: isBossStage(stage)
-      ? foeDamage(stage, harshest, true) / BALANCE.bossAttackInterval
+      ? Math.max(damagePerSecond, foeDamage(stage, harshest, true) / BALANCE.bossAttackInterval)
       : damagePerSecond,
   };
 }

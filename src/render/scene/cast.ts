@@ -1,6 +1,4 @@
 import {
-  bossById,
-  creatureById,
   enemyById,
   heroDefById,
   type Content,
@@ -16,6 +14,7 @@ import { CAMERAS, CameraId, PULLBACK, pulledBack, type Camera } from './camera';
 import type { Box, Point } from './geometry';
 import { partyFormation } from './formation';
 import { bossSlot, packSlot } from './layout';
+import { bossLook } from './looks';
 import { Motion } from './motion';
 
 export interface Actor {
@@ -168,18 +167,13 @@ export class Cast {
   }
 
   #bossActor(bossId: string, element: ElementDef): Actor {
-    const boss = bossById(this.#content, bossId);
-    const creature = creatureById(this.#content, boss.creature);
-    const { sprite } = creature;
+    const look = bossLook(this.#content, bossId, element);
 
     return {
       id: bossId,
       boss: true,
-      attack: creature.attack,
-      key: `boss:${boss.creature}:${element.id}`,
-      sprite,
-      palette: element.palette,
-      box: bossSlot(scaled(sprite, this.#camera.scale.boss)),
+      ...look,
+      box: bossSlot(scaled(look.sprite, this.#camera.scale.boss)),
       pixel: this.#camera.scale.boss,
       motion: new Motion(),
     };

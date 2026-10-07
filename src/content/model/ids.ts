@@ -11,6 +11,19 @@ export const ElementId = {
 } as const;
 export type ElementId = (typeof ElementId)[keyof typeof ElementId];
 
+// Each super boss fights in a lair of its own, painted like an element.
+export const LairId = {
+  Archive: 'archive',
+  Mirage: 'mirage',
+  Mire: 'mire',
+  Court: 'court',
+  Bastion: 'bastion',
+  Recursion: 'recursion',
+  Abyss: 'abyss',
+  Foundry: 'foundry',
+} as const;
+export type LairId = (typeof LairId)[keyof typeof LairId];
+
 export const CreatureId = {
   Dragon: 'dragon',
   Demon: 'demon',
