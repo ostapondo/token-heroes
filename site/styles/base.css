@@ -1,0 +1,165 @@
+/* The game's palette from src/ui/shared/theme/tokens.ts. */
+:root {
+  --ground: #0d0b09;
+  --panel: #1a1612;
+  --raised: #2a231c;
+  --edge: #3b3128;
+  --ink: #efe6d4;
+  --ink-dim: #a89a84;
+  --coin: #e8b23a;
+  --coin-shade: #8a5e14;
+  --coin-ink: #1a1206;
+  --ultimate: #9fd6ff;
+  --heal: #7cc35b;
+  --wound: #ff5b4a;
+  --lava: #7a1d10;
+  --lava-edge: #e0532a;
+  --display: 'Jersey 10', monospace;
+  --body: 'Pixelify Sans', sans-serif;
+  --gutter: clamp(16px, 4vw, 48px);
+  --width: 1120px;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 72px;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font: 400 17px/1.5 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+a {
+  color: var(--coin);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  line-height: 1;
+}
+
+p {
+  margin: 0;
+}
+
+code {
+  padding: 1px 6px;
+  background: var(--raised);
+  color: var(--ink);
+  font:
+    0.9em ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+
+.kicker {
+  margin: 0;
+  color: var(--coin);
+  font: 400 22px/1 var(--display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gold {
+  color: var(--coin);
+}
+
+.coin {
+  display: inline-block;
+  width: 0.62em;
+  height: 0.62em;
+  margin-left: 0.12em;
+  vertical-align: 0.02em;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath fill='%23000' d='M2 0h4v1H2zM1 1h1v1H1zM6 1h1v1H6zM0 2h1v4H0zM7 2h1v4H7zM1 6h1v1H1zM6 6h1v1H6zM2 7h4v1H2z'/%3E%3Cpath fill='%23ffd77a' d='M2 1h4v1H2zM1 2h1v4H1zM3 3h2v2H3z'/%3E%3Cpath fill='%23e8b23a' d='M2 2h4v1H2zM2 3h1v2H2zM5 3h1v2H5zM2 5h4v1H2z'/%3E%3Cpath fill='%238a5e14' d='M6 2h1v4H6zM2 6h4v1H2z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 20px 3px;
+  font: 400 24px/1 var(--display);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: filter 120ms;
+}
+
+.button:hover {
+  filter: brightness(1.12);
+}
+
+.button:active {
+  transform: translateY(2px);
+}
+
+.button--coin {
+  background: var(--coin);
+  color: var(--coin-ink);
+  box-shadow: inset 0 -4px 0 var(--coin-shade);
+}
+
+.button--muted {
+  background: var(--raised);
+  color: var(--ink);
+  box-shadow:
+    inset 0 -4px 0 #000,
+    inset 0 0 0 2px var(--edge);
+}
+
+.button--small {
+  min-height: 36px;
+  padding: 0 14px 3px;
+  font-size: 20px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

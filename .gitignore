@@ -7,3 +7,4 @@ src-tauri/gen/
 *.log
 styled-system/
 dist-balance/
+dist-site/
