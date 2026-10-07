@@ -79,23 +79,27 @@ function ripples(context: CanvasRenderingContext2D, time: number, spots: Spot[],
     const reach = 1 + Math.round(phase * 3 * (0.6 + spot.depth));
 
     context.globalAlpha = 1 - phase;
-    context.fillRect(spot.x - reach, spot.y, 1, 1);
-    context.fillRect(spot.x + reach, spot.y, 1, 1);
-    context.fillRect(spot.x - reach + 1, spot.y - 1, reach * 2 - 1, 1);
+    context.beginPath();
+    context.rect(spot.x - reach, spot.y, 1, 1);
+    context.rect(spot.x + reach, spot.y, 1, 1);
+    context.rect(spot.x - reach + 1, spot.y - 1, reach * 2 - 1, 1);
+    context.fill();
   });
   context.globalAlpha = 1;
 }
 
 function bubbles(context: CanvasRenderingContext2D, time: number, spots: Spot[], color: string) {
   context.fillStyle = color;
+  context.beginPath();
   spots.forEach((spot, index) => {
     const phase = ((time + index * POP.stagger) % POP.period) / POP.period;
 
     if (phase > POP.rise) return;
     const size = Math.ceil(phase * 4);
 
-    context.fillRect(spot.x, spot.y - size, size, size);
+    context.rect(spot.x, spot.y - size, size, size);
   });
+  context.fill();
 }
 
 // Small things on the ground, larger toward the viewer.
