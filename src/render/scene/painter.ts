@@ -2,7 +2,8 @@ import type { ElementDef } from '@content';
 import { BattlePhase, type BattleState } from '@engine';
 import { FX_COLOR } from '../fx/colors';
 import { SPRITE_OUTLINE, type SpriteCache } from '../sprites/sprite-cache';
-import type { Actor } from './cast';
+import { PULLBACK } from './camera';
+import type { Actor, Pullback } from './cast';
 import { ARENA, floorTop } from './geometry';
 
 const TINT = { flash: FX_COLOR.steel, hurt: FX_COLOR.wound, glow: FX_COLOR.gold } as const;
@@ -75,7 +76,11 @@ export function paintCast(
     if (foe && foe.hp > 0 && !foe.boss) paintHpBar(context, actor, foe.hp / foe.maxHp);
   });
   const fallen = battle.phase === BattlePhase.Wiped;
-  const farthestFirst = cast.heroes.toSorted((left, right) => bottom(left) - bottom(right));
+  // Heroes face the foes, so on a tie the one further from them is drawn on top: a neighbour
+  // then covers the back of the hero in front, never its face.
+  const farthestFirst = cast.heroes.toSorted(
+    (left, right) => bottom(left) - bottom(right) || right.box.x - left.box.x,
+  );
 
   for (const actor of farthestFirst) paintActor(context, sprites, actor, 1, fallen);
 }
@@ -87,4 +92,24 @@ function paintHpBar(context: CanvasRenderingContext2D, actor: Actor, share: numb
   context.fillRect(x, y - HP_BAR.gap, width, HP_BAR.height);
   context.fillStyle = FX_COLOR.wound;
   context.fillRect(x, y - HP_BAR.gap, Math.ceil(width * share), HP_BAR.height);
+}
+
+// The scene as it stood shrinks toward the foes' corner while the camera pulls back.
+export function paintPullback(
+  context: CanvasRenderingContext2D,
+  sprites: SpriteCache,
+  pullback: Pullback,
+  progress: number,
+  battle: BattleState,
+): void {
+  const eased = progress < 0.5 ? 2 * progress * progress : 1 - (2 - 2 * progress) ** 2 / 2;
+  const scale = 1 + (pullback.ratio - 1) * eased;
+  const { pivot } = PULLBACK;
+
+  context.save();
+  context.translate(pivot.x, pivot.y);
+  context.scale(scale, scale);
+  context.translate(-pivot.x, -pivot.y);
+  paintCast(context, sprites, pullback, battle);
+  context.restore();
 }

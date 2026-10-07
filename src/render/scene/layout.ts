@@ -1,31 +1,26 @@
+import type { Camera } from './camera';
 import { ARENA, type Box } from './geometry';
 
-const ROW = { frontFeet: ARENA.height - 10, backFeet: ARENA.height - 22, backShift: 8 } as const;
-const PACK = { right: ARENA.width - 4, spacing: 32, perRow: 3 } as const;
-const BOSS_MARGIN = 10;
+const PACK = { right: ARENA.width - 4, perRow: 3 } as const;
+const BOSS = { margin: 10, feet: ARENA.height - 10 } as const;
 
 interface Size {
   readonly width: number;
   readonly height: number;
 }
 
-function inRows(index: number, perRow: number, backShift: number = ROW.backShift) {
-  const back = index >= perRow;
+export function packSlot(index: number, size: Size, camera: Camera): Box {
+  const { spacing, feet, backShift } = camera.pack;
+  const back = index >= PACK.perRow;
+  const left = PACK.right - PACK.perRow * spacing;
 
   return {
-    column: index % perRow,
-    feet: back ? ROW.backFeet : ROW.frontFeet,
-    shift: back ? backShift : 0,
+    x: left + (back ? backShift : 0) + (index % PACK.perRow) * spacing,
+    y: feet[back ? 1 : 0] - size.height,
+    ...size,
   };
 }
 
-export function packSlot(index: number, size: Size): Box {
-  const { column, feet, shift } = inRows(index, PACK.perRow);
-  const left = PACK.right - PACK.perRow * PACK.spacing;
-
-  return { x: left + shift + column * PACK.spacing, y: feet - size.height, ...size };
-}
-
 export function bossSlot(size: Size): Box {
-  return { x: ARENA.width - BOSS_MARGIN - size.width, y: ROW.frontFeet - size.height, ...size };
+  return { x: ARENA.width - BOSS.margin - size.width, y: BOSS.feet - size.height, ...size };
 }

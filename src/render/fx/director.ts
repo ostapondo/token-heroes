@@ -3,7 +3,7 @@ import { BattleEventType, type BattleEvent } from '@engine';
 import { t } from '@i18n';
 import { compactNumber } from '../format';
 import type { Actor } from '../scene/cast';
-import { ARENA, center, floorTop, type Point } from '../scene/geometry';
+import { ARENA, center, type Point } from '../scene/geometry';
 import { MotionCue } from '../scene/motion';
 import { bossAttack } from './boss-attacks';
 import { Sparks } from './bursts';
@@ -67,7 +67,7 @@ export class Director {
 
     return {
       effects: [
-        new LightPillar(center(hero.box).x, floorTop() + 18),
+        new LightPillar(center(hero.box).x, hero.box.y + hero.box.height),
         new FloatingText(
           level === 1 ? t('arena.joined') : t('arena.levelUp', { level }),
           above(hero, 6),

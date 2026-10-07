@@ -12,9 +12,10 @@ import type { Effect } from '../fx/effect';
 import { runLoop } from '../loop';
 import { SpriteCache } from '../sprites/sprite-cache';
 import { createWeather, WeatherLayer, type Weather } from '../weather';
-import { Cast } from './cast';
+import { PULLBACK } from './camera';
+import { Cast, type Pullback } from './cast';
 import { ARENA, center, floorTop } from './geometry';
-import { paintBackdrop, paintCast } from './painter';
+import { paintBackdrop, paintCast, paintPullback } from './painter';
 
 export interface ArenaOptions {
   readonly canvas: HTMLCanvasElement;
@@ -35,6 +36,7 @@ export class Arena {
   #weather: Weather[] = [];
   #effects: Effect[] = [];
   #snapshot: { battle: BattleState; party: PartyState } | undefined;
+  #pullback: { scene: Pullback; left: number } | undefined;
   #shake = 0;
   #stop: (() => void) | undefined;
 
@@ -58,6 +60,9 @@ export class Arena {
       );
     }
     this.#cast.sync(battle, party, this.#element);
+    const pullback = this.#cast.takePullback();
+
+    if (pullback) this.#pullback = { scene: pullback, left: PULLBACK.seconds };
     this.#snapshot = { battle, party };
   }
 
@@ -118,6 +123,8 @@ export class Arena {
       this.#attempt('effect', () => effect.update(dt), false),
     );
     this.#shake = Math.max(0, this.#shake - dt * SHAKE_DECAY);
+    if (this.#pullback) this.#pullback.left -= dt;
+    if (this.#pullback && this.#pullback.left <= 0) this.#pullback = undefined;
 
     context.save();
     const jitter = () => Math.round((Math.random() - 0.5) * this.#shake);
@@ -125,7 +132,13 @@ export class Arena {
     context.translate(jitter(), jitter());
     paintBackdrop(context, element);
     this.#drawWeather(WeatherLayer.Back, { focus });
-    paintCast(context, this.#cast.sprites, this.#cast, snapshot.battle);
+    if (this.#pullback) {
+      const progress = 1 - this.#pullback.left / PULLBACK.seconds;
+
+      paintPullback(context, this.#cast.sprites, this.#pullback.scene, progress, snapshot.battle);
+    } else {
+      paintCast(context, this.#cast.sprites, this.#cast, snapshot.battle);
+    }
     this.#drawWeather(WeatherLayer.Front, { focus });
     this.#effects = this.#effects.filter((effect) =>
       this.#survives('effect', () => effect.draw(context)),
