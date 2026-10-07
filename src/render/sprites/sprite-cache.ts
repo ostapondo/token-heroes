@@ -21,6 +21,17 @@ export class SpriteCache {
     );
   }
 
+  // The sprite in one flat colour with no outline, for a copy laid over the sprite itself.
+  ghost(key: string, sprite: SpriteDef, color: string, palette?: Palette): HTMLCanvasElement {
+    return this.#remember(`${key}~${color}`, () =>
+      paint(
+        sprite,
+        pixelColors(sprite, palette).map((row) => row.map((pixel) => (pixel ? color : null))),
+        false,
+      ),
+    );
+  }
+
   #remember(key: string, create: () => HTMLCanvasElement): HTMLCanvasElement {
     const cached = this.#bitmaps.get(key);
 
@@ -33,7 +44,7 @@ export class SpriteCache {
   }
 }
 
-function paint(sprite: SpriteDef, pixels: PixelGrid): HTMLCanvasElement {
+function paint(sprite: SpriteDef, pixels: PixelGrid, outlined = true): HTMLCanvasElement {
   const { width, height } = spriteSize(sprite);
   const canvas = document.createElement('canvas');
 
@@ -46,11 +57,13 @@ function paint(sprite: SpriteDef, pixels: PixelGrid): HTMLCanvasElement {
   const outlineSize = 1 + SPRITE_OUTLINE * 2;
 
   context.fillStyle = OUTLINE_COLOR;
-  pixels.forEach((row, y) => {
-    row.forEach((color, x) => {
-      if (color) context.fillRect(x, y, outlineSize, outlineSize);
+  if (outlined) {
+    pixels.forEach((row, y) => {
+      row.forEach((color, x) => {
+        if (color) context.fillRect(x, y, outlineSize, outlineSize);
+      });
     });
-  });
+  }
   pixels.forEach((row, y) => {
     row.forEach((color, x) => {
       if (!color) return;

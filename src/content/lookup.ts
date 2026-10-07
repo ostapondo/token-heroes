@@ -69,6 +69,7 @@ const superBossesOf = (content: Content, tier: SuperBossTier): BossStats[] =>
     .map((boss) => ({
       id: boss.id,
       element: boss.lair,
+      mechanic: boss.mechanic,
       hpScale: boss.hpScale,
       damageScale: boss.damageScale,
     }));

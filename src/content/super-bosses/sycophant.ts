@@ -1,4 +1,4 @@
-import { SuperBossTier } from '@engine';
+import { BossMechanic, SuperBossTier } from '@engine';
 import { CreatureAttack, defineSuperBoss } from '../model/definitions';
 import { LairId } from '../model/ids';
 
@@ -9,6 +9,7 @@ export default defineSuperBoss({
   order: 4,
   lair: LairId.Court,
   attack: CreatureAttack.Lunge,
+  mechanic: BossMechanic.Flatter,
   hpScale: 1.5,
   damageScale: 0.8,
   palette: { a: '#d84a8a', b: '#8a2a5a', c: '#ffc8dc', e: '#2a1408', h: '#ffd36a', x: '#2a0a1a' },

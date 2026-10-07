@@ -41,7 +41,9 @@ hero, boss or tweak keeps the game in shape without hand-tuned stats.
   where the boss would, on every 100th a strong one. Each fights like a boss 5 or 10 stages
   deeper, with more of that lead in health so the fight lasts longer. The party stops on the
   super boss instead of a few stages later and then clears those stages at once, so the tokens
-  to reach any later stage stay the same.
+  to reach any later stage stay the same. Each super boss also has a mechanic, such as lost hits
+  or a pause in the party's attacks; it gives up as much health as the mechanic makes the fight
+  harder, so the lead alone decides where the wall stands.
 - **Foes grow alike in health and damage**, 7% a stage, so that product grows by the same factor
   every stage and the fight at the wall lasts about as long at stage 300 as at stage 30: half a
   minute to a minute and a half.

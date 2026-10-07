@@ -15,6 +15,7 @@ import { LightPillar, ScreenFlash } from './screen';
 import { heroAttack } from './hero-attacks';
 import { Beam, CrossSlash } from './strikes';
 import { TEXT } from './text-styles';
+import { Twists } from './twists';
 
 const BANNER_AT: Point = { x: ARENA.width / 2, y: ARENA.height * 0.35 };
 
@@ -30,6 +31,7 @@ function unhandled(event: never): never {
 export class Director {
   readonly #content: Content;
   readonly #trail = new NumberTrail();
+  readonly #twists = new Twists((text, at, style) => this.#number(text, at, style));
 
   constructor(content: Content) {
     this.#content = content;
@@ -54,6 +56,8 @@ export class Director {
         for (const foe of stage.foes) foe.motion.cue(MotionCue.Entering);
 
         return NONE;
+      case BattleEventType.Mechanic:
+        return this.#twists.react(event, stage);
       case BattleEventType.StageCleared:
       case BattleEventType.Wiped:
         return NONE;

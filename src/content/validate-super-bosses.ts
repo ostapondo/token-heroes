@@ -28,6 +28,10 @@ function idProblems(content: Content): string[] {
 
   return [
     ...duplicated('super boss', idsOf(content.superBosses)),
+    ...duplicated(
+      'super boss mechanic',
+      content.superBosses.map((boss) => boss.mechanic),
+    ),
     ...content.superBosses
       .filter((boss) => bossIds.has(boss.id))
       .map((boss) => `super boss ${boss.id} shares its id with a boss`),

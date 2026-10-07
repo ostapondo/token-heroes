@@ -69,6 +69,7 @@ function count(tally: Tally, event: BattleEvent): void {
     case BattleEventType.FoeDefeated:
     case BattleEventType.StageStarted:
     case BattleEventType.Respawned:
+    case BattleEventType.Mechanic:
       break;
   }
 }

@@ -1,4 +1,4 @@
-import type { AttackStyle, HeroRole, SuperBossTier } from '@engine';
+import type { AttackStyle, BossMechanic, HeroRole, SuperBossTier } from '@engine';
 import type { CreatureId, ElementId, LairId } from './ids';
 import type { BackdropDef } from './scenery';
 import type { Palette, SpriteDef } from './sprite';
@@ -49,6 +49,7 @@ export interface SuperBossDef {
   readonly order: number;
   readonly lair: LairId;
   readonly attack: CreatureAttack;
+  readonly mechanic: BossMechanic;
   readonly hpScale: number;
   readonly damageScale: number;
   readonly palette: Palette;

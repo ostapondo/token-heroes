@@ -1,7 +1,7 @@
 import { bossById, creatureById, findSuperBoss, type Content, type ElementDef } from '@content';
 import type { Actor } from './cast';
 
-type Look = Pick<Actor, 'attack' | 'key' | 'sprite' | 'palette'>;
+type Look = Pick<Actor, 'attack' | 'glitches' | 'key' | 'sprite' | 'palette'>;
 
 // A super boss wears its own colours; any other boss is its creature in the element's.
 export function bossLook(content: Content, bossId: string, element: ElementDef): Look {
@@ -10,10 +10,16 @@ export function bossLook(content: Content, bossId: string, element: ElementDef):
   if (superBoss) {
     const { attack, sprite, palette } = superBoss;
 
-    return { attack, key: `super:${bossId}`, sprite, palette };
+    return { attack, glitches: true, key: `super:${bossId}`, sprite, palette };
   }
   const boss = bossById(content, bossId);
   const { attack, sprite } = creatureById(content, boss.creature);
 
-  return { attack, key: `boss:${boss.creature}:${element.id}`, sprite, palette: element.palette };
+  return {
+    attack,
+    glitches: false,
+    key: `boss:${boss.creature}:${element.id}`,
+    sprite,
+    palette: element.palette,
+  };
 }
