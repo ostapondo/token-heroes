@@ -23,7 +23,7 @@ export default defineLair({
           [8, '#d8ffd8', -1, -1],
         ],
       },
-      { kind: SceneryKind.Canopy, color: '#0c1a10', rim: '#1e3a24' },
+      { kind: SceneryKind.Canopy, color: '#1a3020', rim: '#2a4a30' },
       {
         kind: SceneryKind.Trees,
         trees: [
@@ -32,7 +32,7 @@ export default defineLair({
           [96, 24],
           [178, 44],
         ],
-        color: '#040a06',
+        color: '#16281a',
         moss: '#2a5a32',
       },
       {

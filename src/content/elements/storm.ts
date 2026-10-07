@@ -39,7 +39,7 @@ export default defineElement({
         base: 5,
         amplitude: 10,
         roughness: 0.7,
-        color: '#0b1220',
+        color: '#1a2a40',
         rim: '#3a5a80',
       },
       {
