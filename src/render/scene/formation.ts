@@ -11,26 +11,26 @@ export interface Recruit {
   readonly size: Size;
 }
 
-// Each rank stands higher and further back than the one before it, so a hero behind shows
-// its head and shoulders above the rank in front, and every second hero in a rank steps back
-// a little so neighbours do not hide each other's faces. Tuned so a full party of ten keeps
-// three quarters of every head in view; the front rank stops short of the pack.
+// Each rank stands higher than the one before it, so a hero behind shows its head and
+// shoulders above the rank in front. Tuned so a full party of fourteen keeps three quarters of
+// every head in view; the front rank stops short of the pack and the back rank stays on the
+// floor.
 const RANKS = [
-  { feet: ARENA.height - 10, right: 88 },
-  { feet: ARENA.height - 22, right: 84 },
-  { feet: ARENA.height - 34, right: 76 },
+  { feet: ARENA.height - 6, right: 88 },
+  { feet: ARENA.height - 17, right: 86 },
+  { feet: ARENA.height - 28, right: 86 },
+  { feet: ARENA.height - 39, right: 80 },
 ] as const;
-const STEP_BACK = 4;
 const PARTY_LEFT = 2;
 const MAX_SPACING = 26;
 const PER_RANK = 4;
 
 const PREFERRED_RANK: Record<AttackStyle, number> = {
   [AttackStyle.Bash]: 0,
-  [AttackStyle.Slash]: 0,
-  [AttackStyle.Arrow]: 1,
-  [AttackStyle.Spell]: 1,
-  [AttackStyle.Heal]: 2,
+  [AttackStyle.Slash]: 1,
+  [AttackStyle.Arrow]: 2,
+  [AttackStyle.Spell]: 2,
+  [AttackStyle.Heal]: 3,
 };
 
 function rankFor(preferred: number, filled: readonly number[]): number {
@@ -79,7 +79,7 @@ export function partyFormation(recruits: readonly Recruit[]): Box[] {
 
       boxes[index] = {
         x: Math.round(rank.right - size.width - column * spacing),
-        y: rank.feet - (column % 2 === 0 ? 0 : STEP_BACK) - size.height,
+        y: rank.feet - size.height,
         ...size,
       };
     });
