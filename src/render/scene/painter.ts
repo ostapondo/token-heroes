@@ -5,6 +5,7 @@ import { PULLBACK } from './camera';
 import type { Actor, Pullback } from './cast';
 
 const TINT = { flash: FX_COLOR.steel, hurt: FX_COLOR.wound, glow: FX_COLOR.gold } as const;
+const TINT_SHARE = 0.5;
 const GLITCH = { alpha: 0.3, channels: [FX_COLOR.glitchRed, FX_COLOR.glitchCyan] } as const;
 const FALLEN_ALPHA = 0.45;
 const HP_BAR = { height: 2, gap: 3, empty: '#000000' } as const;
@@ -43,9 +44,9 @@ function paintActor(
   fallen: boolean,
 ): void {
   const tint = tintOf(actor);
-  const bitmap = tint
-    ? sprites.silhouette(actor.key, actor.sprite, tint, actor.palette)
-    : sprites.get(actor.key, actor.sprite, actor.palette);
+  const bitmap = sprites.get(actor.key, actor.sprite, actor.palette);
+  // A hit or a level-up washes the sprite in a colour, but only halfway, so it stays readable.
+  const wash = tint ? sprites.ghost(actor.key, actor.sprite, tint, actor.palette) : null;
   const offset = actor.motion.offset(facing);
   const border = SPRITE_OUTLINE * actor.pixel;
   const x = actor.box.x - border;
@@ -53,14 +54,22 @@ function paintActor(
   const width = actor.box.width + border * 2;
   const height = actor.box.height + border * 2;
 
+  const alpha = fallen ? FALLEN_ALPHA : actor.motion.fade;
+  const draw = (image: HTMLCanvasElement, left: number, top: number) => {
+    context.globalAlpha = alpha;
+    context.drawImage(image, left, top, width, height);
+    if (!wash) return;
+    context.globalAlpha = alpha * TINT_SHARE;
+    context.drawImage(wash, left, top, width, height);
+  };
+
   context.save();
-  context.globalAlpha = fallen ? FALLEN_ALPHA : actor.motion.fade;
   if (fallen) {
     context.translate(x + width / 2, y + height);
     context.rotate(-Math.PI / 2);
-    context.drawImage(bitmap, 0, -height / 2, width, height);
+    draw(bitmap, 0, -height / 2);
   } else {
-    context.drawImage(bitmap, x + offset.x, y + offset.y, width, height);
+    draw(bitmap, x + offset.x, y + offset.y);
     if (actor.glitches && actor.motion.flashing) {
       // A red copy one sprite pixel to one side and a cyan one to the other, laid over the
       // sprite without an outline so they tint its edges like a torn signal.
