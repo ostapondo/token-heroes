@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Token Heroes</title>
+    <meta
+      name="description"
+      content="An endless idle RPG in your system tray. Every token your coding agents burn is a coin for your heroes."
+    />
+    <meta property="og:title" content="Token Heroes" />
+    <meta
+      property="og:description"
+      content="An endless idle RPG in your system tray, powered by the tokens your coding agents burn."
+    />
+    <meta name="theme-color" content="#0d0b09" />
+    <link rel="icon" href="../public/cursors/sword.svg" />
+    <link rel="stylesheet" href="./styles/index.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#top">
+        <img src="../public/cursors/sword.svg" alt="" width="24" height="24" />Token Heroes
+      </a>
+      <nav class="nav" aria-label="Sections">
+        <a href="#how">How it works</a>
+        <a href="#fight">The fight</a>
+        <a href="#roster">Heroes</a>
+        <a href="#privacy">Privacy</a>
+        <a href="https://github.com/ostapondo/token-heroes">GitHub</a>
+      </nav>
+      <a
+        class="button button--coin button--small"
+        href="https://github.com/ostapondo/token-heroes/releases/latest"
+        >Download</a
+      >
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="embers" aria-hidden="true">
+          <i style="--x: 52%; --delay: 0s"></i>
+          <i style="--x: 61%; --delay: 2.1s"></i>
+          <i style="--x: 70%; --delay: 4.3s"></i>
+          <i style="--x: 78%; --delay: 1.2s"></i>
+          <i style="--x: 86%; --delay: 3.4s"></i>
+          <i style="--x: 93%; --delay: 5.6s"></i>
+          <i style="--x: 12%; --delay: 2.8s"></i>
+          <i style="--x: 33%; --delay: 5s"></i>
+        </div>
+        <div class="hero__copy">
+          <p class="kicker">Idle RPG for macOS and Windows</p>
+          <h1>
+            Every token your agents burn is a
+            <span class="gold">coin<i class="coin" aria-hidden="true"></i></span>
+          </h1>
+          <p class="lead">
+            An endless idle RPG that lives in your system tray. Your coding agents write code, the
+            party fights, and you spend the tokens they burn on your heroes.
+          </p>
+          <div class="actions">
+            <a
+              class="button button--coin"
+              href="https://github.com/ostapondo/token-heroes/releases/latest"
+              >Download the latest release</a
+            >
+            <a class="button button--muted" href="https://github.com/ostapondo/token-heroes"
+              >View on GitHub</a
+            >
+          </div>
+          <p class="fineprint">Free and open source under MIT. A 1.75 MB download.</p>
+        </div>
+        <figure class="tray">
+          <div class="tray__bar" aria-hidden="true">
+            <span class="tray__item tray__item--open"
+              ><img src="../public/cursors/sword.svg" alt="" width="16" height="16" />3.8M</span
+            >
+            <span class="tray__item">10:42</span>
+          </div>
+          <img
+            class="tray__window"
+            src="../docs/readme/demo.gif"
+            alt="The game window: the party fights the Plague Brute on stage 25 while burned tokens arrive as coins and buy levels"
+            width="393"
+            height="675"
+          />
+        </figure>
+      </section>
+      <div class="lava" aria-hidden="true"></div>
+
+      <section class="agents" aria-labelledby="agents-title">
+        <h2 id="agents-title" class="kicker">Counts the tokens of</h2>
+        <ul class="chips">
+          <li>Claude Code</li>
+          <li>Codex</li>
+          <li>Gemini CLI</li>
+          <li>Qwen Code</li>
+          <li>OpenCode</li>
+          <li>Kilo Code</li>
+        </ul>
+      </section>
+
+      <section id="how" class="section">
+        <div class="section__head">
+          <p class="kicker">How it works</p>
+          <h2>One burned token is one coin</h2>
+          <p>
+            The game reads the session logs your agents already write on your disk, counts the
+            tokens they burn and credits one coin per token. The fight never pays. Stuck on a boss?
+            Ship more work.
+          </p>
+        </div>
+        <div class="art">
+          <img
+            src="../docs/readme/flow.svg"
+            alt="An agent session burns tokens, the host turns each token into one coin, the coins level up the Wanderer"
+            width="960"
+            height="268"
+            loading="lazy"
+          />
+        </div>
+      </section>
+
+      <section id="fight" class="section">
+        <div class="section__head">
+          <p class="kicker">The fight</p>
+          <h2>It plays itself. You decide what to buy.</h2>
+        </div>
+        <ul class="stats">
+          <li>
+            <b>∞</b>
+            <h3>Endless stages</h3>
+            <p>Packs grow by one foe every 10 stages. Every 5th stage is a boss.</p>
+          </li>
+          <li>
+            <b>10%</b>
+            <h3>Auto battle</h3>
+            <p>Heroes attack on their own. Crits hit for 2.5× damage.</p>
+          </li>
+          <li>
+            <b>50%</b>
+            <h3>Tap to strike</h3>
+            <p>Click the arena to hit the front foe for half your party's power.</p>
+          </li>
+          <li>
+            <b class="blue">1M</b>
+            <h3>Ultimate</h3>
+            <p>About an hour of agent work charges ten seconds of party damage.</p>
+          </li>
+          <li>
+            <b>×4</b>
+            <h3>Milestones</h3>
+            <p>Every 25 levels a hero's damage and health grow fourfold.</p>
+          </li>
+          <li>
+            <b class="green">10 s</b>
+            <h3>Gentle wipes</h3>
+            <p>A fallen party is back in ten seconds. Levels and coins stay.</p>
+          </li>
+          <li>
+            <b>8 h</b>
+            <h3>Offline progress</h3>
+            <p>Close the window and the party keeps fighting for up to eight hours.</p>
+          </li>
+          <li>
+            <b class="red">100</b>
+            <h3>Ascension</h3>
+            <p>From stage 100, start over with lasting power from your deepest stage.</p>
+          </li>
+        </ul>
+      </section>
+
+      <section id="roster" class="section">
+        <div class="section__head">
+          <p class="kicker">Ten heroes</p>
+          <h2>Hire a party</h2>
+          <p>
+            Strikers deal damage, tanks hold the party's health and healers restore it. Every hero
+            is stronger per coin than the one before. The rare ones unlock with your lifetime burn:
+            the Paladin takes 800 million tokens.
+          </p>
+        </div>
+        <div class="art">
+          <img
+            src="../docs/readme/heroes.svg"
+            alt="Ten hero cards: Wanderer, Archer, Shieldbearer, Cleric, Fire Mage, Rogue, Barbarian, Frost Witch, Necromancer, Paladin"
+            width="960"
+            height="416"
+            loading="lazy"
+          />
+        </div>
+        <div class="section__head">
+          <p class="kicker">Thirty bosses</p>
+          <h2>Eight creatures, nine elements</h2>
+          <p>
+            The creature brings the attack: dragons breathe fire, golems slam, wraiths swing a
+            scythe. The element brings the palette and the weather: embers on a lava floor, snow,
+            lightning and rain, a summoning ring.
+          </p>
+        </div>
+        <div class="art">
+          <img
+            src="../docs/readme/bosses.svg"
+            alt="Thirty pixel bosses, each a creature in an element's colours and weather"
+            width="960"
+            height="416"
+            loading="lazy"
+          />
+        </div>
+      </section>
+
+      <img
+        class="pack"
+        src="../docs/readme/pack.svg"
+        alt=""
+        width="960"
+        height="64"
+        loading="lazy"
+      />
+
+      <section id="privacy" class="section">
+        <div class="split">
+          <div class="section__head">
+            <p class="kicker">Privacy</p>
+            <h2>Your tokens stay yours</h2>
+            <ul class="checks">
+              <li>
+                Only the <code>usage</code> numbers are read. Prompts and code are never stored or
+                shown.
+              </li>
+              <li>
+                Your work never leaves your machine. The one request the app makes is the update
+                check on GitHub.
+              </li>
+              <li>
+                Everything sits in <code>~/.token-heroes</code>, so a reinstall keeps your progress.
+              </li>
+              <li>
+                Only the host adds coins. The window can spend them, never more than you have.
+              </li>
+            </ul>
+          </div>
+          <dl class="specs">
+            <div>
+              <dt>App size</dt>
+              <dd>3.6 MB</dd>
+            </div>
+            <div>
+              <dt>Memory in the tray</dt>
+              <dd>58 MB</dd>
+            </div>
+            <div>
+              <dt>CPU when idle</dt>
+              <dd>0%</dd>
+            </div>
+            <div>
+              <dt>Token to coin</dt>
+              <dd>&lt;1 s</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <section id="contribute" class="section">
+        <div class="section__head">
+          <p class="kicker">Open source</p>
+          <h2>Come build it</h2>
+          <p>
+            The content is plain data, one entity per file. Name one of the 42 free bosses, draw an
+            enemy or teach the host a new agent. You don't need Rust or React to start.
+          </p>
+        </div>
+        <div class="art">
+          <img
+            src="../docs/readme/slot.svg"
+            alt="A golem cycling through the nine elements next to the eight lines of code that add a boss"
+            width="960"
+            height="256"
+            loading="lazy"
+          />
+        </div>
+        <div class="actions">
+          <a
+            class="button button--coin"
+            href="https://github.com/ostapondo/token-heroes/blob/main/CONTRIBUTING.md"
+            >Read the contributing guide</a
+          >
+          <a class="button button--muted" href="https://github.com/ostapondo/token-heroes/issues"
+            >Open issues</a
+          >
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <img src="../docs/readme/pack.svg" alt="" width="960" height="64" loading="lazy" />
+      <p>
+        <a href="https://github.com/ostapondo/token-heroes/blob/main/LICENSE">MIT</a> ·
+        <a href="https://github.com/ostapondo/token-heroes">Source</a> ·
+        <a href="https://github.com/ostapondo/token-heroes/releases">Releases</a> · The art is drawn
+        from the game's own sprite files.
+      </p>
+    </footer>
+  </body>
+</html>

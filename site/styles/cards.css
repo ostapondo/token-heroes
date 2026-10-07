@@ -1,0 +1,103 @@
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 40%), 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stats li {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 20px;
+  background: var(--panel);
+  border: 2px solid var(--edge);
+  box-shadow: inset 0 -4px 0 #000;
+}
+
+.stats b {
+  color: var(--coin);
+  font: 400 56px/0.9 var(--display);
+  text-shadow: 0 3px 0 #000;
+}
+
+.stats h3 {
+  font-size: 26px;
+}
+
+.stats p {
+  color: var(--ink-dim);
+  font-size: 15px;
+}
+
+.stats .blue {
+  color: var(--ultimate);
+}
+
+.stats .green {
+  color: var(--heal);
+}
+
+.stats .red {
+  color: var(--wound);
+}
+
+.checks {
+  display: grid;
+  gap: 12px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checks li {
+  position: relative;
+  padding-left: 28px;
+}
+
+.checks li::before {
+  content: '';
+  position: absolute;
+  top: 0.45em;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  background: var(--heal);
+  box-shadow: inset 0 -3px 0 #3f6a2c;
+}
+
+.specs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 0;
+}
+
+.specs div {
+  padding: 20px;
+  background: var(--panel);
+  border: 2px solid var(--edge);
+}
+
+.specs dt {
+  color: var(--ink-dim);
+  font-size: 15px;
+}
+
+.specs dd {
+  margin: 6px 0 0;
+  color: var(--coin);
+  font: 400 52px/1 var(--display);
+}
+
+@media (max-width: 900px) {
+  .stats li {
+    padding: 14px;
+  }
+
+  .stats b {
+    font-size: 44px;
+  }
+}
