@@ -9,7 +9,7 @@ import {
 
 type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 
-type FoeDraft = Mutable<Foe>;
+export type FoeDraft = Mutable<Foe>;
 
 export interface BattleDraft extends Omit<Mutable<BattleState>, 'foes' | 'cooldowns'> {
   foes: FoeDraft[];
@@ -26,21 +26,6 @@ export function draftOf(battle: BattleState): BattleDraft {
 
 export function frontFoe(draft: BattleDraft): number {
   return draft.foes.findIndex((foe) => foe.hp > 0);
-}
-
-export function damageFront(
-  draft: BattleDraft,
-  amount: number,
-  events: BattleEvent[],
-  hitEvent: (foe: number) => BattleEvent,
-): void {
-  const index = frontFoe(draft);
-  const foe = draft.foes[index];
-
-  if (!foe) return;
-  foe.hp = Math.max(0, foe.hp - amount);
-  events.push(hitEvent(index));
-  if (foe.hp === 0) events.push({ type: BattleEventType.FoeDefeated, foe: index, boss: foe.boss });
 }
 
 export function settleClear(draft: BattleDraft, events: BattleEvent[]): boolean {

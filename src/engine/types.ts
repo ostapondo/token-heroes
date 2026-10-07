@@ -15,6 +15,19 @@ export type AttackStyle = ValueOf<typeof AttackStyle>;
 export const SuperBossTier = { Medium: 'medium', Strong: 'strong' } as const;
 export type SuperBossTier = ValueOf<typeof SuperBossTier>;
 
+// What sets a super boss fight apart from a plain one.
+export const BossMechanic = {
+  StealContext: 'steal-context',
+  Hallucinate: 'hallucinate',
+  Inject: 'inject',
+  Flatter: 'flatter',
+  Throttle: 'throttle',
+  Loop: 'loop',
+  Unmask: 'unmask',
+  Maximize: 'maximize',
+} as const;
+export type BossMechanic = ValueOf<typeof BossMechanic>;
+
 export const BattlePhase = { Fighting: 'fighting', Wiped: 'wiped', Cleared: 'cleared' } as const;
 export type BattlePhase = ValueOf<typeof BattlePhase>;
 
@@ -29,6 +42,7 @@ export const BattleEventType = {
   StageStarted: 'stageStarted',
   Wiped: 'wiped',
   Respawned: 'respawned',
+  Mechanic: 'mechanic',
 } as const;
 export type BattleEventType = ValueOf<typeof BattleEventType>;
 
@@ -52,6 +66,7 @@ export interface FoeStats {
 
 export interface BossStats extends FoeStats {
   readonly element: string;
+  readonly mechanic?: BossMechanic | undefined;
 }
 
 export interface Roster {
@@ -79,6 +94,11 @@ export interface Foe {
   readonly damage: number;
   readonly attackInterval: number;
   readonly attackIn: number;
+  readonly mechanic?: BossMechanic | undefined;
+  // Seconds the foe has fought, for a mechanic that comes round on a timer.
+  readonly clock?: number | undefined;
+  // A mechanic that fires once per fight has fired.
+  readonly spent?: boolean | undefined;
 }
 
 export interface BattleState {
@@ -109,7 +129,8 @@ export type BattleEvent =
   | Event<typeof BattleEventType.StageCleared, { stage: number }>
   | Event<typeof BattleEventType.StageStarted, { stage: number }>
   | Event<typeof BattleEventType.Wiped>
-  | Event<typeof BattleEventType.Respawned, { stage: number }>;
+  | Event<typeof BattleEventType.Respawned, { stage: number }>
+  | Event<typeof BattleEventType.Mechanic, FoeAmount & { mechanic: BossMechanic }>;
 
 export interface BattleStep {
   readonly battle: BattleState;

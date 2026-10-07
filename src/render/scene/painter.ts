@@ -5,6 +5,7 @@ import { PULLBACK } from './camera';
 import type { Actor, Pullback } from './cast';
 
 const TINT = { flash: FX_COLOR.steel, hurt: FX_COLOR.wound, glow: FX_COLOR.gold } as const;
+const GLITCH = { alpha: 0.3, channels: [FX_COLOR.glitchRed, FX_COLOR.glitchCyan] } as const;
 const FALLEN_ALPHA = 0.45;
 const HP_BAR = { height: 2, gap: 3, empty: '#000000' } as const;
 const SHADOW = { color: 'rgba(0, 0, 0, 0.42)', spread: 0.55, depth: 2, bossDepth: 3 } as const;
@@ -12,7 +13,7 @@ const SHADOW = { color: 'rgba(0, 0, 0, 0.42)', spread: 0.55, depth: 2, bossDepth
 const bottom = (actor: Actor): number => actor.box.y + actor.box.height;
 
 function tintOf(actor: Actor): string | null {
-  if (actor.motion.flashing) return TINT.flash;
+  if (actor.motion.flashing && !actor.glitches) return TINT.flash;
   if (actor.motion.hurting) return TINT.hurt;
   if (actor.motion.glowing) return TINT.glow;
 
@@ -60,6 +61,17 @@ function paintActor(
     context.drawImage(bitmap, 0, -height / 2, width, height);
   } else {
     context.drawImage(bitmap, x + offset.x, y + offset.y, width, height);
+    if (actor.glitches && actor.motion.flashing) {
+      // A red copy one sprite pixel to one side and a cyan one to the other, laid over the
+      // sprite without an outline so they tint its edges like a torn signal.
+      context.globalAlpha = GLITCH.alpha * actor.motion.fade;
+      GLITCH.channels.forEach((color, side) => {
+        const shift = (side === 0 ? -1 : 1) * actor.pixel;
+        const channel = sprites.ghost(actor.key, actor.sprite, color, actor.palette);
+
+        context.drawImage(channel, x + offset.x + shift, y + offset.y, width, height);
+      });
+    }
   }
   context.restore();
 }

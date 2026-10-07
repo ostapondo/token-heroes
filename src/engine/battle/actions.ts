@@ -9,7 +9,8 @@ import {
   type PartyState,
   type Roster,
 } from '../types';
-import { damageFront, draftOf, settleClear } from './draft';
+import { draftOf, settleClear } from './draft';
+import { damageFront } from './mechanics';
 
 export function strike(battle: BattleState, party: PartyState, roster: Roster): BattleStep {
   if (battle.phase !== BattlePhase.Fighting || battle.strikeReadyIn > 0)
@@ -18,7 +19,11 @@ export function strike(battle: BattleState, party: PartyState, roster: Roster): 
   const events: BattleEvent[] = [];
   const amount = strikeDamage(party, roster);
 
-  damageFront(draft, amount, events, (foe) => ({ type: BattleEventType.Strike, foe, amount }));
+  damageFront(draft, amount, events, (foe, landed) => ({
+    type: BattleEventType.Strike,
+    foe,
+    amount: landed,
+  }));
   draft.strikeReadyIn = BALANCE.strikeCooldown;
   settleClear(draft, events);
 
@@ -35,7 +40,11 @@ export function unleashUltimate(
   const events: BattleEvent[] = [];
   const amount = ultimateDamage(party, roster);
 
-  damageFront(draft, amount, events, (foe) => ({ type: BattleEventType.Ultimate, foe, amount }));
+  damageFront(draft, amount, events, (foe, landed) => ({
+    type: BattleEventType.Ultimate,
+    foe,
+    amount: landed,
+  }));
   draft.ultimate = 0;
   settleClear(draft, events);
 

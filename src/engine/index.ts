@@ -35,6 +35,7 @@ export { heroById } from './roster';
 export {
   AttackStyle,
   BattleEventType,
+  BossMechanic,
   BattlePhase,
   HeroRole,
   SuperBossTier,

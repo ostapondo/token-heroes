@@ -1,6 +1,7 @@
 import { BALANCE } from '../balance';
-import { foeDamage, foeHp } from '../formulas';
+import { foeDamage, foeHp, safeAmount } from '../formulas';
 import { bossAt, enemyAt, superBossAt } from '../roster';
+import { mechanicWeight } from './mechanics';
 import { SuperBossTier, type BossStats, type Foe, type Roster } from '../types';
 
 const ENEMY_PICK_STRIDE = { perStage: 7, perSlot: 3 } as const;
@@ -58,7 +59,9 @@ export function upcomingBoss(roster: Roster, stage: number): BossStats {
 export function foesForStage(roster: Roster, stage: number): Foe[] {
   if (isBossStage(stage)) {
     const { stats, lead } = bossOfStage(roster, stage);
-    const hp = foeHp(stage + lead.hpLead, stats.hpScale, true);
+    const hp = safeAmount(
+      foeHp(stage + lead.hpLead, stats.hpScale, true) / mechanicWeight(stats.mechanic),
+    );
 
     return [
       {
@@ -69,6 +72,7 @@ export function foesForStage(roster: Roster, stage: number): Foe[] {
         damage: foeDamage(stage + lead.damageLead, stats.damageScale, true),
         attackInterval: BALANCE.bossAttackInterval,
         attackIn: BALANCE.bossAttackInterval,
+        mechanic: stats.mechanic,
       },
     ];
   }

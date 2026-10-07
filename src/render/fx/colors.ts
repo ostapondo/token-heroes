@@ -10,4 +10,8 @@ export const FX_COLOR = {
   wound: '#ff5b4a',
   stone: '#c9ced6',
   player: '#6fe3ff',
+  glitchRed: '#ff2a6a',
+  glitchCyan: '#2af0ff',
+  poison: '#5dff8a',
+  charge: '#9fd6ff',
 } as const;

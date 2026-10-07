@@ -14,7 +14,6 @@ import {
   type Roster,
 } from '../types';
 import {
-  damageFront,
   draftOf,
   foesDamagePerSecond,
   frontFoe,
@@ -22,6 +21,7 @@ import {
   wipe,
   type BattleDraft,
 } from './draft';
+import { heroHit, stealContext, throttled } from './mechanics';
 import { startStage } from './start';
 
 export function stepBattle(
@@ -58,7 +58,7 @@ function fight(battle: BattleState, dt: number, party: PartyState, roster: Roste
 
   draft.strikeReadyIn = Math.max(0, draft.strikeReadyIn - dt);
 
-  heroesAct(draft, dt, party, roster, events);
+  if (!throttled(draft, dt, events)) heroesAct(draft, dt, party, roster, events);
   if (settleClear(draft, events)) return { battle: draft, events };
 
   foesAct(draft, dt, events);
@@ -92,16 +92,8 @@ function heroesAct(
 
         draft.seed = seed;
         const power = safeAmount(heroDamage(hero, slot.level) * renown);
-        const crit = roll < BALANCE.critChance;
-        const amount = crit ? safeAmount(power * BALANCE.critMultiplier) : power;
 
-        damageFront(draft, amount, events, (foe) => ({
-          type: BattleEventType.Hit,
-          source: hero.id,
-          foe,
-          amount,
-          crit,
-        }));
+        heroHit(draft, hero.id, power, roll < BALANCE.critChance, events);
       }
       cooldown += hero.attackInterval;
     }
@@ -116,6 +108,7 @@ function foesAct(draft: BattleDraft, dt: number, events: BattleEvent[]): void {
     while (foe.attackIn <= 0) {
       draft.partyHp -= foe.damage;
       events.push({ type: BattleEventType.PartyHit, foe: index, amount: foe.damage });
+      stealContext(draft, foe, index, events);
       foe.attackIn += foe.attackInterval;
     }
   });

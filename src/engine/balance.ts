@@ -28,6 +28,17 @@ export const BALANCE = {
     medium: { every: 50, hpLead: 7, damageLead: 3 },
     strong: { every: 100, hpLead: 14, damageLead: 6 },
   },
+  // A super boss mechanic makes the fight harder by a factor its numbers give, and the boss
+  // gives up that much health, so its lead alone decides where the wall stands.
+  mechanics: {
+    stealContext: { share: 0.1 },
+    hallucinate: { share: 0.25 },
+    inject: { share: 0.125 },
+    throttle: { every: 8, pause: 1.5 },
+    loop: { at: 0.25, back: 0.5 },
+    unmask: { at: 0.5, damage: 1.5 },
+    maximize: { kept: 0.8 },
+  },
   bossDamageBase: 1.2,
   enemyAttackInterval: 1.6,
   bossAttackInterval: 2.5,

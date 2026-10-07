@@ -9,7 +9,7 @@ import {
   string,
   union,
 } from 'zod';
-import { BattlePhase, type Roster } from '../types';
+import { BattlePhase, BossMechanic, type Roster } from '../types';
 import { LEGACY_SAVE_VERSION, SAVE_VERSION, type StoredSave } from './save';
 
 const foeWire = object({
@@ -20,6 +20,9 @@ const foeWire = object({
   damage: number().nonnegative(),
   attackInterval: number().positive(),
   attackIn: number(),
+  mechanic: enumOf(BossMechanic).optional(),
+  clock: number().nonnegative().optional(),
+  spent: boolean().optional(),
 });
 
 const battleWire = object({

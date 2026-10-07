@@ -20,6 +20,8 @@ import { Motion } from './motion';
 export interface Actor {
   readonly id: string;
   readonly boss: boolean;
+  // A super boss splits into colour channels when hit instead of flashing white.
+  readonly glitches: boolean;
   readonly attack: CreatureAttack | null;
   readonly key: string;
   readonly sprite: SpriteDef;
@@ -156,6 +158,7 @@ export class Cast {
     return {
       id: heroId,
       boss: false,
+      glitches: false,
       attack: null,
       key: `hero:${heroId}`,
       sprite,
@@ -185,6 +188,7 @@ export class Cast {
     return {
       id: enemyId,
       boss: false,
+      glitches: false,
       attack: null,
       key: `enemy:${enemyId}:${element.id}`,
       sprite,
