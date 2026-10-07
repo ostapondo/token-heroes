@@ -15,3 +15,8 @@ export function compactNumber(value: number): string {
 
   return `${scaled.toFixed(digits)}${unit.suffix}`;
 }
+
+const NUMERALS = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'] as const;
+
+// A skill's rank as a Roman numeral, plain digits past ten.
+export const rankNumeral = (rank: number): string => NUMERALS[rank] ?? String(rank);

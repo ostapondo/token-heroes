@@ -8,15 +8,19 @@ import {
 } from '@engine';
 import { Backdrop } from '../backdrop/backdrop';
 import { Director } from '../fx/director';
+import { Telegraphs } from '../fx/telegraphs';
 import type { Reaction } from '../fx/reaction';
-import type { Effect } from '../fx/effect';
 import { runLoop } from '../loop';
 import { SpriteCache } from '../sprites/sprite-cache';
 import { createWeather, WeatherLayer, type Weather } from '../weather';
 import { PULLBACK } from './camera';
 import { Cast, type Pullback } from './cast';
+import { EffectLayer } from './effect-layer';
+import { Guarded } from './guarded';
 import { ARENA, center } from './geometry';
+import { Juice } from './juice';
 import { paintCast, paintPullback } from './painter';
+import { paintSkillStates } from './skill-states';
 
 export interface ArenaOptions {
   readonly canvas: HTMLCanvasElement;
@@ -25,7 +29,6 @@ export interface ArenaOptions {
   readonly onError: (error: unknown, where: string) => void;
 }
 
-const SHAKE_DECAY = 18;
 // Weather that marks the foes' ground, such as the summoning ring, centres just above their feet.
 const FOCUS_RISE = 18;
 
@@ -37,10 +40,13 @@ export class Arena {
   readonly #backdrop = new Backdrop();
   #element: ElementDef | undefined;
   #weather: Weather[] = [];
-  #effects: Effect[] = [];
+  readonly #guard: Guarded;
+  readonly #effects: EffectLayer;
+  readonly #ground: EffectLayer;
+  readonly #juice = new Juice();
+  readonly #telegraphs: Telegraphs;
   #snapshot: { battle: BattleState; party: PartyState } | undefined;
   #pullback: { scene: Pullback; left: number } | undefined;
-  #shake = 0;
   #clock = 0;
   #stop: (() => void) | undefined;
 
@@ -51,7 +57,11 @@ export class Arena {
     this.#options = options;
     this.#context = context;
     this.#cast = new Cast(options.content, new SpriteCache());
-    this.#director = new Director(options.content);
+    this.#director = new Director(options.content, options.roster);
+    this.#telegraphs = new Telegraphs(options.content, options.roster);
+    this.#guard = new Guarded(options.onError);
+    this.#effects = new EffectLayer('effect', this.#guard);
+    this.#ground = new EffectLayer('ground', this.#guard);
   }
 
   show(battle: BattleState, party: PartyState): void {
@@ -60,7 +70,7 @@ export class Arena {
     if (this.#element?.id !== elementId) {
       this.#element = elementById(this.#options.content, elementId);
       this.#weather = this.#element.weather.flatMap((def) =>
-        this.#attempt('weather setup', () => [createWeather(def)], []),
+        this.#guard.attempt('weather setup', () => [createWeather(def)], []),
       );
     }
     this.#cast.sync(battle, party, this.#element);
@@ -77,7 +87,9 @@ export class Arena {
     const stage = { heroes: this.#cast.heroes, foes: this.#cast.foes, element };
 
     for (const event of events) {
-      this.#apply(this.#attempt('battle event', () => this.#director.react(event, stage), null));
+      this.#apply(
+        this.#guard.attempt('battle event', () => this.#director.react(event, stage), null),
+      );
     }
   }
 
@@ -98,7 +110,7 @@ export class Arena {
   }
 
   start(): void {
-    this.#stop ??= runLoop((dt) => this.#attempt('frame', () => this.#frame(dt), undefined));
+    this.#stop ??= runLoop((dt) => this.#guard.attempt('frame', () => this.#frame(dt), undefined));
   }
 
   stop(): void {
@@ -119,35 +131,48 @@ export class Arena {
       y: ARENA.height - FOCUS_RISE,
     };
 
-    this.#clock += dt;
-    for (const actor of actors) actor.motion.update(dt);
+    const world = this.#juice.advance(dt);
+
+    this.#clock += world;
+    for (const actor of actors) actor.motion.update(world);
     this.#weather = this.#weather.filter((effect) =>
-      this.#survives('weather', () => effect.update?.(dt)),
+      this.#guard.survives('weather', () => effect.update?.(world)),
     );
-    this.#effects = this.#effects.filter((effect) =>
-      this.#attempt('effect', () => effect.update(dt), false),
-    );
-    this.#shake = Math.max(0, this.#shake - dt * SHAKE_DECAY);
+    this.#effects.update(world);
+    this.#ground.update(world);
+    if (!this.#pullback) {
+      const { battle, party } = snapshot;
+
+      this.#effects.push(
+        this.#guard.attempt(
+          'telegraph',
+          () => this.#telegraphs.update(battle, party, this.#cast),
+          [],
+        ),
+      );
+    }
     if (this.#pullback) this.#pullback.left -= dt;
     if (this.#pullback && this.#pullback.left <= 0) this.#pullback = undefined;
 
     context.save();
-    const jitter = () => Math.round((Math.random() - 0.5) * this.#shake);
+    const jitter = () => Math.round((Math.random() - 0.5) * this.#juice.shake);
 
     context.translate(jitter(), jitter());
     this.#backdrop.paint(context, element, this.#clock);
     this.#drawWeather(WeatherLayer.Back, { focus });
+    this.#ground.draw(context);
     if (this.#pullback) {
       const progress = 1 - this.#pullback.left / PULLBACK.seconds;
 
       paintPullback(context, this.#cast.sprites, this.#pullback.scene, progress, snapshot.battle);
     } else {
       paintCast(context, this.#cast.sprites, this.#cast, snapshot.battle);
+      this.#guard.survives('skill states', () =>
+        paintSkillStates(context, this.#cast, snapshot, this.#options.content, this.#clock),
+      );
     }
     this.#drawWeather(WeatherLayer.Front, { focus });
-    this.#effects = this.#effects.filter((effect) =>
-      this.#survives('effect', () => effect.draw(context)),
-    );
+    this.#effects.draw(context);
     context.restore();
   }
 
@@ -155,35 +180,13 @@ export class Arena {
     this.#weather = this.#weather.filter(
       (effect) =>
         effect.layer !== layer ||
-        this.#survives('weather', () => effect.draw(this.#context, scene)),
+        this.#guard.survives('weather', () => effect.draw(this.#context, scene)),
     );
   }
 
   #apply(reaction: Reaction | null): void {
     if (!reaction) return;
-    this.#effects.push(...reaction.effects);
-    this.#shake = Math.max(this.#shake, reaction.shake);
-  }
-
-  #survives(where: string, work: () => void): boolean {
-    return this.#attempt(
-      where,
-      () => {
-        work();
-
-        return true;
-      },
-      false,
-    );
-  }
-
-  #attempt<T>(where: string, work: () => T, fallback: T): T {
-    try {
-      return work();
-    } catch (error) {
-      this.#options.onError(error, where);
-
-      return fallback;
-    }
+    this.#effects.push([...reaction.effects, ...this.#juice.apply(reaction)]);
+    this.#ground.push(reaction.ground ?? []);
   }
 }
