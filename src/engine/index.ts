@@ -4,7 +4,16 @@ export { foesForStage, isBossStage, upcomingBoss } from './battle/stages';
 export { startStage } from './battle/start';
 export { stepBattle } from './battle/step';
 export { designHero } from './design';
+export { formTier, levelOfRank, rankedSkills, skillRank, skillShare, tiered } from './skills/ranks';
+export { skillHitPerCast } from './skills/budget';
 export {
+  SkillEffectKind,
+  SkillTrigger,
+  type SkillBlueprint,
+  type SkillEffect,
+} from './skills/types';
+export {
+  heroAttack,
   heroDamage,
   healerWeight,
   heroHp,

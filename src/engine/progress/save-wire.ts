@@ -24,6 +24,21 @@ const foeWire = object({
   mechanic: enumOf(BossMechanic).optional(),
   clock: number().nonnegative().optional(),
   spent: boolean().optional(),
+  stunned: number().nonnegative().optional(),
+  burn: object({
+    left: number().nonnegative(),
+    perSecond: number().nonnegative(),
+    tickIn: number(),
+    source: string(),
+    skill: string(),
+  }).optional(),
+  mark: object({ left: number().nonnegative(), bonus: number().nonnegative() }).optional(),
+});
+
+const skillWire = object({
+  readyIn: number().nonnegative(),
+  pool: number().nonnegative(),
+  misses: number().int().nonnegative(),
 });
 
 const battleWire = object({
@@ -36,6 +51,12 @@ const battleWire = object({
   strikeReadyIn: number().nonnegative(),
   ultimate: number().min(0).max(1),
   seed: number().int(),
+  skills: record(string(), skillWire).optional(),
+  shield: object({
+    amount: number().nonnegative(),
+    left: number().nonnegative(),
+    skill: string(),
+  }).optional(),
 });
 
 const saveWire = object({

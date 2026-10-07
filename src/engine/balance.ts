@@ -67,6 +67,27 @@ export const BALANCE = {
   mendShare: 0.25,
   healLevelFactor: { min: 0, max: 1.5 },
 
+  // A skill opens at unlockLevel and ranks up every rankEvery levels. A rank multiplies the hero's
+  // damage and health by rankGrowth, ×1.08 on the fight: at 1.05 the best-upgrade player leads by
+  // 20 stages (no-dominant-strategy), and growth in damage alone breaks focus. Each rank also
+  // moves a share of the basic attack into the skill, so the skill grows faster than the hero.
+  skills: {
+    unlockLevel: 10,
+    rankEvery: 10,
+    rankGrowth: 1.04,
+    attackShare: { first: 0.7, step: 0.05, floor: 0.4 },
+    stunCap: 2,
+    markCap: 0.25,
+    // A burn ticks this often; a party's first casts are spread from this share of a cooldown.
+    burnTick: 0.5,
+    firstCast: 0.3,
+    // A boss fight opens with every timed skill due within this share of its cooldown, so even
+    // a slow skill is seen three times in the shortest wall fight (skills-are-seen).
+    bossOpening: 0.5,
+    // A proc that has not fired for this long stops gathering budget.
+    poolSeconds: 30,
+  },
+
   // Ascending starts the game over: every hero back to level 1, the party back to stage 1, with
   // power from the deepest stage reached over the base stage. Levels bought with tokens are not
   // refunded, so the power must pay them back within a fraction of the tokens they took. The

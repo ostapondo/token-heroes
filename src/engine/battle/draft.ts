@@ -1,4 +1,5 @@
 import { BALANCE } from '../balance';
+import type { SkillState } from '../skills/types';
 import {
   type BattleEvent,
   BattleEventType,
@@ -11,9 +12,10 @@ type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 
 export type FoeDraft = Mutable<Foe>;
 
-export interface BattleDraft extends Omit<Mutable<BattleState>, 'foes' | 'cooldowns'> {
+export interface BattleDraft extends Omit<Mutable<BattleState>, 'foes' | 'cooldowns' | 'skills'> {
   foes: FoeDraft[];
   cooldowns: Record<string, number>;
+  skills: Record<string, SkillState>;
 }
 
 export function draftOf(battle: BattleState): BattleDraft {
@@ -21,6 +23,7 @@ export function draftOf(battle: BattleState): BattleDraft {
     ...battle,
     foes: battle.foes.map((foe) => ({ ...foe })),
     cooldowns: { ...battle.cooldowns },
+    skills: { ...battle.skills },
   };
 }
 

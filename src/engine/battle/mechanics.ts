@@ -48,32 +48,49 @@ function afterWound(foe: FoeDraft, index: number, events: BattleEvent[]): void {
   }
 }
 
+type Landed = (foe: number, amount: number) => void;
+
+// A marked foe takes more from every hit; a maximizer turns a share of it into paperclips.
+export function damageAt(
+  draft: BattleDraft,
+  index: number,
+  amount: number,
+  events: BattleEvent[],
+  landed: Landed,
+): void {
+  const foe = draft.foes[index];
+
+  if (!foe || foe.hp <= 0) return;
+  const marked = foe.mark && foe.mark.left > 0 ? amount * (1 + foe.mark.bonus) : amount;
+  const dealt =
+    foe.mechanic === BossMechanic.Maximize
+      ? safeAmount(marked * RULES.maximize.kept)
+      : safeAmount(marked);
+
+  foe.hp = Math.max(0, foe.hp - dealt);
+  landed(index, dealt);
+  if (foe.hp === 0) events.push({ type: BattleEventType.FoeDefeated, foe: index, boss: foe.boss });
+  else afterWound(foe, index, events);
+}
+
 export function damageFront(
   draft: BattleDraft,
   amount: number,
   events: BattleEvent[],
   hitEvent: (foe: number, amount: number) => BattleEvent,
 ): void {
-  const index = frontFoe(draft);
-  const foe = draft.foes[index];
-
-  if (!foe) return;
-  const landed =
-    foe.mechanic === BossMechanic.Maximize ? safeAmount(amount * RULES.maximize.kept) : amount;
-
-  foe.hp = Math.max(0, foe.hp - landed);
-  events.push(hitEvent(index, landed));
-  if (foe.hp === 0) events.push({ type: BattleEventType.FoeDefeated, foe: index, boss: foe.boss });
-  else afterWound(foe, index, events);
+  damageAt(draft, frontFoe(draft), amount, events, (foe, dealt) =>
+    events.push(hitEvent(foe, dealt)),
+  );
 }
 
 // A hero's hit, unless the front foe makes it land on nothing, heal it, or flatter a crit away.
 export function heroHit(
   draft: BattleDraft,
-  source: string,
   power: number,
   crit: boolean,
   events: BattleEvent[],
+  landed: (foe: number, amount: number, crit: boolean) => void,
 ): void {
   const index = frontFoe(draft);
   const foe = draft.foes[index];
@@ -101,13 +118,7 @@ export function heroHit(
   const landsCrit = crit && !flattered;
   const amount = landsCrit ? safeAmount(power * BALANCE.critMultiplier) : power;
 
-  damageFront(draft, amount, events, (target, landed) => ({
-    type: BattleEventType.Hit,
-    source,
-    foe: target,
-    amount: landed,
-    crit: landsCrit,
-  }));
+  damageAt(draft, index, amount, events, (target, dealt) => landed(target, dealt, landsCrit));
 }
 
 // Every few seconds the front foe may hold the party's attacks back for a moment.

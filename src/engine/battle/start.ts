@@ -1,14 +1,15 @@
 import { BALANCE } from '../balance';
 import { partyMaxHp } from '../party';
 import { heroById } from '../roster';
+import { freshSkills } from '../skills/tick';
 import { BattlePhase, type BattleState, type PartyState, type Roster } from '../types';
-import { foesForStage } from './stages';
+import { foesForStage, isBossStage } from './stages';
 
 export function startStage(
   stage: number,
   party: PartyState,
   roster: Roster,
-  carried: Pick<BattleState, 'seed' | 'ultimate'>,
+  carried: Pick<BattleState, 'seed' | 'ultimate'> & Partial<Pick<BattleState, 'skills'>>,
 ): BattleState {
   return {
     stage,
@@ -26,5 +27,6 @@ export function startStage(
     strikeReadyIn: 0,
     ultimate: carried.ultimate,
     seed: carried.seed,
+    skills: freshSkills(party, roster, carried.skills, isBossStage(stage)),
   };
 }

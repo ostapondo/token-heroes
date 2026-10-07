@@ -1,4 +1,5 @@
 import { BALANCE } from './balance';
+import { attackShare, damageRankPower, healthRankPower, skillRank } from './skills/ranks';
 import { HeroRole, type HeroStats } from './types';
 
 const grown = (base: number, rate: number, steps: number) => base * rate ** steps;
@@ -28,8 +29,27 @@ export function levelsToMilestone(level: number): number {
   return BALANCE.milestoneEvery - (level % BALANCE.milestoneEvery);
 }
 
+const baseOutput = (hero: HeroStats, level: number): number =>
+  hero.baseDamage * level * milestoneBonus(level);
+
+// Everything the hero deals per attack interval: its own attack and its skills together.
 export function heroDamage(hero: HeroStats, level: number): number {
-  return safeAmount(hero.baseDamage * level * milestoneBonus(level));
+  return safeAmount(baseOutput(hero, level) * damageRankPower(hero, level));
+}
+
+// The hero's own hit, once its skills have taken their share.
+export function heroAttack(hero: HeroStats, level: number): number {
+  return safeAmount(baseOutput(hero, level) * attackShare(hero, level));
+}
+
+// A skill's damage per second for each unit of share it holds; see skillShare.
+export const baseDamagePerSecond = (hero: HeroStats, level: number): number =>
+  baseOutput(hero, level) / hero.attackInterval;
+
+// A healer's own heal keeps the attack share of its healing; its skills carry the rest, so a
+// rank adds no healing (healing that grew with rank made healers the one buy that wins).
+export function healShare(hero: HeroStats, level: number): number {
+  return hero.skills.length > 0 && skillRank(level) > 0 ? attackShare(hero, level) : 1;
 }
 
 export interface PartyVitals {
@@ -69,7 +89,7 @@ export function heroHeal(
 }
 
 export function heroHp(hero: HeroStats, level: number): number {
-  return safeAmount(hero.baseHp * level * milestoneBonus(level));
+  return safeAmount(hero.baseHp * level * milestoneBonus(level) * healthRankPower(level));
 }
 
 export function levelCost(level: number): number {

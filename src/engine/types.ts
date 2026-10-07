@@ -1,3 +1,12 @@
+import type {
+  FoeBurn,
+  FoeMark,
+  PartyShield,
+  SkillOutcome,
+  SkillState,
+  SkillStats,
+} from './skills/types';
+
 type ValueOf<T> = T[keyof T];
 
 export const HeroRole = { Striker: 'striker', Tank: 'tank', Healer: 'healer' } as const;
@@ -43,6 +52,8 @@ export const BattleEventType = {
   Wiped: 'wiped',
   Respawned: 'respawned',
   Mechanic: 'mechanic',
+  Skill: 'skill',
+  SkillTick: 'skillTick',
 } as const;
 export type BattleEventType = ValueOf<typeof BattleEventType>;
 
@@ -56,6 +67,7 @@ export interface HeroStats {
   readonly baseHp: number;
   readonly hireCost: number;
   readonly unlockAtTokens: number;
+  readonly skills: readonly SkillStats[];
 }
 
 export interface FoeStats {
@@ -99,6 +111,10 @@ export interface Foe {
   readonly clock?: number | undefined;
   // A mechanic that fires once per fight has fired.
   readonly spent?: boolean | undefined;
+  // Seconds a skill has held the foe's attack back, for the arena to show.
+  readonly stunned?: number | undefined;
+  readonly burn?: FoeBurn | undefined;
+  readonly mark?: FoeMark | undefined;
 }
 
 export interface BattleState {
@@ -111,6 +127,9 @@ export interface BattleState {
   readonly strikeReadyIn: number;
   readonly ultimate: number;
   readonly seed: number;
+  // Keyed by skill id; skills carry their timers and gathered budget from stage to stage.
+  readonly skills?: Readonly<Record<string, SkillState>> | undefined;
+  readonly shield?: PartyShield | undefined;
 }
 
 type Event<T extends BattleEventType, Data = object> = Readonly<{ type: T } & Data>;
@@ -124,13 +143,18 @@ export type BattleEvent =
   | Event<typeof BattleEventType.Strike, FoeAmount>
   | Event<typeof BattleEventType.Ultimate, FoeAmount>
   | Event<typeof BattleEventType.Heal, { source: string; amount: number }>
-  | Event<typeof BattleEventType.PartyHit, FoeAmount>
+  | Event<typeof BattleEventType.PartyHit, FoeAmount & { blocked?: number }>
   | Event<typeof BattleEventType.FoeDefeated, { foe: number; boss: boolean }>
   | Event<typeof BattleEventType.StageCleared, { stage: number }>
   | Event<typeof BattleEventType.StageStarted, { stage: number }>
   | Event<typeof BattleEventType.Wiped>
   | Event<typeof BattleEventType.Respawned, { stage: number }>
-  | Event<typeof BattleEventType.Mechanic, FoeAmount & { mechanic: BossMechanic }>;
+  | Event<typeof BattleEventType.Mechanic, FoeAmount & { mechanic: BossMechanic }>
+  | Event<
+      typeof BattleEventType.Skill,
+      SkillOutcome & { source: string; skill: string; rank: number; target: number }
+    >
+  | Event<typeof BattleEventType.SkillTick, FoeAmount & { source: string; skill: string }>;
 
 export interface BattleStep {
   readonly battle: BattleState;

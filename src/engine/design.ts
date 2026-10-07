@@ -1,4 +1,7 @@
 import { BALANCE } from './balance';
+import { prdConstant } from './skills/procs';
+import { skillLag } from './skills/ranks';
+import type { SkillBlueprint, SkillStats } from './skills/types';
 import type { AttackStyle, HeroRole, HeroStats } from './types';
 
 export interface HeroBlueprint {
@@ -29,8 +32,22 @@ const unlockAt = (order: number): number =>
     ? 0
     : BALANCE.unlockFirst * BALANCE.unlockGrowth ** (order - BALANCE.starterHeroes - 1);
 
-// Focus leans a hero towards offence (positive) or toughness (negative) within one budget.
-export function designHero(blueprint: HeroBlueprint): HeroStats {
+function designSkills(skills: readonly SkillBlueprint[]): SkillStats[] {
+  return skills
+    .toSorted((left, right) => left.slot - right.slot)
+    .map((skill) => ({
+      ...skill,
+      lag: skillLag(skill.slot, skills.length),
+      prd: skill.chance ? prdConstant(skill.chance) : 0,
+    }));
+}
+
+// Focus leans a hero towards offence (positive) or toughness (negative) within one budget. Its
+// skills spend that budget too, so they shape the hero's output without adding to it.
+export function designHero(
+  blueprint: HeroBlueprint,
+  skills: readonly SkillBlueprint[] = [],
+): HeroStats {
   const role = BALANCE.roles[blueprint.role];
   const rank = heroRank(blueprint.order);
   const focus = blueprint.focus ?? 0;
@@ -46,5 +63,6 @@ export function designHero(blueprint: HeroBlueprint): HeroStats {
     baseHp: role.hp * rank * (1 - focus),
     hireCost: hireCostAt(blueprint.order),
     unlockAtTokens: unlockAt(blueprint.order),
+    skills: designSkills(skills),
   };
 }

@@ -11,20 +11,28 @@ import {
   levelCost,
   levelsToMilestone,
   partyMend,
+  safeAmount,
 } from './formulas';
 import { heroById } from './roster';
+import { skillRank } from './skills/ranks';
 import { testRoster } from './testing';
 
 const knight = heroById(testRoster, 'knight');
+const ranked = (level: number) => BALANCE.skills.rankGrowth ** skillRank(level);
 const cleric = heroById(testRoster, 'cleric');
 
 describe('hero growth', () => {
-  it('multiplies damage at every 25th level', () => {
+  it('multiplies damage at every 25th level and a little at every skill rank', () => {
     const milestone = BALANCE.milestoneMultiplier;
 
-    expect(heroDamage(knight, 24)).toBe(knight.baseDamage * 24);
-    expect(heroDamage(knight, 25)).toBe(knight.baseDamage * 25 * milestone);
-    expect(heroDamage(knight, 50)).toBe(knight.baseDamage * 50 * milestone ** 2);
+    expect(heroDamage(knight, 9)).toBe(knight.baseDamage * 9);
+    expect(heroDamage(knight, 24)).toBe(safeAmount(knight.baseDamage * 24 * ranked(24)));
+    expect(heroDamage(knight, 25)).toBe(
+      safeAmount(knight.baseDamage * 25 * milestone * ranked(25)),
+    );
+    expect(heroDamage(knight, 50)).toBe(
+      safeAmount(knight.baseDamage * 50 * milestone ** 2 * ranked(50)),
+    );
   });
 
   it("undoes a share of the foes' damage, more for a healer who keeps up", () => {

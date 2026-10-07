@@ -25,6 +25,7 @@ function hero(
     baseHp: 50,
     hireCost: 0,
     unlockAtTokens: 0,
+    skills: [],
     ...overrides,
   };
 }
