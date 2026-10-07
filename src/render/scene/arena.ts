@@ -14,7 +14,7 @@ import { SpriteCache } from '../sprites/sprite-cache';
 import { createWeather, WeatherLayer, type Weather } from '../weather';
 import { PULLBACK } from './camera';
 import { Cast, type Pullback } from './cast';
-import { ARENA, center, floorTop } from './geometry';
+import { ARENA, center } from './geometry';
 import { paintBackdrop, paintCast, paintPullback } from './painter';
 
 export interface ArenaOptions {
@@ -25,7 +25,8 @@ export interface ArenaOptions {
 }
 
 const SHAKE_DECAY = 18;
-const FOCUS_DEPTH = 22;
+// Weather that marks the foes' ground, such as the summoning ring, centres just above their feet.
+const FOCUS_RISE = 18;
 
 export class Arena {
   readonly #options: ArenaOptions;
@@ -112,7 +113,7 @@ export class Arena {
     const front = this.#cast.foes[0];
     const focus = {
       x: front ? center(front.box).x : ARENA.width * 0.75,
-      y: floorTop() + FOCUS_DEPTH,
+      y: ARENA.height - FOCUS_RISE,
     };
 
     for (const actor of actors) actor.motion.update(dt);
