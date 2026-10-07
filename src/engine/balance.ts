@@ -45,10 +45,9 @@ export const BALANCE = {
     tank: { damagePerSecond: 1.2, hp: 55 },
     healer: { damagePerSecond: 0, hp: 16 },
   },
-  // The share of the party's health a first-rank healer restores each second at the party's
-  // level. A healer heals in proportion to its level against the party's, up to the cap, so a
-  // neglected healer cannot keep healing for free.
-  healShare: 0.0045,
+  // Each point of healer power at the party's level makes the party last mendShare longer
+  // against the foes' damage; see partyMend.
+  mendShare: 0.25,
   healLevelFactor: { min: 0, max: 1.5 },
 
   // Ascending starts the game over: every hero back to level 1, the party back to stage 1, with

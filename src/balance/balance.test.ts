@@ -1,5 +1,14 @@
 import { CONTENT, toRoster } from '@content';
-import { AttackStyle, BALANCE, designHero, heroById, heroHeal, heroHp, HeroRole } from '@engine';
+import {
+  AttackStyle,
+  BALANCE,
+  designHero,
+  healerWeight,
+  heroById,
+  heroHp,
+  heroMend,
+  HeroRole,
+} from '@engine';
 import { describe, expect, it } from 'vitest';
 import { judgeParty, standardScenarios } from './check';
 import { paceCurve } from './pace';
@@ -11,13 +20,12 @@ import { runParty } from './simulate';
 const roster = toRoster(CONTENT);
 
 describe('sheets', () => {
-  it('reports the heal the battle really casts', () => {
+  it('reports the share of damage the battle really undoes', () => {
     const cleric = heroSheet(roster, 'cleric', 94);
-
     const stats = heroById(roster, 'cleric');
+    const alone = { hp: heroHp(stats, 94), level: 94, mending: healerWeight(stats, 94, 94) };
 
-    expect(cleric.heal).toBe(heroHeal(stats, 94, { hp: heroHp(stats, 94), level: 94 }));
-    expect(cleric.healPerSecond).toBeCloseTo(cleric.heal / cleric.interval);
+    expect(cleric.mend).toBe(heroMend(stats, 94, alone));
     expect(cleric.damagePerSecond).toBe(0);
   });
 
@@ -46,16 +54,17 @@ describe('runParty', () => {
 });
 
 describe('rules', () => {
-  it('flags a healer whose healing barely dents the damage where the party is stuck', () => {
-    const cleric = heroSheet(roster, 'cleric', 10);
-    const frontier = { ...stageSheet(roster, 50), damagePerSecond: cleric.healPerSecond * 100 };
+  it('flags a healer who has fallen far behind the party', () => {
+    const stats = heroById(roster, 'cleric');
+    const party = { hp: 1, level: 100, mending: healerWeight(stats, 1, 100) };
+    const cleric = heroSheet(roster, 'cleric', 1, party);
     const run = runParty({ heroes: [] }, roster, { maxSeconds: 0 });
-    const healers = judge({ heroes: [cleric], run, frontier }).find(
+    const healers = judge({ heroes: [cleric], run, frontier: stageSheet(roster, 50) }).find(
       (finding) => finding.rule === 'healers-keep-up',
     );
 
     expect(healers?.passed).toBe(false);
-    expect(healers?.measured).toBeCloseTo(0.01);
+    expect(healers?.measured).toBeCloseTo(heroMend(stats, 1, party));
   });
 
   it('judges every standard party with a run and its findings', () => {

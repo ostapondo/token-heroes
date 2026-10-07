@@ -53,6 +53,13 @@ export function settleClear(draft: BattleDraft, events: BattleEvent[]): boolean 
   return true;
 }
 
+export function foesDamagePerSecond(draft: BattleDraft): number {
+  return draft.foes.reduce(
+    (sum, foe) => (foe.hp > 0 ? sum + foe.damage / foe.attackInterval : sum),
+    0,
+  );
+}
+
 export function wipe(draft: BattleDraft, reason: WipeReason, events: BattleEvent[]): void {
   draft.phase = BattlePhase.Wiped;
   draft.phaseLeft = BALANCE.respawnDelay;

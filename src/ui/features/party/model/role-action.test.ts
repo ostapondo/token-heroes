@@ -1,18 +1,17 @@
 import { CONTENT, toRoster } from '@content';
-import { heroById, heroDamage, heroHeal, heroHp, HeroRole } from '@engine';
+import { healerWeight, heroById, heroDamage, heroHp, heroMend, HeroRole } from '@engine';
 import { describe, expect, it } from 'vitest';
 import { roleAction } from './role-action';
 
 const roster = toRoster(CONTENT);
-const party = { hp: 50_000, level: 40 };
+const cleric = heroById(roster, 'cleric');
+const party = { hp: 50_000, level: 40, mending: healerWeight(cleric, 40, 40) };
 
 describe('roleAction', () => {
-  it('shows what a healer restores, not the damage it would deal', () => {
-    const cleric = heroById(roster, 'cleric');
-
+  it("shows the share of the foes' damage a healer undoes, not the damage it would deal", () => {
     expect(roleAction(cleric, 40, party)).toEqual({
       role: HeroRole.Healer,
-      amount: heroHeal(cleric, 40, party),
+      amount: Math.round(heroMend(cleric, 40, party) * 100),
       seconds: cleric.attackInterval,
       hp: heroHp(cleric, 40),
     });

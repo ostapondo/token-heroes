@@ -1,5 +1,5 @@
 import { BALANCE } from './balance';
-import type { HeroStats } from './types';
+import { HeroRole, type HeroStats } from './types';
 
 const grown = (base: number, rate: number, steps: number) => base * rate ** steps;
 
@@ -35,13 +35,37 @@ export function heroDamage(hero: HeroStats, level: number): number {
 export interface PartyVitals {
   readonly hp: number;
   readonly level: number;
+  readonly mending: number;
 }
 
-export function heroHeal(hero: HeroStats, level: number, party: PartyVitals): number {
+// A healer's power counts in proportion to its level against the party's, up to the cap, so a
+// neglected healer cannot keep healing for free.
+export function healerWeight(hero: HeroStats, level: number, partyLevel: number): number {
+  if (hero.role !== HeroRole.Healer) return 0;
   const { min, max } = BALANCE.healLevelFactor;
-  const standing = Math.min(Math.max(level / Math.max(party.level, 1), min), max);
 
-  return safeAmount(BALANCE.healShare * hero.power * party.hp * hero.attackInterval * standing);
+  return hero.power * Math.min(Math.max(level / Math.max(partyLevel, 1), min), max);
+}
+
+const mendDivisor = (party: PartyVitals) => 1 + BALANCE.mendShare * party.mending;
+
+// The healers together undo mendShare·m / (1 + mendShare·m) of the foes' damage: always under
+// all of it, so healing makes the party last longer but never makes it immortal.
+export function partyMend(party: PartyVitals): number {
+  return (BALANCE.mendShare * party.mending) / mendDivisor(party);
+}
+
+export function heroMend(hero: HeroStats, level: number, party: PartyVitals): number {
+  return (BALANCE.mendShare * healerWeight(hero, level, party.level)) / mendDivisor(party);
+}
+
+export function heroHeal(
+  hero: HeroStats,
+  level: number,
+  party: PartyVitals,
+  foesDamagePerSecond: number,
+): number {
+  return safeAmount(heroMend(hero, level, party) * foesDamagePerSecond * hero.attackInterval);
 }
 
 export function heroHp(hero: HeroStats, level: number): number {

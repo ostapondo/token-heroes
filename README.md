@@ -82,7 +82,7 @@ All of these numbers live in one file, [`src/engine/balance.ts`](src/engine/bala
 <img src="docs/readme/heroes.svg" alt="Ten hero cards: Wanderer, Archer, Shieldbearer, Cleric, Fire Mage, Rogue, Barbarian, Frost Witch, Necromancer, Paladin" width="100%">
 
 You start with the Wanderer. Strikers deal damage, tanks hold the party's health and healers
-restore a share of it. Every later hero is stronger per coin than the one before; the rare ones
+undo a share of the foes' damage. Every later hero is stronger per coin than the one before; the rare ones
 appear only once your lifetime burn passes their threshold. Anyone who reaches the Paladin has
 burned 800 million tokens.
 

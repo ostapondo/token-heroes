@@ -2,10 +2,9 @@ import {
   BALANCE,
   heroById,
   heroDamage,
-  heroHeal,
-  HeroRole,
   costToLevel,
   levelCost,
+  partyMend,
   partyVitals,
   type PartyState,
   type Roster,
@@ -16,20 +15,15 @@ import {
 // Foes grow alike in health and damage, so both reduce to powers of the foe growth.
 function reach(party: PartyState, roster: Roster): number {
   const vitals = partyVitals(party, roster);
-  let damage = 0;
-  let healing = 0;
-
-  for (const slot of party.heroes) {
+  const damage = party.heroes.reduce((sum, slot) => {
     const hero = heroById(roster, slot.heroId);
 
-    damage += heroDamage(hero, slot.level) / hero.attackInterval;
-    if (hero.role === HeroRole.Healer) {
-      healing += heroHeal(hero, slot.level, vitals) / hero.attackInterval;
-    }
-  }
+    return sum + heroDamage(hero, slot.level) / hero.attackInterval;
+  }, 0);
+  const toughness = vitals.hp / (1 - partyMend(vitals));
   const bossHp = BALANCE.enemyHpBase * BALANCE.bossHpMultiplier;
   const bossDamage = BALANCE.bossDamageBase / BALANCE.bossAttackInterval;
-  const toughness = vitals.hp + healing * BALANCE.bossTimeLimit;
+
   const growth = Math.log(BALANCE.foeGrowth);
   const beforeTimer = Math.log((damage * BALANCE.bossTimeLimit) / bossHp) / growth;
   const beforeDefeat = Math.log((damage * toughness) / (bossHp * bossDamage)) / (2 * growth);
