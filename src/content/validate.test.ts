@@ -26,9 +26,9 @@ describe('validateContent', () => {
     expect(CONTENT.bosses).toHaveLength(72);
   });
 
-  it('ships twelve enemies and ten heroes', () => {
+  it('ships twelve enemies and fourteen heroes', () => {
     expect(CONTENT.enemies).toHaveLength(12);
-    expect(CONTENT.heroes).toHaveLength(10);
+    expect(CONTENT.heroes).toHaveLength(14);
   });
 
   it('reports a ragged sprite and an unknown pixel', () => {
