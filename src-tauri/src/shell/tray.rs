@@ -1,3 +1,5 @@
+use std::sync::{Mutex, PoisonError};
+
 use tauri::image::Image;
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{AppHandle, Manager};
@@ -11,6 +13,9 @@ use crate::support::logging;
 
 const TRAY_ID: &str = "token-heroes";
 const TRAY_ICON: &[u8] = include_bytes!("../../icons/tray.png");
+
+// The menu bar redraws on every change, and most credits leave the shown amount as it was.
+static SHOWN: Mutex<Option<String>> = Mutex::new(None);
 
 pub fn create(app: &AppHandle) -> tauri::Result<()> {
     let menu = tray_menu::build(app)?;
@@ -51,6 +56,9 @@ pub fn refresh_balance(app: &AppHandle) {
         copy::APP_NAME.to_owned()
     };
 
+    if !shows_new(&tooltip) {
+        return;
+    }
     if let Err(problem) = tray.set_tooltip(Some(&tooltip)) {
         logging::warn(&format!("could not update the tray tooltip: {problem}"));
     }
@@ -58,4 +66,15 @@ pub fn refresh_balance(app: &AppHandle) {
     if let Err(problem) = tray.set_title(shown.then_some(coins.as_str())) {
         logging::warn(&format!("could not update the tray title: {problem}"));
     }
+}
+
+fn shows_new(tooltip: &str) -> bool {
+    let mut shown = SHOWN.lock().unwrap_or_else(PoisonError::into_inner);
+
+    if shown.as_deref() == Some(tooltip) {
+        return false;
+    }
+    *shown = Some(tooltip.to_owned());
+
+    true
 }
