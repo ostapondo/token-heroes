@@ -69,7 +69,7 @@ server.registerTool(
 server.registerTool(
   'stage_sheet',
   {
-    description: 'The foes of a stage: HP, hit, interval, damage per second and the boss timer.',
+    description: 'The foes of a stage: HP, hit, interval and damage per second.',
     inputSchema: { stage: z.number().int().min(1).max(100_000) },
   },
   ({ stage }) => reply(() => stageSheet(roster, stage)),

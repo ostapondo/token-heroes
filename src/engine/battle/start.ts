@@ -23,7 +23,6 @@ export function startStage(
           (BALANCE.openingCooldown + order * BALANCE.openingStagger),
       ]),
     ),
-    bossTimeLeft: BALANCE.bossTimeLimit,
     strikeReadyIn: 0,
     ultimate: carried.ultimate,
     seed: carried.seed,

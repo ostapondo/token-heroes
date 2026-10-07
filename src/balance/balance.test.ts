@@ -1,7 +1,6 @@
 import { CONTENT, toRoster } from '@content';
 import {
   AttackStyle,
-  BALANCE,
   designHero,
   healerWeight,
   heroById,
@@ -27,11 +26,6 @@ describe('sheets', () => {
 
     expect(cleric.mend).toBe(heroMend(stats, 94, alone));
     expect(cleric.damagePerSecond).toBe(0);
-  });
-
-  it('gives a boss stage its timer and a pack stage none', () => {
-    expect(stageSheet(roster, BALANCE.bossEvery).timeLimit).toBe(BALANCE.bossTimeLimit);
-    expect(stageSheet(roster, 1).timeLimit).toBeNull();
   });
 });
 

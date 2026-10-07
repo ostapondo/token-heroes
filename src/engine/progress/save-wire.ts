@@ -29,7 +29,6 @@ const battleWire = object({
   foes: array(foeWire),
   partyHp: number(),
   cooldowns: record(string(), number()),
-  bossTimeLeft: number(),
   strikeReadyIn: number().nonnegative(),
   ultimate: number().min(0).max(1),
   seed: number().int(),

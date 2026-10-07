@@ -24,7 +24,6 @@ export interface BossStatus {
   readonly bossId: string;
   readonly hp: number;
   readonly maxHp: number;
-  readonly secondsLeft: number;
 }
 
 export interface WipeStatus {

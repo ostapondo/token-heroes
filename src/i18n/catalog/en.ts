@@ -6,7 +6,6 @@ export const en = {
   'hud.footer': '1 burned token = 1 coin',
 
   'arena.strike': 'Strike the front foe',
-  'arena.bossTimer': '{element} · {seconds}s',
   'arena.bossHp': '{hp} / {maxHp}',
   'arena.partyHealth': 'Party health',
   'arena.partyHp': 'HP {hp} / {maxHp}',

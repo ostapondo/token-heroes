@@ -62,7 +62,7 @@ cache on every request, since that is what the agent burns.
 ## The fight
 
 - **Endless stages.** Packs of 3 enemies grow by one every 10 stages, up to 6. Every 5th stage is
-  a boss with a 30-second timer.
+  a boss that fights until it or the party falls.
 - **Auto battle.** Heroes attack on their own. Crits land 10% of the time for 2.5× damage.
 - **Tap to strike.** Click the arena to hit the front foe for half your party's power.
 - **Ultimate.** About an hour of agent work (a million burned tokens) charges one ultimate worth

@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { BALANCE } from '../balance';
 import { partyMaxHp } from '../party';
 import { partyOf, runFor, testRoster } from '../testing';
 import { startStage } from './start';
-import { BattleEventType, BattlePhase, WipeReason } from '../types';
+import { BattleEventType } from '../types';
 
 const fresh = { seed: 7, ultimate: 0 };
 
@@ -23,24 +22,17 @@ describe('stepBattle', () => {
     const party = partyOf(['knight', 1]);
     const lost = runFor(startStage(50, party, testRoster, fresh), 40, party);
 
-    expect(lost.events).toContainEqual({ type: BattleEventType.Wiped, reason: WipeReason.Defeat });
+    expect(lost.events).toContainEqual({ type: BattleEventType.Wiped });
     expect(lost.events).toContainEqual({ type: BattleEventType.Respawned, stage: 50 });
     expect(lost.battle.stage).toBe(50);
   });
 
-  it('wipes on the boss timer when the party outlives the boss', () => {
+  it('fights a boss until one side falls, however long that takes', () => {
     const party = partyOf(['guard', 3]);
-    const result = runFor(
-      startStage(5, party, testRoster, fresh),
-      BALANCE.bossTimeLimit + 1,
-      party,
-    );
+    const { events } = runFor(startStage(5, party, testRoster, fresh), 120, party);
 
-    expect(result.events).toContainEqual({
-      type: BattleEventType.Wiped,
-      reason: WipeReason.Timeout,
-    });
-    expect(result.battle.phase).toBe(BattlePhase.Wiped);
+    expect(events).toContainEqual({ type: BattleEventType.StageCleared, stage: 5 });
+    expect(events.some((event) => event.type === BattleEventType.Wiped)).toBe(false);
   });
 
   it('never heals the party above its maximum', () => {

@@ -37,7 +37,6 @@ interface FoeSheet {
 export interface StageSheet {
   readonly stage: number;
   readonly boss: boolean;
-  readonly timeLimit: number | null;
   readonly foes: readonly FoeSheet[];
   readonly totalHp: number;
   readonly damagePerSecond: number;
@@ -87,7 +86,6 @@ export function stageSheet(roster: Roster, stage: number): StageSheet {
   return {
     stage,
     boss: isBossStage(stage),
-    timeLimit: isBossStage(stage) ? BALANCE.bossTimeLimit : null,
     foes,
     totalHp: foes.reduce((sum, foe) => sum + foe.hp, 0),
     damagePerSecond,

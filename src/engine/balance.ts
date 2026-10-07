@@ -1,7 +1,6 @@
 export const BALANCE = {
   bossEvery: 5,
   packSize: { first: 3, max: 6, growEvery: 10 },
-  bossTimeLimit: 30,
   respawnDelay: 10,
   advanceDelay: 1.5,
   openingCooldown: 0.3,
@@ -21,8 +20,8 @@ export const BALANCE = {
   foeGrowth: 1.07,
   enemyHpBase: 10,
   enemyDamageBase: 0.15,
-  bossHpMultiplier: 10,
-  bossDamageBase: 1,
+  bossHpMultiplier: 22,
+  bossDamageBase: 1.2,
   enemyAttackInterval: 1.6,
   bossAttackInterval: 2.5,
 
