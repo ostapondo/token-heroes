@@ -9,6 +9,7 @@ import {
   string,
   union,
 } from 'zod';
+import { startStage } from '../battle/start';
 import { BattlePhase, BossMechanic, type Roster } from '../types';
 import { LEGACY_SAVE_VERSION, SAVE_VERSION, type StoredSave } from './save';
 
@@ -48,11 +49,28 @@ const saveWire = object({
   savedAt: number().nonnegative(),
 });
 
+const foeIds = (roster: Roster): Set<string> =>
+  new Set(
+    [
+      ...roster.enemies,
+      ...roster.bosses,
+      ...roster.superBosses.medium,
+      ...roster.superBosses.strong,
+    ].map((foe) => foe.id),
+  );
+
 export function saveFromWire(value: unknown, roster: Roster): StoredSave | null {
   const parsed = saveWire.safeParse(value);
 
   if (!parsed.success) return null;
+  const save = parsed.data;
   const known = new Set(roster.heroes.map((hero) => hero.id));
 
-  return parsed.data.party.heroes.every((slot) => known.has(slot.heroId)) ? parsed.data : null;
+  if (!save.party.heroes.every((slot) => known.has(slot.heroId))) return null;
+  const foes = foeIds(roster);
+
+  // A foe the content no longer has starts its stage over, so the save keeps its progress.
+  return save.battle.foes.every((foe) => foes.has(foe.id))
+    ? save
+    : { ...save, battle: startStage(save.battle.stage, save.party, roster, save.battle) };
 }
