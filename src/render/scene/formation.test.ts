@@ -74,7 +74,7 @@ describe('partyFormation', () => {
     expect(rightmost).toBeLessThanOrEqual(packLeft + 2);
   });
 
-  it.each([1, 3, 6, 10])('gives a party of %d a place each', (size) => {
+  it.each([1, 3, 6, 10, 14])('gives a party of %d a place each', (size) => {
     const boxes = partyFormation(everyHero.slice(0, size));
 
     expect(new Set(boxes.map((box) => `${box.x}:${box.y}`)).size).toBe(size);
