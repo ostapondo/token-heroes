@@ -1,5 +1,5 @@
 import { BALANCE } from '@engine';
-import type { ElementDef, HeroDef } from './model/definitions';
+import type { BossDef, ElementDef, HeroDef } from './model/definitions';
 import { CreatureId, ElementId } from './model/ids';
 import { PALETTE_SLOTS, TRANSPARENT_PIXEL, type SpriteDef } from './model/sprite';
 import type { Content } from './registry';
@@ -66,6 +66,8 @@ function elementProblems(element: ElementDef): string[] {
 
 const idsOf = (items: readonly { readonly id: string }[]) => items.map((item) => item.id);
 const ordersOf = (items: readonly { readonly order: number }[]) => items.map((item) => item.order);
+const pairingsOf = (bosses: readonly BossDef[]) =>
+  bosses.map((boss) => `${boss.creature} in ${boss.element}`);
 
 function missingReference(owner: string, kind: string, id: string, known: Set<string>): string[] {
   return known.has(id) ? [] : [`${owner} names ${kind} ${id}, which does not exist`];
@@ -92,6 +94,7 @@ function uniquenessProblems(content: Content): string[] {
     ...duplicated('boss', idsOf(content.bosses)),
     ...duplicated('boss order', ordersOf(content.bosses)),
     ...sequenceProblems('boss', ordersOf(content.bosses)),
+    ...duplicated('boss pairing', pairingsOf(content.bosses)),
     ...duplicated('enemy', idsOf(content.enemies)),
     ...duplicated('hero', idsOf(content.heroes)),
     ...duplicated('hero order', ordersOf(content.heroes)),
