@@ -56,10 +56,10 @@ export interface SuperBossDef {
   readonly sprite: SpriteDef;
 }
 
+// A pack enemy takes the colours of the element it fights in.
 export interface EnemyDef {
   readonly id: string;
   readonly name: string;
-  readonly element: ElementId;
   readonly hpScale: number;
   readonly damageScale: number;
   readonly sprite: SpriteDef;

@@ -49,8 +49,8 @@ describe('validateContent', () => {
     ]);
   });
 
-  it('ships twelve enemies and fourteen heroes', () => {
-    expect(CONTENT.enemies).toHaveLength(12);
+  it('ships three pack enemies for every boss creature, and fourteen heroes', () => {
+    expect(CONTENT.enemies).toHaveLength(3 * CONTENT.creatures.length);
     expect(CONTENT.heroes).toHaveLength(14);
   });
 
@@ -58,7 +58,6 @@ describe('validateContent', () => {
     const broken = defineEnemy({
       id: 'broken',
       name: 'Broken',
-      element: ElementId.Fire,
       hpScale: 1,
       damageScale: 1,
       sprite: { rows: ['aa', 'a', 'aq'] },
@@ -93,7 +92,6 @@ describe('validateContent', () => {
 
     expect(validateContent(content)).toEqual([
       'gold has an id constant but no definition',
-      'enemy gold-beetle names element gold, which does not exist',
       ...[
         'slime-king',
         'gilded-colossus',

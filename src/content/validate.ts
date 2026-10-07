@@ -43,15 +43,10 @@ function referenceProblems(content: Content): string[] {
   const elements = new Set(idsOf(content.elements));
   const creatures = new Set(idsOf(content.creatures));
 
-  return [
-    ...content.enemies.flatMap((enemy) =>
-      missingReference(`enemy ${enemy.id}`, 'element', enemy.element, elements),
-    ),
-    ...content.bosses.flatMap((boss) => [
-      ...missingReference(`boss ${boss.id}`, 'creature', boss.creature, creatures),
-      ...missingReference(`boss ${boss.id}`, 'element', boss.element, elements),
-    ]),
-  ];
+  return content.bosses.flatMap((boss) => [
+    ...missingReference(`boss ${boss.id}`, 'creature', boss.creature, creatures),
+    ...missingReference(`boss ${boss.id}`, 'element', boss.element, elements),
+  ]);
 }
 
 function artProblems(content: Content): string[] {

@@ -47,4 +47,11 @@ describe('saveFromWire', () => {
 
     expect(saveFromWire(roundTrip(stranger), testRoster)).toBeNull();
   });
+
+  it('starts the stage over when the save names a foe the content no longer has', () => {
+    const stale = { ...game.battle, foes: game.battle.foes.map((foe) => ({ ...foe, id: 'gone' })) };
+    const loaded = saveFromWire(roundTrip({ ...game, battle: stale }), testRoster);
+
+    expect(loaded?.battle.foes.map((foe) => foe.id)).toEqual(game.battle.foes.map((foe) => foe.id));
+  });
 });
