@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
 
+use super::burn::{Agent, Burn, Kinds};
 use super::memory::LineMemory;
 use super::source::TokenSource;
 
@@ -25,6 +26,7 @@ struct Record {
     id: Option<String>,
     #[serde(rename = "type")]
     kind: Option<String>,
+    model: Option<String>,
     tokens: Option<Tokens>,
 }
 
@@ -38,6 +40,8 @@ struct Tokens {
     thoughts: u64,
     #[serde(default)]
     tool: u64,
+    #[serde(default)]
+    cached: u64,
     #[serde(default)]
     total: u64,
 }
@@ -53,29 +57,46 @@ impl Tokens {
             .saturating_add(self.thoughts)
             .saturating_add(self.tool)
     }
+
+    const fn kinds(&self) -> Kinds {
+        Kinds {
+            input: self.input.saturating_sub(self.cached),
+            output: self
+                .output
+                .saturating_add(self.thoughts)
+                .saturating_add(self.tool),
+            cache_writes: 0,
+            cache_reads: self.cached,
+        }
+    }
 }
 
 impl TokenSource for GeminiCli {
+    fn agent(&self) -> Agent {
+        Agent::GeminiCli
+    }
+
     fn root(&self) -> &Path {
         &self.root
     }
 
-    fn tokens_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<u64, serde_json::Error> {
+    fn burn_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<Burn, serde_json::Error> {
         if !line.contains(TOKENS_MARKER) {
-            return Ok(0);
+            return Ok(Burn::default());
         }
         let record: Record = serde_json::from_str(line)?;
         let Some(tokens) = record
             .tokens
             .filter(|_| record.kind.as_deref() == Some(REPLY))
         else {
-            return Ok(0);
+            return Ok(Burn::default());
         };
         let burned = tokens.burned();
-
-        Ok(record
+        let credited = record
             .id
-            .map_or(burned, |id| memory.message_growth(&id, burned)))
+            .map_or(burned, |id| memory.message_growth(&id, burned));
+
+        Ok(Burn::credited(tokens.kinds(), credited).by(record.model))
     }
 }
 
@@ -93,7 +114,9 @@ mod tests {
         let source = GeminiCli::new(PathBuf::new());
 
         assert_eq!(
-            source.tokens_in(REPLY, &mut Memory::default().at(0))?,
+            source
+                .burn_in(REPLY, &mut Memory::default().at(0))?
+                .tokens(),
             18_649
         );
         Ok(())
@@ -104,8 +127,8 @@ mod tests {
         let source = GeminiCli::new(PathBuf::new());
         let mut memory = Memory::default();
 
-        assert!(source.tokens_in(REPLY, &mut memory.at(0))? > 0);
-        assert_eq!(source.tokens_in(REPLY, &mut memory.at(1))?, 0);
+        assert!(source.burn_in(REPLY, &mut memory.at(0))?.tokens() > 0);
+        assert_eq!(source.burn_in(REPLY, &mut memory.at(1))?.tokens(), 0);
         Ok(())
     }
 
@@ -120,7 +143,7 @@ mod tests {
         ];
 
         for line in lines {
-            assert_eq!(source.tokens_in(line, &mut memory.at(0))?, 0);
+            assert_eq!(source.burn_in(line, &mut memory.at(0))?.tokens(), 0);
         }
         Ok(())
     }

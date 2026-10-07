@@ -78,11 +78,18 @@ pub fn on_select(app: &AppHandle, id: &str) {
 }
 
 fn toggle_start_at_login(app: &AppHandle) {
+    match app.autolaunch().is_enabled() {
+        Ok(enabled) => set_start_at_login(app, !enabled),
+        Err(problem) => logging::error(&format!("could not read start at login: {problem}")),
+    }
+}
+
+pub fn set_start_at_login(app: &AppHandle, on: bool) {
     let launcher = app.autolaunch();
-    let result = match launcher.is_enabled() {
-        Ok(true) => launcher.disable(),
-        Ok(false) => launcher.enable(),
-        Err(problem) => Err(problem),
+    let result = if on {
+        launcher.enable()
+    } else {
+        launcher.disable()
     };
 
     if let Err(problem) = result {
@@ -90,7 +97,7 @@ fn toggle_start_at_login(app: &AppHandle) {
     }
 }
 
-fn sync_checks(app: &AppHandle) {
+pub fn sync_checks(app: &AppHandle) {
     let Some(checks) = app.try_state::<SettingChecks>() else {
         return;
     };

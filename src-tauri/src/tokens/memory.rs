@@ -8,6 +8,12 @@ pub struct FileCursor {
     pub offset: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub running_total: Option<u64>,
+    // A transcript that names its folder and model once, at the top, keeps them here for the
+    // lines read later.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]

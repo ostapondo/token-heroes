@@ -15,12 +15,16 @@ fn claude_at(root: &Path) -> Collector {
     Collector::new(vec![Box::new(ClaudeCode::new(root.to_path_buf()))])
 }
 
-const fn credited(tokens: u64) -> Batch {
-    Batch {
-        tokens,
-        advanced: true,
-    }
+// What a batch credited and whether it moved a position; who burned it is tested elsewhere.
+const fn credited(tokens: u64) -> (u64, bool) {
+    (tokens, true)
 }
+
+const fn summary(batch: &Batch) -> (u64, bool) {
+    (batch.tokens, batch.advanced)
+}
+
+const NOTHING: (u64, bool) = (0, false);
 
 #[test]
 fn reads_only_new_complete_lines() -> std::io::Result<()> {
@@ -32,16 +36,22 @@ fn reads_only_new_complete_lines() -> std::io::Result<()> {
 
     fs::create_dir_all(&project)?;
     fs::write(&transcript, answer("a"))?;
-    assert_eq!(collector.scan(&mut reading, 0), credited(15));
+    assert_eq!(summary(&collector.scan(&mut reading, 0)), credited(15));
 
     let mut file = OpenOptions::new().append(true).open(&transcript)?;
     file.write_all(answer("b").as_bytes())?;
     file.write_all(br#"{"message":{"id":"c","usage":"#)?;
-    assert_eq!(collector.read(&transcript, &mut reading, 0), credited(15));
+    assert_eq!(
+        summary(&collector.read(&transcript, &mut reading, 0)),
+        credited(15)
+    );
 
     writeln!(file, r#"{{"input_tokens":1,"output_tokens":1}}}}}}"#)?;
-    assert_eq!(collector.read(&transcript, &mut reading, 0), credited(2));
-    assert_eq!(collector.scan(&mut reading, 0), Batch::default());
+    assert_eq!(
+        summary(&collector.read(&transcript, &mut reading, 0)),
+        credited(2)
+    );
+    assert_eq!(summary(&collector.scan(&mut reading, 0)), NOTHING);
     Ok(())
 }
 
@@ -53,12 +63,15 @@ fn credits_nothing_already_on_disk_when_the_game_starts() -> std::io::Result<()>
     let mut reading = Reading::default();
 
     fs::write(&transcript, answer("a"))?;
-    assert_eq!(collector.scan(&mut reading, 7), credited(0));
+    assert_eq!(summary(&collector.scan(&mut reading, 7)), credited(0));
     assert_eq!(reading.started_at, Some(7));
 
     let mut file = OpenOptions::new().append(true).open(&transcript)?;
     file.write_all(answer("b").as_bytes())?;
-    assert_eq!(collector.read(&transcript, &mut reading, 8), credited(15));
+    assert_eq!(
+        summary(&collector.read(&transcript, &mut reading, 8)),
+        credited(15)
+    );
     Ok(())
 }
 
@@ -75,7 +88,7 @@ fn places_again_the_positions_kept_from_before_a_start() -> std::io::Result<()> 
         .files
         .insert(transcript.clone(), FileCursor::default());
 
-    assert_eq!(collector.scan(&mut reading, 0), credited(0));
+    assert_eq!(summary(&collector.scan(&mut reading, 0)), credited(0));
     assert_eq!(
         reading.files.get(&transcript).map(|cursor| cursor.offset),
         u64::try_from(history.len()).ok()
@@ -112,7 +125,10 @@ fn rereads_a_transcript_that_was_cut_short() -> std::io::Result<()> {
     collector.scan(&mut reading, 0);
     fs::write(&transcript, answer("c"))?;
 
-    assert_eq!(collector.read(&transcript, &mut reading, 0), credited(15));
+    assert_eq!(
+        summary(&collector.read(&transcript, &mut reading, 0)),
+        credited(15)
+    );
     Ok(())
 }
 
@@ -134,12 +150,12 @@ fn forgets_deleted_transcripts_but_not_those_of_a_missing_root() -> std::io::Res
         unmounted.join("old.jsonl"),
         FileCursor {
             offset: 1,
-            running_total: None,
+            ..FileCursor::default()
         },
     );
     fs::remove_file(&gone)?;
 
-    assert_eq!(collector.scan(&mut reading, 0), credited(0));
+    assert_eq!(summary(&collector.scan(&mut reading, 0)), credited(0));
     assert!(!reading.files.contains_key(&gone));
     assert!(reading.files.contains_key(&unmounted.join("old.jsonl")));
     Ok(())
@@ -180,7 +196,10 @@ fn keeps_one_cursor_when_events_arrive_through_a_symlinked_root() -> std::io::Re
     file.write_all(answer("b").as_bytes())?;
     let reported = fs::canonicalize(&real)?.join("session.jsonl");
 
-    assert_eq!(collector.read(&reported, &mut reading, 0), credited(15));
+    assert_eq!(
+        summary(&collector.read(&reported, &mut reading, 0)),
+        credited(15)
+    );
     assert_eq!(reading.files.len(), 1);
     Ok(())
 }

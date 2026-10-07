@@ -1,5 +1,6 @@
 use std::path::Path;
 
+use super::burn::{Agent, Burn, Spending};
 use super::collector::Batch;
 use super::memory::{Reading, StoreCursor};
 use crate::support::logging;
@@ -9,11 +10,13 @@ use crate::support::logging;
 pub trait StoreSource: Send {
     fn name(&self) -> &'static str;
 
+    fn agent(&self) -> Agent;
+
     fn root(&self) -> &Path;
 
     fn owns(&self, path: &Path) -> bool;
 
-    fn read_new(&self, cursor: &mut StoreCursor, now: u64) -> Result<u64, String>;
+    fn read_new(&self, cursor: &mut StoreCursor, now: u64) -> Result<Vec<Burn>, String>;
 }
 
 // Database sources grow a reply over minutes and may touch it again later, so their message
@@ -28,10 +31,18 @@ pub fn read_store(source: &dyn StoreSource, reading: &mut Reading, now: u64) -> 
         .seen
         .forget_before(now.saturating_sub(REMEMBER_REPLIES_FOR_SECONDS));
     match source.read_new(cursor, now) {
-        Ok(tokens) => Batch {
-            tokens,
-            advanced: tokens > 0 || cursor.watermark != before,
-        },
+        Ok(burns) => {
+            let mut spending = Spending::default();
+
+            for burn in burns {
+                spending.add(source.agent(), burn);
+            }
+            Batch {
+                tokens: spending.tokens(),
+                advanced: spending.tokens() > 0 || cursor.watermark != before,
+                spending,
+            }
+        }
         Err(problem) => {
             logging::warn(&format!("could not read {}: {problem}", source.name()));
             Batch::default()

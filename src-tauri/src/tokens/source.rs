@@ -1,9 +1,12 @@
 use std::path::Path;
 
+use super::burn::{Agent, Burn};
 use super::memory::LineMemory;
 
 pub trait TokenSource: Send {
+    fn agent(&self) -> Agent;
+
     fn root(&self) -> &Path;
 
-    fn tokens_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<u64, serde_json::Error>;
+    fn burn_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<Burn, serde_json::Error>;
 }

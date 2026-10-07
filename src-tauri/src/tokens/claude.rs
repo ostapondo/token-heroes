@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
 
+use super::burn::{Agent, Burn, Kinds};
 use super::memory::LineMemory;
 use super::source::TokenSource;
 
@@ -19,12 +20,14 @@ impl ClaudeCode {
 
 #[derive(Deserialize)]
 struct Entry {
+    cwd: Option<String>,
     message: Option<Message>,
 }
 
 #[derive(Deserialize)]
 struct Message {
     id: Option<String>,
+    model: Option<String>,
     usage: Option<Usage>,
 }
 
@@ -41,29 +44,39 @@ struct Usage {
 }
 
 impl TokenSource for ClaudeCode {
+    fn agent(&self) -> Agent {
+        Agent::ClaudeCode
+    }
+
     fn root(&self) -> &Path {
         &self.root
     }
 
-    fn tokens_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<u64, serde_json::Error> {
+    fn burn_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<Burn, serde_json::Error> {
         if !line.contains(USAGE_MARKER) {
-            return Ok(0);
+            return Ok(Burn::default());
         }
         let entry: Entry = serde_json::from_str(line)?;
         let Some(Message {
             id,
+            model,
             usage: Some(usage),
         }) = entry.message
         else {
-            return Ok(0);
+            return Ok(Burn::default());
         };
-        let tokens = usage
-            .input
-            .saturating_add(usage.output)
-            .saturating_add(usage.cache_writes)
-            .saturating_add(usage.cache_reads);
+        let kinds = Kinds {
+            input: usage.input,
+            output: usage.output,
+            cache_writes: usage.cache_writes,
+            cache_reads: usage.cache_reads,
+        };
+        let tokens = kinds.total();
+        let credited = id.map_or(tokens, |id| memory.message_growth(&id, tokens));
 
-        Ok(id.map_or(tokens, |id| memory.message_growth(&id, tokens)))
+        Ok(Burn::credited(kinds, credited)
+            .by(model)
+            .in_folder(entry.cwd.as_deref()))
     }
 }
 
@@ -81,7 +94,9 @@ mod tests {
         let source = ClaudeCode::new(PathBuf::new());
 
         assert_eq!(
-            source.tokens_in(ANSWER, &mut Memory::default().at(0))?,
+            source
+                .burn_in(ANSWER, &mut Memory::default().at(0))?
+                .tokens(),
             2 + 20_329 + 26_639 + 865
         );
         Ok(())
@@ -92,8 +107,8 @@ mod tests {
         let source = ClaudeCode::new(PathBuf::new());
         let mut memory = Memory::default();
 
-        assert!(source.tokens_in(ANSWER, &mut memory.at(0))? > 0);
-        assert_eq!(source.tokens_in(ANSWER, &mut memory.at(1))?, 0);
+        assert!(source.burn_in(ANSWER, &mut memory.at(0))?.tokens() > 0);
+        assert_eq!(source.burn_in(ANSWER, &mut memory.at(1))?.tokens(), 0);
         Ok(())
     }
 
@@ -103,8 +118,8 @@ mod tests {
         let mut memory = Memory::default();
         let longer = ANSWER.replace(r#""output_tokens":865"#, r#""output_tokens":1000"#);
 
-        assert_eq!(source.tokens_in(ANSWER, &mut memory.at(0))?, 47_835);
-        assert_eq!(source.tokens_in(&longer, &mut memory.at(0))?, 135);
+        assert_eq!(source.burn_in(ANSWER, &mut memory.at(0))?.tokens(), 47_835);
+        assert_eq!(source.burn_in(&longer, &mut memory.at(0))?.tokens(), 135);
         Ok(())
     }
 
@@ -115,14 +130,26 @@ mod tests {
 
         assert_eq!(
             source
-                .tokens_in(r#"{"type":"user"}"#, &mut memory.at(0))
-                .ok(),
+                .burn_in(r#"{"type":"user"}"#, &mut memory.at(0))
+                .ok()
+                .map(|burn| burn.tokens()),
             Some(0)
         );
-        assert!(
-            source
-                .tokens_in(r#"{"usage": "#, &mut memory.at(0))
-                .is_err()
+        assert!(source.burn_in(r#"{"usage": "#, &mut memory.at(0)).is_err());
+    }
+
+    #[test]
+    fn credits_the_model_and_folder_of_a_reply() -> Result<(), serde_json::Error> {
+        let source = ClaudeCode::new(PathBuf::new());
+        let line = ANSWER.replace(
+            r#"{"type":"assistant","message":{"id":"msg_1","#,
+            r#"{"type":"assistant","cwd":"/code/heroes","message":{"id":"msg_1","model":"claude-opus-5-5","#,
         );
+        let burn = source.burn_in(&line, &mut Memory::default().at(0))?;
+
+        assert_eq!(burn.model.as_deref(), Some("claude-opus-5-5"));
+        assert_eq!(burn.project.as_deref(), Some("heroes"));
+        assert_eq!(burn.kinds.cache_reads, 26_639);
+        Ok(())
     }
 }

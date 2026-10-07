@@ -12,7 +12,7 @@ mod layers;
 
 use tauri_plugin_autostart::MacosLauncher;
 
-use crate::app::{commands, release, setup};
+use crate::app::{commands, menu, release, setup};
 use crate::shell::window;
 use crate::support::logging;
 
@@ -35,6 +35,10 @@ pub fn run() {
             commands::load_save,
             commands::write_save,
             commands::log,
+            menu::burn_history,
+            menu::settings,
+            menu::change_setting,
+            menu::watched_agents,
             release::check_update,
             release::install_update,
             release::report_bug,

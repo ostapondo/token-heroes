@@ -1,4 +1,5 @@
 use super::OpenCode;
+use crate::tokens::burn::Burn;
 use crate::tokens::memory::StoreCursor;
 use crate::tokens::store::StoreSource;
 use rusqlite::{Connection, params};
@@ -6,6 +7,10 @@ use std::path::PathBuf;
 
 const REPLY: &str = r#"{"role":"assistant","tokens":{"input":100,"output":20,"reasoning":5,"cache":{"read":9000,"write":30}}}"#;
 const PROMPT: &str = r#"{"role":"user"}"#;
+
+fn total(burns: &[Burn]) -> u64 {
+    burns.iter().map(Burn::tokens).sum()
+}
 
 struct Database {
     _folder: tempfile::TempDir,
@@ -51,8 +56,11 @@ fn counts_replies_with_their_cache_traffic_but_not_prompts()
     write(&database.connection, "msg_1", 10, REPLY)?;
     write(&database.connection, "msg_2", 11, PROMPT)?;
 
-    assert_eq!(source.read_new(&mut cursor, 0)?, 100 + 20 + 5 + 9_000 + 30);
-    assert_eq!(source.read_new(&mut cursor, 0)?, 0);
+    assert_eq!(
+        total(&source.read_new(&mut cursor, 0)?),
+        100 + 20 + 5 + 9_000 + 30
+    );
+    assert_eq!(total(&source.read_new(&mut cursor, 0)?), 0);
     Ok(())
 }
 
@@ -64,10 +72,10 @@ fn credits_only_the_growth_of_a_reply_that_streams() -> Result<(), Box<dyn std::
     let early = r#"{"role":"assistant","tokens":{"input":100,"output":2}}"#;
 
     write(&database.connection, "msg_1", 10, early)?;
-    assert_eq!(source.read_new(&mut cursor, 0)?, 102);
+    assert_eq!(total(&source.read_new(&mut cursor, 0)?), 102);
     write(&database.connection, "msg_1", 12, REPLY)?;
 
-    assert_eq!(source.read_new(&mut cursor, 0)?, 9_155 - 102);
+    assert_eq!(total(&source.read_new(&mut cursor, 0)?), 9_155 - 102);
     Ok(())
 }
 
@@ -79,7 +87,7 @@ fn does_not_count_reasoning_twice_in_old_sessions() -> Result<(), Box<dyn std::e
     write(&database.connection, "msg_1", 10, REPLY)?;
 
     assert_eq!(
-        source.read_new(&mut StoreCursor::default(), 0)?,
+        total(&source.read_new(&mut StoreCursor::default(), 0)?),
         100 + 20 + 9_000 + 30
     );
     Ok(())
@@ -90,7 +98,7 @@ fn reads_nothing_where_opencode_never_ran() -> Result<(), String> {
     let folder = tempfile::tempdir().map_err(|problem| problem.to_string())?;
     let source = OpenCode::new(folder.path().join("missing").join("opencode.db"));
 
-    assert_eq!(source.read_new(&mut StoreCursor::default(), 0)?, 0);
+    assert_eq!(total(&source.read_new(&mut StoreCursor::default(), 0)?), 0);
     Ok(())
 }
 
