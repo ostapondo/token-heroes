@@ -6,10 +6,13 @@ export {
   enemyById,
   findSuperBoss,
   heroDefById,
+  skillDefById,
+  skillsOf,
   starterHero,
   toRoster,
 } from './lookup';
 export { CreatureAttack, type ElementDef } from './model/definitions';
+export { SkillLook } from './model/skill';
 export {
   LitterShape,
   PoolMotion,

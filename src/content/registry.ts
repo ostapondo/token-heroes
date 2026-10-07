@@ -6,6 +6,7 @@ import type {
   HeroDef,
   SuperBossDef,
 } from './model/definitions';
+import type { SkillDef } from './model/skill';
 
 type Modules<T> = Record<string, { readonly default: T }>;
 
@@ -26,6 +27,7 @@ export interface Content {
   readonly superBosses: readonly SuperBossDef[];
   readonly enemies: readonly EnemyDef[];
   readonly heroes: readonly HeroDef[];
+  readonly skills: readonly SkillDef[];
 }
 
 export const CONTENT: Content = {
@@ -44,4 +46,5 @@ export const CONTENT: Content = {
   heroes: byOrder(
     collect(import.meta.glob<{ default: HeroDef }>('./heroes/*.ts', { eager: true })),
   ),
+  skills: collect(import.meta.glob<{ default: SkillDef }>('./skills/*.ts', { eager: true })),
 };
