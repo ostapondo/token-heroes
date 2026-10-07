@@ -49,7 +49,7 @@ export default defineLair({
         base: 6,
         amplitude: 8,
         roughness: 0.6,
-        color: '#0c1c1c',
+        color: '#1a3030',
         rim: '#3a6a60',
       },
       {

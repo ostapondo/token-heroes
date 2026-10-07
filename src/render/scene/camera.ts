@@ -31,6 +31,8 @@ export interface Camera {
 // close camera holds a small party at 3x; the wide one draws every sprite one step smaller,
 // which shrinks the pack too and gives the party the ground up to x 106. Scales stay whole so
 // every pixel stays square. Rows 12 px apart keep the face of the hero behind in view at 2x.
+// The pack's back row stands about two thirds of a foe higher than the front, so a foe behind
+// shows above the one in front instead of hiding behind it.
 export const CAMERAS: Readonly<Record<CameraId, Camera>> = {
   [CameraId.Close]: {
     id: CameraId.Close,
@@ -45,7 +47,7 @@ export const CAMERAS: Readonly<Record<CameraId, Camera>> = {
       lineGap: 0,
       lineRise: 0,
     },
-    pack: { spacing: 32, feet: [ARENA.height - 10, ARENA.height - 22], backShift: 8 },
+    pack: { spacing: 32, feet: [ARENA.height - 10, ARENA.height - 36], backShift: 8 },
   },
   [CameraId.Wide]: {
     id: CameraId.Wide,
@@ -60,7 +62,7 @@ export const CAMERAS: Readonly<Record<CameraId, Camera>> = {
       lineGap: 4,
       lineRise: 3,
     },
-    pack: { spacing: 24, feet: [ARENA.height - 6, ARENA.height - 18], backShift: 6 },
+    pack: { spacing: 24, feet: [ARENA.height - 6, ARENA.height - 24], backShift: 6 },
   },
 };
 
