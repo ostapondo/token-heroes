@@ -11,6 +11,7 @@ export {
   starterHero,
   toRoster,
 } from './lookup';
+export { DeathKind } from './model/death';
 export { CreatureAttack, type ElementDef } from './model/definitions';
 export { SkillLook } from './model/skill';
 export {

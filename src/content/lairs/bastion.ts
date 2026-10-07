@@ -1,6 +1,7 @@
 import { defineLair } from '../model/definitions';
 import { LairId } from '../model/ids';
 import { SceneryKind } from '../model/scenery';
+import { DeathKind } from '../model/death';
 import { ParticlePreset, WeatherKind } from '../model/weather';
 
 export default defineLair({
@@ -57,6 +58,7 @@ export default defineLair({
       { kind: SceneryKind.Flagstones, rows: 8, spacing: 22, joint: '#262a32' },
     ],
   },
+  death: DeathKind.Stone,
   weather: [
     { kind: WeatherKind.Pulse, color: '#ff3030' },
     { kind: WeatherKind.Particles, preset: ParticlePreset.Rain },

@@ -1,6 +1,7 @@
 import { defineElement } from '../model/definitions';
 import { ElementId } from '../model/ids';
 import { SceneryKind } from '../model/scenery';
+import { DeathKind } from '../model/death';
 import { ParticlePreset, WeatherKind } from '../model/weather';
 
 export default defineElement({
@@ -53,6 +54,7 @@ export default defineElement({
       { kind: SceneryKind.Reflection, color: '#5a6070' },
     ],
   },
+  death: DeathKind.Sink,
   weather: [
     { kind: WeatherKind.Pulse, color: '#000000' },
     { kind: WeatherKind.Particles, preset: ParticlePreset.Motes },

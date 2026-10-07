@@ -1,6 +1,7 @@
 import { defineElement } from '../model/definitions';
 import { ElementId } from '../model/ids';
 import { SceneryKind } from '../model/scenery';
+import { DeathKind } from '../model/death';
 import { ParticlePreset, WeatherKind } from '../model/weather';
 
 const SPIRE = '#0f0305';
@@ -65,6 +66,7 @@ export default defineElement({
       },
     ],
   },
+  death: DeathKind.Drain,
   weather: [
     { kind: WeatherKind.SummoningRing },
     { kind: WeatherKind.Pulse, color: '#e0252f' },

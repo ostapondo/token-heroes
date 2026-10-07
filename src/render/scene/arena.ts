@@ -154,6 +154,8 @@ export class Arena {
     if (this.#pullback) this.#pullback.left -= dt;
     if (this.#pullback && this.#pullback.left <= 0) this.#pullback = undefined;
 
+    const death = { kind: element.death, accent: element.accent, time: this.#clock };
+
     context.save();
     const jitter = () => Math.round((Math.random() - 0.5) * this.#juice.shake);
 
@@ -164,9 +166,16 @@ export class Arena {
     if (this.#pullback) {
       const progress = 1 - this.#pullback.left / PULLBACK.seconds;
 
-      paintPullback(context, this.#cast.sprites, this.#pullback.scene, progress, snapshot.battle);
+      paintPullback(
+        context,
+        this.#cast.sprites,
+        this.#pullback.scene,
+        progress,
+        snapshot.battle,
+        death,
+      );
     } else {
-      paintCast(context, this.#cast.sprites, this.#cast, snapshot.battle);
+      paintCast(context, this.#cast.sprites, this.#cast, snapshot.battle, death);
       this.#guard.survives('skill states', () =>
         paintSkillStates(context, this.#cast, snapshot, this.#options.content, this.#clock),
       );

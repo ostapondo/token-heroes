@@ -1,4 +1,5 @@
 import type { AttackStyle, BossMechanic, HeroRole, SuperBossTier } from '@engine';
+import type { DeathKind } from './death';
 import type { CreatureId, ElementId, LairId } from './ids';
 import type { BackdropDef } from './scenery';
 import type { Palette, SpriteDef } from './sprite';
@@ -12,6 +13,7 @@ export interface ElementDef {
   readonly accent: string;
   readonly backdrop: BackdropDef;
   readonly weather: readonly WeatherDef[];
+  readonly death: DeathKind;
 }
 
 export const CreatureAttack = {

@@ -1,6 +1,7 @@
 import { defineElement } from '../model/definitions';
 import { ElementId } from '../model/ids';
 import { PoolMotion, SceneryKind } from '../model/scenery';
+import { DeathKind } from '../model/death';
 import { ParticlePreset, WeatherKind } from '../model/weather';
 
 export default defineElement({
@@ -62,6 +63,7 @@ export default defineElement({
       },
     ],
   },
+  death: DeathKind.Shock,
   weather: [
     { kind: WeatherKind.Lightning },
     { kind: WeatherKind.Particles, preset: ParticlePreset.Rain },
