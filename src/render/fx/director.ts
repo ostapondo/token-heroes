@@ -1,16 +1,17 @@
 import { heroDefById, type Content } from '@content';
-import { BattleEventType, type BattleEvent } from '@engine';
+import { BattleEventType, type BattleEvent, type Roster } from '@engine';
 import { t } from '@i18n';
 import { compactNumber } from '../format';
 import type { Actor } from '../scene/cast';
 import { ARENA, center, type Point } from '../scene/geometry';
 import { MotionCue } from '../scene/motion';
-import { bossAttack } from './boss-attacks';
 import { Sparks } from './bursts';
 import { FX_COLOR } from './colors';
 import { FloatingText, type TextStyle } from './floating-text';
 import { NumberTrail } from './number-trail';
 import { NONE, type EventOf, type Reaction, type Stage } from './reaction';
+import { partyHit } from './party-hit';
+import { SkillDirector } from './skill-director';
 import { LightPillar, ScreenFlash } from './screen';
 import { heroAttack } from './hero-attacks';
 import { Beam, CrossSlash } from './strikes';
@@ -32,9 +33,11 @@ export class Director {
   readonly #content: Content;
   readonly #trail = new NumberTrail();
   readonly #twists = new Twists((text, at, style) => this.#number(text, at, style));
+  readonly #skills: SkillDirector;
 
-  constructor(content: Content) {
+  constructor(content: Content, roster: Roster) {
     this.#content = content;
+    this.#skills = new SkillDirector(content, roster);
   }
 
   react(event: BattleEvent, stage: Stage): Reaction {
@@ -48,7 +51,7 @@ export class Director {
       case BattleEventType.Heal:
         return this.#heal(event, stage);
       case BattleEventType.PartyHit:
-        return this.#partyHit(event, stage);
+        return partyHit(event, stage, (text, at, style) => this.#number(text, at, style));
       case BattleEventType.FoeDefeated:
         return this.#defeated(event, stage);
       case BattleEventType.StageStarted:
@@ -58,10 +61,12 @@ export class Director {
         return NONE;
       case BattleEventType.Mechanic:
         return this.#twists.react(event, stage);
+      case BattleEventType.Skill:
+        return this.#skills.cast(event, stage);
+      case BattleEventType.SkillTick:
+        return this.#skills.tick(event, stage);
       case BattleEventType.StageCleared:
       case BattleEventType.Wiped:
-      case BattleEventType.Skill:
-      case BattleEventType.SkillTick:
         return NONE;
       default:
         return unhandled(event);
@@ -79,6 +84,7 @@ export class Director {
           above(hero, 6),
           TEXT.levelUp,
         ),
+        ...this.#skills.ranked(hero.id, level),
       ],
       shake: 0,
     };
@@ -148,26 +154,6 @@ export class Director {
     const text = this.#number(`+${compactNumber(event.amount)}`, above(healer), TEXT.heal);
 
     return { effects: [text], shake: 0 };
-  }
-
-  #partyHit(event: EventOf<typeof BattleEventType.PartyHit>, stage: Stage): Reaction {
-    const attacker = stage.foes[event.foe];
-    const accent = stage.element.accent;
-    const signature = attacker?.attack
-      ? bossAttack(attacker.attack, attacker, stage.heroes, accent)
-      : { effects: [], shake: 1 };
-
-    if (!attacker?.attack) attacker?.motion.cue(MotionCue.Hop);
-    for (const hero of stage.heroes) hero.motion.cue(MotionCue.Hurt);
-    const target = stage.heroes[0];
-    const wound = target
-      ? [this.#number(`-${compactNumber(event.amount)}`, above(target), TEXT.wound)]
-      : [];
-
-    return {
-      effects: [...signature.effects, ...wound, new ScreenFlash(accent, 0.25, 0.4)],
-      shake: signature.shake,
-    };
   }
 
   #defeated(event: EventOf<typeof BattleEventType.FoeDefeated>, stage: Stage): Reaction {

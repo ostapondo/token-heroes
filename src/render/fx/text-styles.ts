@@ -7,6 +7,8 @@ export const TEXT = {
   strike: { color: FX_COLOR.player, size: 16 },
   ultimate: { color: FX_COLOR.holy, size: 18 },
   heal: { color: FX_COLOR.heal, size: 9 },
+  burn: { color: FX_COLOR.ember, size: 8, life: 0.6, rise: 10 },
+  block: { color: FX_COLOR.steel, size: 10 },
   wound: { color: FX_COLOR.wound, size: 11 },
   levelUp: { color: FX_COLOR.gold, size: 11, life: 1.3 },
   phantom: { color: FX_COLOR.glitchCyan, size: 12 },
