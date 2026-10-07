@@ -120,17 +120,23 @@ export class Particles implements Weather {
     });
   }
 
+  // One fill per colour: a storm is forty drops a frame.
   draw(context: CanvasRenderingContext2D): void {
     const length = this.#preset.length ?? 0;
 
-    for (const particle of this.#particles) {
-      context.fillStyle = particle.color;
-      context.fillRect(
-        Math.round(particle.x),
-        Math.round(particle.y),
-        particle.size,
-        particle.size + length,
-      );
+    for (const color of this.#preset.colors) {
+      context.fillStyle = color;
+      context.beginPath();
+      for (const particle of this.#particles) {
+        if (particle.color !== color) continue;
+        context.rect(
+          Math.round(particle.x),
+          Math.round(particle.y),
+          particle.size,
+          particle.size + length,
+        );
+      }
+      context.fill();
     }
   }
 

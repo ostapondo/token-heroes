@@ -34,7 +34,7 @@ const feetOf = (body: Body) => ({ x: body.cx, y: body.feet });
 
 function charred(context: CanvasRenderingContext2D, body: Body, tip: number): void {
   tipped(context, feetOf(body), tip, () =>
-    paintCells(context, body, body.cells, (cell) => css(ramp(CHARRED, cell.color))),
+    paintCells(context, body, body.cells, (cell) => ramp(CHARRED, cell.color)),
   );
 }
 
@@ -77,9 +77,7 @@ function husk(context: CanvasRenderingContext2D, body: Body, progress: number): 
     feetOf(body),
     ease(clamp01((progress - 0.6) / 0.35)),
     () =>
-      paintCells(context, body, body.cells, (cell) =>
-        css(mix(cell.color, ramp(HUSK, cell.color), dry)),
-      ),
+      paintCells(context, body, body.cells, (cell) => mix(cell.color, ramp(HUSK, cell.color), dry)),
     1 - 0.35 * dry,
   );
 }

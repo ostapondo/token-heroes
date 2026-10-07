@@ -12,6 +12,7 @@ interface Spark {
 export class Sparks extends TimedEffect {
   readonly #at: Point;
   readonly #reach: number;
+  readonly #colors: readonly string[];
   readonly #sparks: readonly Spark[];
 
   constructor(at: Point, colors: readonly string[], options: { count: number; reach: number }) {
@@ -24,6 +25,7 @@ export class Sparks extends TimedEffect {
       color: colors[index % colors.length] ?? FX_COLOR.steel,
       long: index % 2 === 1,
     }));
+    this.#colors = [...new Set(this.#sparks.map((spark) => spark.color))];
   }
 
   draw(context: CanvasRenderingContext2D): void {
@@ -31,12 +33,17 @@ export class Sparks extends TimedEffect {
 
     context.save();
     context.globalAlpha = 1 - this.progress;
-    for (const spark of this.#sparks) {
-      const x = this.#at.x + Math.cos(spark.angle) * distance * spark.speed;
-      const y = this.#at.y + Math.sin(spark.angle) * distance * spark.speed;
+    for (const color of this.#colors) {
+      context.fillStyle = color;
+      context.beginPath();
+      for (const spark of this.#sparks) {
+        if (spark.color !== color) continue;
+        const x = this.#at.x + Math.cos(spark.angle) * distance * spark.speed;
+        const y = this.#at.y + Math.sin(spark.angle) * distance * spark.speed;
 
-      context.fillStyle = spark.color;
-      context.fillRect(Math.round(x), Math.round(y), spark.long ? 3 : 2, spark.long ? 1 : 2);
+        context.rect(Math.round(x), Math.round(y), spark.long ? 3 : 2, spark.long ? 1 : 2);
+      }
+      context.fill();
     }
     context.restore();
   }

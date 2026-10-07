@@ -106,23 +106,27 @@ function paintDome(
   const height = base - top;
 
   context.fillStyle = withAlpha(color, DOME.fill);
+  context.beginPath();
   for (let y = 0; y < height; y += 1) {
     const span = Math.round(half * Math.sqrt(1 - (y / height) ** 2));
 
-    context.fillRect(Math.round(middle - span), base - y, span * 2, 1);
+    context.rect(Math.round(middle - span), base - y, span * 2, 1);
   }
+  context.fill();
   context.fillStyle = withAlpha(color, DOME.rim);
+  context.beginPath();
   for (let step = 0; step <= 90; step += 1) {
     if (Math.floor(clock * 8 + step / 4) % 6 === 0) continue;
     const angle = (step / 90) * Math.PI;
 
-    context.fillRect(
+    context.rect(
       Math.round(middle - Math.cos(angle) * half),
       Math.round(base - Math.sin(angle) * height),
       1,
       1,
     );
   }
+  context.fill();
 }
 
 function paintGuards(

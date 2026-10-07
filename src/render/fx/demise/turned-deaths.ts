@@ -1,6 +1,6 @@
 import type { Body, Cell } from './body';
 import type { Demise } from './demise';
-import { clamp01, css, ease, mix, noise, paintCells, ramp, square } from './paint';
+import { clamp01, ease, mix, noise, paintCells, ramp, square } from './paint';
 
 const STONE = ['#6a655a', '#a8a294', '#e0dacb'] as const;
 const CRACK = '#2f2a24';
@@ -19,7 +19,7 @@ export const stone: Demise = {
     paintCells(context, body, body.cells, (cell) =>
       progress > 0.7 && cracked(body, cell)
         ? CRACK
-        : css(mix(cell.color, ramp(STONE, cell.color), risen(body, cell, progress * 1.4, 3))),
+        : mix(cell.color, ramp(STONE, cell.color), risen(body, cell, progress * 1.4, 3)),
     );
   },
   down(context, body, scene) {
@@ -38,21 +38,23 @@ function glint(context: CanvasRenderingContext2D, body: Body, share: number): vo
   context.clip();
   context.globalAlpha = 0.8;
   context.fillStyle = ICE.shine;
+  context.beginPath();
   for (let step = -height; step < height; step += 2) {
-    context.fillRect(x + step * 0.5, body.y + height - step, 3, 2);
+    context.rect(x + step * 0.5, body.y + height - step, 3, 2);
   }
+  context.fill();
   context.restore();
 }
 
 export const gold: Demise = {
   dying(context, body, progress) {
     paintCells(context, body, body.cells, (cell) =>
-      css(mix(cell.color, ramp(GOLD, cell.color), risen(body, cell, progress * 1.3, 4))),
+      mix(cell.color, ramp(GOLD, cell.color), risen(body, cell, progress * 1.3, 4)),
     );
     if (progress > 0.8) glint(context, body, (progress - 0.8) / 0.2);
   },
   down(context, body, scene) {
-    paintCells(context, body, body.cells, (cell) => css(ramp(GOLD, cell.color)));
+    paintCells(context, body, body.cells, (cell) => ramp(GOLD, cell.color));
     const shine = (scene.time * 0.5 + noise(body.seed)) % 1;
 
     if (shine < 0.3) glint(context, body, shine / 0.3);
@@ -80,12 +82,12 @@ export const ice: Demise = {
     const tint = clamp01(progress / 0.4);
 
     paintCells(context, body, body.cells, (cell) =>
-      css(mix(cell.color, FROST, risen(body, cell, tint * 1.5, 2) * 0.6)),
+      mix(cell.color, FROST, risen(body, cell, tint * 1.5, 2) * 0.6),
     );
     block(context, body, clamp01((progress - 0.3) / 0.6));
   },
   down(context, body) {
-    paintCells(context, body, body.cells, (cell) => css(mix(cell.color, FROST, 0.6)));
+    paintCells(context, body, body.cells, (cell) => mix(cell.color, FROST, 0.6));
     block(context, body, 1);
   },
 };

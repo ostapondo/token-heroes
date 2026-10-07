@@ -47,11 +47,13 @@ function paintShadow(context: CanvasRenderingContext2D, actor: Actor, facing: 1 
   const ry = actor.boss ? SHADOW.bossDepth : SHADOW.depth;
 
   context.fillStyle = SHADOW.color;
+  context.beginPath();
   for (let dy = -ry; dy <= ry; dy += 1) {
     const half = Math.round(rx * Math.sqrt(1 - (dy / (ry + 0.6)) ** 2));
 
-    context.fillRect(Math.round(middle - half), feet + dy, half * 2, 1);
+    context.rect(Math.round(middle - half), feet + dy, half * 2, 1);
   }
+  context.fill();
 }
 
 function paintActor(

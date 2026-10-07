@@ -1,6 +1,6 @@
 import { heapSlot, type Body, type Cell } from './body';
 import type { Demise } from './demise';
-import { clamp01, css, ease, ellipse, mix, noise, paintCells, square } from './paint';
+import { clamp01, css, ease, ellipse, mix, noise, paintCells, square, squares } from './paint';
 
 const HEAP = 16;
 const ASH = { ember: '#ffb02e', char: '#2a2420', grey: '#4a423a', smoke: '#8a8070' } as const;
@@ -31,6 +31,10 @@ function skeletonOf(): Cell[] {
 }
 
 const BONES = skeletonOf();
+const SKULL = BONES.filter((cell) => cell.y < 3);
+const SPINE = BONES.filter((cell) => cell.y >= 3);
+
+const greyed = (cell: Cell) => cell.index % 5 === 0;
 
 function fallTo(body: Body, cell: Cell, fall: number, curve: number) {
   const from = { x: body.x + cell.x * body.scale, y: body.y + cell.y * body.scale };
@@ -43,33 +47,40 @@ export const ash: Demise = {
   dying(context, body, progress) {
     const heat = clamp01(progress / 0.4);
     const char = clamp01((progress - 0.4) / 0.25);
-    const colorOf = (cell: Cell) =>
-      char > 0
-        ? css(mix(ASH.ember, ASH.char, char))
-        : css(
-            mix(cell.color, ASH.ember, heat * 1.6 - ((body.rows - 1 - cell.y) / body.rows) * 0.6),
-          );
 
     if (progress < 0.55) {
-      paintCells(context, body, body.cells, colorOf);
+      paintCells(context, body, body.cells, (cell) =>
+        char > 0
+          ? mix(ASH.ember, ASH.char, char)
+          : mix(cell.color, ASH.ember, heat * 1.6 - ((body.rows - 1 - cell.y) / body.rows) * 0.6),
+      );
 
       return;
     }
-    for (const cell of body.cells) {
+    // Charred through by now, so every falling cell is the same colour.
+    const falling = body.cells.flatMap((cell) => {
       const fall = clamp01((progress - 0.55 - (cell.y / body.rows) * 0.15) / 0.3);
 
-      if (fall >= 1 && cell.index >= HEAP) continue;
-      const at = fallTo(body, cell, fall, 2);
+      return fall >= 1 && cell.index >= HEAP ? [] : [fallTo(body, cell, fall, 2)];
+    });
 
-      square(context, at.x, at.y, body.scale, colorOf(cell));
-    }
+    squares(context, falling, body.scale, css(mix(ASH.ember, ASH.char, char)));
   },
   down(context, body, scene) {
-    for (const cell of body.cells.slice(0, HEAP)) {
-      const at = heapSlot(body, cell.index);
+    const heap = body.cells.slice(0, HEAP);
 
-      square(context, at.x, at.y, body.scale, cell.index % 5 === 0 ? ASH.grey : ASH.char);
-    }
+    squares(
+      context,
+      heap.filter((cell) => !greyed(cell)).map((cell) => heapSlot(body, cell.index)),
+      body.scale,
+      ASH.char,
+    );
+    squares(
+      context,
+      heap.filter(greyed).map((cell) => heapSlot(body, cell.index)),
+      body.scale,
+      ASH.grey,
+    );
     [0, 3].forEach((index, ember) => {
       const at = heapSlot(body, index);
 
@@ -142,11 +153,10 @@ export const melt: Demise = {
 };
 
 function heapOfBones(context: CanvasRenderingContext2D, body: Body, fall: number): void {
-  for (const cell of BONES) {
-    const at = fallTo(body, cell, fall, 1);
+  const at = (cell: Cell) => fallTo(body, cell, fall, 1);
 
-    square(context, at.x, at.y, body.scale, cell.y < 3 ? BONE.skull : BONE.bone);
-  }
+  squares(context, SKULL.map(at), body.scale, BONE.skull);
+  squares(context, SPINE.map(at), body.scale, BONE.bone);
 }
 
 export const bones: Demise = {

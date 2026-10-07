@@ -1,8 +1,6 @@
 import { rgb } from '../../backdrop/tone';
 import type { Body, Cell } from './body';
-
-type Rgb = readonly [number, number, number];
-type Tone = Rgb | string;
+import { cellSheet, type Rgb, type Tone } from './cell-sheet';
 
 export const clamp01 = (value: number): number => Math.min(1, Math.max(0, value));
 export const ease = (t: number): number => t * t * (3 - 2 * t);
@@ -55,12 +53,29 @@ export function square(
   context.globalAlpha = 1;
 }
 
-// Cells drawn the way the sprite cache draws a sprite: a black outline, then the colours.
+// Squares of one colour as one shape, so the canvas fills them in one call.
+export function squares(
+  context: CanvasRenderingContext2D,
+  spots: readonly { x: number; y: number }[],
+  size: number,
+  color: string,
+  alpha = 1,
+): void {
+  context.globalAlpha = clamp01(alpha);
+  context.fillStyle = color;
+  context.beginPath();
+  for (const spot of spots) context.rect(spot.x, spot.y, size, size);
+  context.fill();
+  context.globalAlpha = 1;
+}
+
+// Cells drawn the way the sprite cache draws a sprite: a black outline, then the colours. A cell
+// whose tone is null is left out.
 export function paintCells(
   context: CanvasRenderingContext2D,
   body: Body,
   cells: readonly Cell[],
-  colorOf: (cell: Cell) => string,
+  toneOf: (cell: Cell) => Tone | null,
   options: {
     dy?: number;
     alpha?: number;
@@ -69,26 +84,13 @@ export function paintCells(
     at?: { x: number; y: number };
   } = {},
 ): void {
+  const sheet = cellSheet(body, cells, toneOf, options.outline ?? true);
   const scale = options.scale ?? body.scale;
-  const left = options.at?.x ?? body.x;
-  const top = (options.at?.y ?? body.y) + (options.dy ?? 0);
+  const left = (options.at?.x ?? body.x) - scale;
+  const top = (options.at?.y ?? body.y) + (options.dy ?? 0) - scale;
 
   context.globalAlpha = clamp01(options.alpha ?? 1);
-  if (options.outline ?? true) {
-    context.fillStyle = '#000000';
-    for (const cell of cells) {
-      context.fillRect(
-        left + (cell.x - 1) * scale,
-        top + (cell.y - 1) * scale,
-        scale * 3,
-        scale * 3,
-      );
-    }
-  }
-  for (const cell of cells) {
-    context.fillStyle = colorOf(cell);
-    context.fillRect(left + cell.x * scale, top + cell.y * scale, scale, scale);
-  }
+  context.drawImage(sheet, left, top, sheet.width * scale, sheet.height * scale);
   context.globalAlpha = 1;
 }
 
