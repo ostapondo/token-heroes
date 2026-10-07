@@ -33,6 +33,18 @@ export function rampAt(
   return (edge > bayer(x, y) ? ramp[index + 1] : ramp[index]) ?? '#000000';
 }
 
+const linear = (channel: number): number => {
+  const share = channel / 255;
+
+  return share <= 0.04045 ? share / 12.92 : ((share + 0.055) / 1.055) ** 2.4;
+};
+
+export const relativeLuminance = (r: number, g: number, b: number): number =>
+  0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
+
+export const contrast = (a: number, b: number): number =>
+  (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+
 export function seededRandom(seed: number): () => number {
   let state = seed >>> 0;
 

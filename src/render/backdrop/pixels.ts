@@ -1,4 +1,4 @@
-import { bayer, rgb } from './tone';
+import { bayer, relativeLuminance, rgb } from './tone';
 
 // A 1:1 pixel buffer. Every shape is spans and single pixels, so nothing anti-aliases.
 export class Pixels {
@@ -90,6 +90,12 @@ export class Pixels {
       this.column(x, base - height, base, hex);
       if (rim) this.set(x, base - height, rim);
     });
+  }
+
+  luminanceAt(x: number, y: number): number {
+    const at = (Math.round(y) * this.width + Math.round(x)) * 4;
+
+    return relativeLuminance(this.data[at] ?? 0, this.data[at + 1] ?? 0, this.data[at + 2] ?? 0);
   }
 
   toCanvas(): HTMLCanvasElement {
