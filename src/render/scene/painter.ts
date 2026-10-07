@@ -9,6 +9,7 @@ import { ARENA, floorTop } from './geometry';
 const TINT = { flash: FX_COLOR.steel, hurt: FX_COLOR.wound, glow: FX_COLOR.gold } as const;
 const FALLEN_ALPHA = 0.45;
 const HP_BAR = { height: 2, gap: 3, empty: '#000000' } as const;
+const SHADOW = { color: 'rgba(0, 0, 0, 0.42)', spread: 0.55, depth: 2, bossDepth: 3 } as const;
 
 export function paintBackdrop(context: CanvasRenderingContext2D, element: ElementDef): void {
   context.fillStyle = element.sky;
@@ -27,6 +28,21 @@ function tintOf(actor: Actor): string | null {
   if (actor.motion.glowing) return TINT.glow;
 
   return null;
+}
+
+// A flat pixel ellipse under the feet. It follows a dash but stays on the ground through a hop.
+function paintShadow(context: CanvasRenderingContext2D, actor: Actor, facing: 1 | -1): void {
+  const feet = actor.box.y + actor.box.height + SPRITE_OUTLINE * actor.pixel - 1;
+  const middle = actor.box.x + actor.box.width / 2 + actor.motion.offset(facing).x;
+  const rx = Math.round(actor.box.width * SHADOW.spread);
+  const ry = actor.boss ? SHADOW.bossDepth : SHADOW.depth;
+
+  context.fillStyle = SHADOW.color;
+  for (let dy = -ry; dy <= ry; dy += 1) {
+    const half = Math.round(rx * Math.sqrt(1 - (dy / (ry + 0.6)) ** 2));
+
+    context.fillRect(Math.round(middle - half), feet + dy, half * 2, 1);
+  }
 }
 
 function paintActor(
@@ -69,6 +85,8 @@ export function paintCast(
     .map((actor, index) => ({ actor, foe: battle.foes[index] }))
     .toSorted((left, right) => bottom(left.actor) - bottom(right.actor));
 
+  for (const { actor, foe } of foes) if (foe && foe.hp > 0) paintShadow(context, actor, -1);
+  for (const actor of cast.heroes) paintShadow(context, actor, 1);
   foes.forEach(({ actor, foe }) => {
     const visible = foe && (foe.hp > 0 || actor.motion.fade < 1);
 
