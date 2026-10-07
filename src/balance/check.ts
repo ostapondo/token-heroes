@@ -6,6 +6,7 @@ import { greedyPartyFor } from './greedy';
 import { PACE_RULES } from './pace-rules';
 import { PLAY_RULES } from './play-rules';
 import { judge, type Finding } from './rules';
+import { SKILL_PACE_RULES, SKILL_RULES } from './skill-rules';
 import { heroSheet, stageSheet, type StageSheet } from './sheets';
 import { runParty, type RunOptions, type RunReport } from './simulate';
 
@@ -41,7 +42,8 @@ export interface BalanceReport {
 function judgePace(roster: Roster): BalanceReport['pace'] {
   const steady = paceCurve(roster);
   const greedy = paceCurve(roster, greedyPartyFor);
-  const findings = [...PACE_RULES, ...PLAY_RULES, ...ASCENSION_RULES].map((rule) => ({
+  const rules = [...PACE_RULES, ...PLAY_RULES, ...ASCENSION_RULES, ...SKILL_PACE_RULES];
+  const findings = rules.map((rule) => ({
     rule: rule.id,
     threshold: rule.threshold,
     ...rule.judge({ roster, steady, greedy }),
@@ -74,7 +76,7 @@ export function judgeParty(roster: Roster, scenario: Scenario, options: RunOptio
     party: scenario.party,
     run,
     frontier,
-    findings: judge({ heroes, run, frontier }),
+    findings: judge({ heroes, run, frontier }, SKILL_RULES),
   };
 }
 
