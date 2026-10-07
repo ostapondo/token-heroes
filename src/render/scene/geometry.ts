@@ -1,4 +1,5 @@
-export const ARENA = { width: 186, height: 170, floorHeight: 40 } as const;
+// The horizon sits on the lower third: a full party's back rank stands 22 px in front of it.
+export const ARENA = { width: 186, height: 170, floorHeight: 58 } as const;
 
 export interface Point {
   readonly x: number;

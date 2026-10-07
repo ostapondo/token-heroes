@@ -43,10 +43,10 @@ export class Fog implements Weather {
   draw(context: CanvasRenderingContext2D): void {
     const drift = Math.sin(this.#time * 0.5) * 14;
 
-    context.fillStyle = withAlpha(this.#color, 0.14);
-    context.fillRect(drift - 20, floorTop() - 12, ARENA.width + 40, 26);
-    context.fillStyle = withAlpha(this.#color, 0.09);
-    context.fillRect(-drift - 30, floorTop() - 30, ARENA.width + 60, 14);
+    context.fillStyle = withAlpha(this.#color, 0.12);
+    context.fillRect(drift - 20, floorTop() - 8, ARENA.width + 40, 18);
+    context.fillStyle = withAlpha(this.#color, 0.08);
+    context.fillRect(-drift - 30, floorTop() - 22, ARENA.width + 60, 10);
   }
 }
 
