@@ -77,23 +77,25 @@ cache on every request, since that is what the agent burns.
 
 All of these numbers live in one file, [`src/engine/balance.ts`](src/engine/balance.ts).
 
-### Ten heroes
+### Fourteen heroes
 
-<img src="docs/readme/heroes.svg" alt="Ten hero cards: Wanderer, Archer, Shieldbearer, Cleric, Fire Mage, Rogue, Barbarian, Frost Witch, Necromancer, Paladin" width="100%">
+<img src="docs/readme/heroes.svg" alt="Fourteen hero cards: Wanderer, Archer, Shieldbearer, Cleric, Fire Mage, Rogue, Barbarian, Frost Witch, Necromancer, Paladin, Monk, Templar, Sentinel, Druid" width="100%">
 
 You start with the Wanderer. Strikers deal damage, tanks hold the party's health and healers
-undo a share of the foes' damage. Every later hero is stronger per coin than the one before; the rare ones
-appear only once your lifetime burn passes their threshold. Anyone who reaches the Paladin has
-burned 800 million tokens.
+undo a share of the foes' damage. Strikers and tanks each come with all four attacks: slash,
+arrow, bash and spell. Every later hero is stronger per coin than the one before; the rare ones
+appear only once your lifetime burn passes their threshold. Anyone who reaches the Druid has
+burned 12.8 billion tokens.
 
-### Thirty bosses
+### Seventy-two bosses
 
-<img src="docs/readme/bosses.svg" alt="A grid of thirty pixel bosses, each a creature in an element's colours and weather" width="100%">
+<img src="docs/readme/bosses.svg" alt="A grid of seventy-two pixel bosses: eight creatures down, nine elements across" width="100%">
 
-Every boss is one of 8 creatures drawn in one of 9 elements. The creature brings the attack:
-dragons breathe fire, golems and slimes slam, wraiths swing a scythe, spiders spit, and demons and
-knights lunge. The element brings the palette and the weather: lava floors and embers for fire,
-frosted edges and snow for ice, lightning and rain for storms, a summoning ring for blood.
+Every one of the 8 creatures comes in every one of the 9 elements, one boss per pairing. The
+creature brings the attack: dragons breathe fire, golems and slimes slam, wraiths swing a scythe,
+spiders spit, and demons and knights lunge. The element brings the palette and the weather: lava
+floors and embers for fire, frosted edges and snow for ice, lightning and rain for storms, a
+summoning ring for blood.
 
 <img src="docs/readme/pack.svg" alt="Twelve pack enemies marching across" width="100%">
 
@@ -142,7 +144,7 @@ host. It starts you on 17.9M burned tokens and burns a few thousand more every 2
 
 ## Come build it with us
 
-<img src="docs/readme/slot.svg" alt="A golem cycling through all nine elements next to the eight lines of code that add a new boss" width="100%">
+<img src="docs/readme/slot.svg" alt="A golem cycling through all nine elements next to the eight lines of code for one of its bosses" width="100%">
 
 Token Heroes is young, and it is open to contributors. You can make a real difference in an
 evening, and **you don't need to know Rust or React to start**. The game's content is plain data,
@@ -150,7 +152,7 @@ one entity per file, and the registry finds new files on its own.
 
 | If you like…       | You could                                                                    |
 | ------------------ | ---------------------------------------------------------------------------- |
-| Pixel art          | name one of the 42 free creature × element bosses, or draw a new enemy       |
+| Pixel art          | draw a new creature, which brings nine bosses, or a new enemy                |
 | Game design        | tune `balance.ts`, design a hero's role, propose a new mechanic              |
 | Canvas and effects | add a weather kind, a particle preset or a combat effect in `src/render`     |
 | Rust               | teach the host a new agent, such as Copilot CLI, Goose, Cline or Amp         |
@@ -205,12 +207,11 @@ docs/         concept boards and the art in this README
 
 ## Roadmap
 
-The game runs end to end today: the watcher, the ledger, the battle, the heroes and the saves.
-Next up:
+The game runs end to end today: the watcher, the ledger, the battle, fourteen heroes, all 72
+bosses and the saves. Next up:
 
 - [ ] Prebuilt installers for macOS, Windows and Linux
 - [ ] More agents as token sources: Copilot CLI, Goose, Cline, Roo Code, Amp
-- [ ] The remaining 42 creature × element bosses
 - [ ] A second language
 
 Have an idea? [Open an issue](../../issues/new/choose). We read every one.
