@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Token Heroes demo</title>
+    <meta
+      name="description"
+      content="Play Token Heroes in your browser. A fake agent burns the tokens, so you can hire and level right away."
+    />
+    <meta name="theme-color" content="#0d0b09" />
+    <link rel="icon" href="../../public/cursors/sword.svg" />
+    <link rel="stylesheet" href="../styles/index.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="../">
+        <img src="../../public/cursors/sword.svg" alt="" width="24" height="24" />Token Heroes
+      </a>
+      <nav class="nav" aria-label="Sections">
+        <a href="../#how">How it works</a>
+        <a href="../#fight">The fight</a>
+        <a href="../#roster">Heroes</a>
+        <a href="../#privacy">Privacy</a>
+        <a href="./" aria-current="page">Play</a>
+        <a href="https://github.com/ostapondo/token-heroes">GitHub</a>
+      </nav>
+      <a
+        class="button button--coin button--small"
+        href="https://github.com/ostapondo/token-heroes/releases/latest"
+        >Download</a
+      >
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="embers" aria-hidden="true">
+          <i style="--x: 8%; --delay: 0.6s"></i>
+          <i style="--x: 22%; --delay: 3.1s"></i>
+          <i style="--x: 41%; --delay: 1.7s"></i>
+          <i style="--x: 58%; --delay: 4.4s"></i>
+          <i style="--x: 74%; --delay: 0s"></i>
+          <i style="--x: 90%; --delay: 2.5s"></i>
+        </div>
+        <div class="hero__copy">
+          <p class="kicker">Demo</p>
+          <h1>Play in your browser</h1>
+          <p class="lead">
+            This is the real game with a fake agent. It starts you with millions of tokens and burns
+            a few thousand more every few seconds, so you can hire and level right away.
+          </p>
+          <ul class="checks">
+            <li>Click the arena to strike. Spend coins on levels and heroes below it.</li>
+            <li>In the app, only your own agents burn tokens. Here they are simulated.</li>
+            <li>The party is saved in this browser. The fake purse starts over on every visit.</li>
+          </ul>
+          <div class="actions">
+            <a
+              class="button button--coin"
+              href="https://github.com/ostapondo/token-heroes/releases/latest"
+              >Get the app</a
+            >
+            <a class="button button--muted" href="../">Back to the page</a>
+          </div>
+        </div>
+        <figure class="tray tray--game">
+          <div class="tray__bar" aria-hidden="true">
+            <span class="tray__item tray__item--open"
+              ><img src="../../public/cursors/sword.svg" alt="" width="16" height="16" />Demo</span
+            >
+          </div>
+          <div class="game">
+            <iframe src="./game/" title="Token Heroes demo" width="400" height="680"></iframe>
+          </div>
+        </figure>
+      </section>
+      <div class="lava" aria-hidden="true"></div>
+    </main>
+
+    <footer class="footer">
+      <p>
+        <a href="https://github.com/ostapondo/token-heroes/blob/main/LICENSE">MIT</a> ·
+        <a href="https://github.com/ostapondo/token-heroes">Source</a> ·
+        <a href="https://github.com/ostapondo/token-heroes/releases">Releases</a>
+      </p>
+    </footer>
+  </body>
+</html>

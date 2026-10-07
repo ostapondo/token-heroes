@@ -1,0 +1,50 @@
+/* The game window is 400 × 680, the size of the tray window in src-tauri/src/shell/window.rs. */
+.tray--game {
+  width: auto;
+}
+
+.game {
+  --scale: 1;
+
+  width: calc(400px * var(--scale));
+  height: calc(680px * var(--scale));
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px var(--edge),
+    0 0 0 4px #000,
+    12px 12px 0 #000;
+}
+
+.game iframe {
+  display: block;
+  width: 400px;
+  height: 680px;
+  border: 0;
+  transform: scale(var(--scale));
+  transform-origin: 0 0;
+}
+
+/* Steps rather than a formula: CSS cannot divide a width by a width to get a scale. */
+@media (max-width: 440px) {
+  .game {
+    --scale: 0.88;
+  }
+}
+
+@media (max-width: 392px) {
+  .game {
+    --scale: 0.84;
+  }
+}
+
+@media (max-width: 375px) {
+  .game {
+    --scale: 0.8;
+  }
+}
+
+@media (max-width: 359px) {
+  .game {
+    --scale: 0.76;
+  }
+}
