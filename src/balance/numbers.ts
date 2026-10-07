@@ -12,3 +12,5 @@ export function compact(value: number): string {
 }
 
 export const percent = (share: number): string => `${(share * 100).toFixed(1)}%`;
+
+export const times = (ratio: number): string => `${ratio.toFixed(1)}×`;

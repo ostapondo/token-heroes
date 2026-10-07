@@ -85,16 +85,16 @@ the current set.
 | `ascension-pays-back`           | after ascending at the wall, half the tokens it took win it back |
 | `ascension-pays-off`            | ten times the tokens later, an ascended party is 5+ stages ahead |
 
-| Party rule                 | The party passes when                                   |
-| -------------------------- | ------------------------------------------------------- |
-| `healers-keep-up`          | its healing undoes at least 20% of the foes' damage     |
-| `bosses-still-threaten`    | its healing undoes at most 60% of the foes' damage      |
-| `wall-fights-take-time`    | the fight that stops it lasts 15 seconds or longer      |
-| `wall-fights-end`          | the fight that stops it lasts at most 3 minutes         |
-| `bosses-are-the-wall`      | it gets stuck on a boss, never on a pack                |
-| `strikers-pull-weight`     | every striker deals at least 5% of the party's damage   |
-| `tanks-hold-the-line`      | every tank holds at least 15% of the party's health     |
-| `no-wipes-before-the-wall` | it wipes at most once on the stages it goes on to clear |
+| Party rule                 | The party passes when                                          |
+| -------------------------- | -------------------------------------------------------------- |
+| `healers-keep-up`          | its healing undoes at least 20% of the foes' damage            |
+| `bosses-still-threaten`    | its healing undoes at most 60% of the foes' damage             |
+| `wall-fights-take-time`    | the fight that stops it lasts 15 seconds or longer             |
+| `wall-fights-end`          | the fight that stops it lasts at most 3 minutes                |
+| `bosses-are-the-wall`      | it gets stuck on a boss, never on a pack                       |
+| `strikers-pull-weight`     | every striker deals at least 5% of the party's damage          |
+| `tanks-hold-the-line`      | every tank holds twice an average striker's or healer's health |
+| `no-wipes-before-the-wall` | it wipes at most once on the stages it goes on to clear        |
 
 A test adds three made-up heroes after the last one and checks every pace rule still passes, so
 the model is known to hold as the roster grows.
