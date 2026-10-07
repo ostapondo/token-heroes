@@ -19,7 +19,7 @@ starts it with the same command over stdio.
 | Tool             | What it returns                                                            |
 | ---------------- | -------------------------------------------------------------------------- |
 | `balance_rules`  | every rule, why it exists and its threshold                                |
-| `hero_sheets`    | hit, mend, HP, damage per second and next level cost at a level            |
+| `hero_sheets`    | hit, mend, HP, damage per second, skills and next level cost at a level    |
 | `stage_sheet`    | a stage's foes: HP, hit, interval and damage per second                    |
 | `simulate_party` | runs a party until it is stuck and judges it at the stage that stopped it  |
 | `check_balance`  | judges the standard parties, from 3 heroes at level 10 to all at level 150 |
@@ -53,6 +53,18 @@ hero, boss or tweak keeps the game in shape without hand-tuned stats.
   and the party to stage 1; its power becomes (deepest stage ÷ 50)². Levels are not refunded, so
   the power is set to win the wall back with under half the tokens it took. The next ascension
   opens a quarter deeper than the last, which costs months of tokens, so it stays rare.
+- **Skills reshape a hero's output; they never add to it.** A skill opens at level 10 and ranks up
+  every 10 levels. A rank multiplies the hero's damage and health by 1.04, ×1.08 on the fight: at
+  1.05 the best-upgrade player leads by 20 stages, and growth in damage alone breaks focus. Each
+  rank also moves 5% of the basic attack into the skill, from 70% at rank I to a floor of 40%, so
+  skills grow faster than heroes. Ranks III and V change a skill's form. A hero with N skills
+  splits its budget into N lines, each ranking 10 / N levels behind the last, so it is never ahead
+  of a hero with one.
+- **A skill spends its budget at the fight's own rate.** Damage lands one to one; foes struck
+  besides the front one cost nothing, since the wall is a lone boss. A stun, a shield or a missed
+  blow is worth the damage it keeps off at the rate of the party's damage to the foes' damage,
+  counting only the share the healers leave, since healing comes whether a blow lands or not. A
+  healer's skill brings a share of its own healing at once and adds none.
 - **Healers undo a share of the foes' damage**, more when they keep up with the party's level.
   Each point of healer power makes the party last a quarter longer, so the shares of all healers
   add up to less than the whole: healing stretches a fight but never makes the party immortal.
@@ -91,6 +103,8 @@ the current set.
 | `ultimate-is-a-boost`           | one ultimate takes at most a quarter of the wall boss's health   |
 | `ascension-pays-back`           | after ascending at the wall, half the tokens it took win it back |
 | `ascension-pays-off`            | ten times the tokens later, an ascended party is 5+ stages ahead |
+| `skills-stand-out`              | a skill's first cast hits for 3+ of its hero's own hits          |
+| `skills-are-fairly-priced`      | skills move either player's wall by at most 5 stages             |
 
 | Party rule                 | The party passes when                                          |
 | -------------------------- | -------------------------------------------------------------- |
@@ -102,6 +116,7 @@ the current set.
 | `strikers-pull-weight`     | every striker deals at least 5% of the party's damage          |
 | `tanks-hold-the-line`      | every tank holds twice an average striker's or healer's health |
 | `no-wipes-before-the-wall` | it wipes at most once on the stages it goes on to clear        |
+| `skills-are-seen`          | every hero with a skill casts it 3+ times in the wall fight    |
 
 A test adds three made-up heroes after the last one and checks every pace rule still passes, so
 the model is known to hold as the roster grows.
