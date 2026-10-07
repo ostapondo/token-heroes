@@ -14,7 +14,15 @@ import {
   type Roster,
   WipeReason,
 } from '../types';
-import { damageFront, draftOf, frontFoe, settleClear, wipe, type BattleDraft } from './draft';
+import {
+  damageFront,
+  draftOf,
+  foesDamagePerSecond,
+  frontFoe,
+  settleClear,
+  wipe,
+  type BattleDraft,
+} from './draft';
 import { isBossStage } from './stages';
 import { startStage } from './start';
 
@@ -86,7 +94,7 @@ function heroesAct(
 
     while (cooldown <= 0 && frontFoe(draft) !== -1) {
       if (hero.role === HeroRole.Healer) {
-        const amount = heroHeal(hero, slot.level, vitals);
+        const amount = heroHeal(hero, slot.level, vitals, foesDamagePerSecond(draft));
 
         draft.partyHp = Math.min(vitals.hp, draft.partyHp + amount);
         events.push({ type: BattleEventType.Heal, source: hero.id, amount });

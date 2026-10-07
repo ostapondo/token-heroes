@@ -57,7 +57,7 @@ server.registerTool(
 server.registerTool(
   'hero_sheets',
   {
-    description: 'Hit, heal, HP, per-second output and next level cost of heroes at a level.',
+    description: 'Hit, mend, HP, damage per second and next level cost of heroes at a level.',
     inputSchema: { level, heroIds: z.array(member.shape.heroId).optional() },
   },
   ({ level: at, heroIds }) =>

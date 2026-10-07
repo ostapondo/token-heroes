@@ -2,11 +2,12 @@ import {
   BALANCE,
   foeDamage,
   foesForStage,
+  healerWeight,
   heroById,
   heroDamage,
-  heroHeal,
   heroHp,
-  HeroRole,
+  heroMend,
+  type HeroRole,
   isBossStage,
   levelCost,
   type PartyVitals,
@@ -18,10 +19,9 @@ export interface HeroSheet {
   readonly role: HeroRole;
   readonly level: number;
   readonly hit: number;
-  readonly heal: number;
+  readonly mend: number;
   readonly interval: number;
   readonly damagePerSecond: number;
-  readonly healPerSecond: number;
   readonly hp: number;
   readonly nextLevelCost: number;
 }
@@ -44,7 +44,7 @@ export interface StageSheet {
   readonly harshestDamagePerSecond: number;
 }
 
-// A healer's heal depends on the party it heals; alone, it heals itself at its own level.
+// A healer's share depends on the party it heals; alone, it heals itself at its own level.
 export function heroSheet(
   roster: Roster,
   heroId: string,
@@ -52,20 +52,21 @@ export function heroSheet(
   party?: PartyVitals,
 ): HeroSheet {
   const hero = heroById(roster, heroId);
-  const healer = hero.role === HeroRole.Healer;
-  const hit = healer ? 0 : heroDamage(hero, level);
-  const vitals = party ?? { hp: heroHp(hero, level), level };
-  const heal = healer ? heroHeal(hero, level, vitals) : 0;
+  const hit = heroDamage(hero, level);
+  const vitals = party ?? {
+    hp: heroHp(hero, level),
+    level,
+    mending: healerWeight(hero, level, level),
+  };
 
   return {
     heroId,
     role: hero.role,
     level,
     hit,
-    heal,
+    mend: heroMend(hero, level, vitals),
     interval: hero.attackInterval,
     damagePerSecond: hit / hero.attackInterval,
-    healPerSecond: heal / hero.attackInterval,
     hp: heroHp(hero, level),
     nextLevelCost: levelCost(level),
   };

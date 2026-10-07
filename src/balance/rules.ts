@@ -49,40 +49,37 @@ function weakest(
 export const RULES: readonly Rule[] = [
   {
     id: 'healers-keep-up',
-    statement: "Where the party is stuck, its healing undoes at least 20% of the foes' damage.",
+    statement: "The party's healers undo at least 20% of the foes' damage.",
     why: 'A healer trades its whole damage for healing; below this it is dead weight.',
     threshold: 0.2,
-    judge({ heroes, frontier }) {
+    judge({ heroes }) {
       const healers = ofRole(heroes, HeroRole.Healer);
 
-      if (healers.length === 0 || !frontier) return null;
-      const healing = sum(healers, (sheet) => sheet.healPerSecond);
-      const measured = healing / frontier.damagePerSecond;
+      if (healers.length === 0) return null;
+      const measured = sum(healers, (sheet) => sheet.mend);
 
       return {
         passed: measured >= this.threshold,
         measured,
-        detail: `heals ${compact(healing)}/s against ${compact(frontier.damagePerSecond)}/s`,
+        detail: `healing undoes ${percent(measured)} of the foes' damage`,
       };
     },
   },
   {
     id: 'bosses-still-threaten',
-    statement:
-      'Where the party is stuck, the hardest-hitting boss kind still outdamages its healing.',
-    why: 'Healing that outpaces every boss makes the party immortal and tanks pointless.',
-    threshold: 1,
-    judge({ heroes, frontier }) {
+    statement: "The party's healers undo at most 60% of the foes' damage.",
+    why: 'Healing that undoes nearly every hit leaves tanks pointless and fights endless.',
+    threshold: 0.6,
+    judge({ heroes }) {
       const healers = ofRole(heroes, HeroRole.Healer);
 
-      if (healers.length === 0 || !frontier) return null;
-      const measured =
-        sum(healers, (sheet) => sheet.healPerSecond) / frontier.harshestDamagePerSecond;
+      if (healers.length === 0) return null;
+      const measured = sum(healers, (sheet) => sheet.mend);
 
       return {
-        passed: measured < this.threshold,
+        passed: measured <= this.threshold,
         measured,
-        detail: `healing undoes ${percent(measured)} of the harshest boss at ${frontier.stage}`,
+        detail: `healing undoes ${percent(measured)} of the foes' damage`,
       };
     },
   },
@@ -94,7 +91,7 @@ export const RULES: readonly Rule[] = [
     judge({ heroes, frontier }) {
       if (!frontier?.boss || frontier.timeLimit === null) return null;
       const hp = sum(heroes, (sheet) => sheet.hp);
-      const net = Math.max(1, frontier.damagePerSecond - sum(heroes, (s) => s.healPerSecond));
+      const net = frontier.damagePerSecond * (1 - sum(heroes, (sheet) => sheet.mend));
       const lasts = hp / net;
 
       return {

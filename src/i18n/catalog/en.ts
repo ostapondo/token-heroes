@@ -27,7 +27,7 @@ export const en = {
   'party.role.healer': 'Healer',
   'party.role.tank': 'Tank',
   'party.action.striker': 'hits {amount} every {seconds}s',
-  'party.action.healer': 'heals the party {amount} every {seconds}s',
+  'party.action.healer': 'undoes {amount}% of the damage foes deal',
   'party.action.tank': 'adds {hp} HP to the party, hits {amount}',
   'party.milestone.one': 'x{multiplier} power in {count} level',
   'party.milestone.other': 'x{multiplier} power in {count} levels',

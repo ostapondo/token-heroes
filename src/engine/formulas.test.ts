@@ -4,15 +4,19 @@ import {
   foeDamage,
   foeHp,
   heroDamage,
+  healerWeight,
   heroHeal,
   heroHp,
+  heroMend,
   levelCost,
   levelsToMilestone,
+  partyMend,
 } from './formulas';
 import { heroById } from './roster';
 import { testRoster } from './testing';
 
 const knight = heroById(testRoster, 'knight');
+const cleric = heroById(testRoster, 'cleric');
 
 describe('hero growth', () => {
   it('multiplies damage at every 25th level', () => {
@@ -23,13 +27,18 @@ describe('hero growth', () => {
     expect(heroDamage(knight, 50)).toBe(knight.baseDamage * 50 * milestone ** 2);
   });
 
-  it("heals a share of the party's health, more for a healer who keeps up", () => {
-    const party = { hp: 10_000, level: 20 };
-    const atPace = heroHeal(knight, 20, party);
+  it("undoes a share of the foes' damage, more for a healer who keeps up", () => {
+    const party = { hp: 10_000, level: 20, mending: healerWeight(cleric, 20, 20) };
+    const atPace = heroMend(cleric, 20, party);
 
-    expect(atPace).toBe(Math.ceil(BALANCE.healShare * knight.power * party.hp));
-    expect(heroHeal(knight, 5, party)).toBe(Math.ceil((atPace * 5) / party.level));
-    expect(heroHeal(knight, 200, party)).toBe(Math.ceil(atPace * BALANCE.healLevelFactor.max));
+    expect(heroMend(cleric, 5, party)).toBeCloseTo((atPace * 5) / party.level);
+    expect(heroMend(cleric, 200, party)).toBeCloseTo(atPace * BALANCE.healLevelFactor.max);
+    expect(heroMend(knight, 20, party)).toBe(0);
+    expect(heroHeal(cleric, 20, party, 100)).toBe(Math.ceil(atPace * 100 * cleric.attackInterval));
+  });
+
+  it('never undoes all of the damage, however many healers the party has', () => {
+    expect(partyMend({ hp: 1, level: 1, mending: 1e12 })).toBeLessThan(1);
   });
 
   it('counts the levels left to the next doubling', () => {
@@ -46,8 +55,8 @@ describe('hero growth', () => {
 });
 
 describe('foe growth', () => {
-  it('gives a boss the HP of an enemy with a tenfold scale', () => {
-    expect(foeHp(20, 1, true)).toBe(foeHp(20, 10, false));
+  it('gives a boss the HP of an enemy scaled by the boss multiplier', () => {
+    expect(foeHp(20, 1, true)).toBe(foeHp(20, BALANCE.bossHpMultiplier, false));
   });
 
   it('makes every stage tougher than the last', () => {

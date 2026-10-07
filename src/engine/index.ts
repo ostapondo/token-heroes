@@ -6,8 +6,10 @@ export { stepBattle } from './battle/step';
 export { designHero } from './design';
 export {
   heroDamage,
-  heroHeal,
+  healerWeight,
   heroHp,
+  heroMend,
+  partyMend,
   costToLevel,
   foeDamage,
   levelCost,

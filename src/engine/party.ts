@@ -1,5 +1,5 @@
 import { BALANCE } from './balance';
-import { heroDamage, heroHp, safeAmount, type PartyVitals } from './formulas';
+import { healerWeight, heroDamage, heroHp, safeAmount, type PartyVitals } from './formulas';
 import { heroById } from './roster';
 import { HeroRole, type HeroStats, type PartyState, type Roster } from './types';
 
@@ -20,11 +20,13 @@ export function partyMaxHp(party: PartyState, roster: Roster): number {
 
 export function partyVitals(party: PartyState, roster: Roster): PartyVitals {
   const levels = party.heroes.reduce((sum, slot) => sum + slot.level, 0);
+  const level = party.heroes.length > 0 ? levels / party.heroes.length : 1;
+  const mending = party.heroes.reduce(
+    (sum, slot) => sum + healerWeight(heroById(roster, slot.heroId), slot.level, level),
+    0,
+  );
 
-  return {
-    hp: partyMaxHp(party, roster),
-    level: party.heroes.length > 0 ? levels / party.heroes.length : 1,
-  };
+  return { hp: partyMaxHp(party, roster), level, mending };
 }
 
 export function partyPower(party: PartyState, roster: Roster): number {

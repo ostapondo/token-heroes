@@ -19,7 +19,7 @@ starts it with the same command over stdio.
 | Tool             | What it returns                                                            |
 | ---------------- | -------------------------------------------------------------------------- |
 | `balance_rules`  | every rule, why it exists and its threshold                                |
-| `hero_sheets`    | hit, heal, HP, damage and healing per second, next level cost at a level   |
+| `hero_sheets`    | hit, mend, HP, damage per second and next level cost at a level            |
 | `stage_sheet`    | a stage's foes: HP, hit, interval, damage per second and the boss timer    |
 | `simulate_party` | runs a party until it is stuck and judges it at the stage that stopped it  |
 | `check_balance`  | judges the standard parties, from 3 heroes at level 10 to all at level 150 |
@@ -43,8 +43,9 @@ hero, boss or tweak keeps the game in shape without hand-tuned stats.
   and the party to stage 1; its power becomes (deepest stage ÷ 50)². Levels are not refunded, so
   the power is set to win the wall back with under half the tokens it took. The next ascension
   opens a quarter deeper than the last, which costs months of tokens, so it stays rare.
-- **Healers restore a share of the party's health**, more when they keep up with the party's
-  level, so healing scales with everything else instead of falling behind.
+- **Healers undo a share of the foes' damage**, more when they keep up with the party's level.
+  Each point of healer power makes the party last a quarter longer, so the shares of all healers
+  add up to less than the whole: healing stretches a fight but never makes the party immortal.
 
 ## How a party is judged
 
@@ -81,15 +82,15 @@ the current set.
 | `ascension-pays-back`           | after ascending at the wall, half the tokens it took win it back |
 | `ascension-pays-off`            | ten times the tokens later, an ascended party is 5+ stages ahead |
 
-| Party rule                   | The party passes when                                      |
-| ---------------------------- | ---------------------------------------------------------- |
-| `healers-keep-up`            | its healing undoes at least 20% of the frontier's damage   |
-| `bosses-still-threaten`      | the hardest-hitting boss kind still outdamages its healing |
-| `party-outlasts-the-opening` | its health lasts 40% of the frontier boss timer or longer  |
-| `bosses-are-the-wall`        | it gets stuck on a boss, never on a pack                   |
-| `strikers-pull-weight`       | every striker deals at least 5% of the party's damage      |
-| `tanks-hold-the-line`        | every tank holds at least 15% of the party's health        |
-| `no-wipes-before-the-wall`   | it wipes at most once on the stages it goes on to clear    |
+| Party rule                   | The party passes when                                     |
+| ---------------------------- | --------------------------------------------------------- |
+| `healers-keep-up`            | its healing undoes at least 20% of the foes' damage       |
+| `bosses-still-threaten`      | its healing undoes at most 60% of the foes' damage        |
+| `party-outlasts-the-opening` | its health lasts 40% of the frontier boss timer or longer |
+| `bosses-are-the-wall`        | it gets stuck on a boss, never on a pack                  |
+| `strikers-pull-weight`       | every striker deals at least 5% of the party's damage     |
+| `tanks-hold-the-line`        | every tank holds at least 15% of the party's health       |
+| `no-wipes-before-the-wall`   | it wipes at most once on the stages it goes on to clear   |
 
 A test adds three made-up heroes after the last one and checks every pace rule still passes, so
 the model is known to hold as the roster grows.
