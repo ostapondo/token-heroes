@@ -16,6 +16,7 @@ import {
   type PartyState,
   type Roster,
 } from '@engine';
+import { CONTENT } from '@content';
 import { t, tCount } from '@i18n';
 import { LogLevel, type Host } from '@platform';
 import type { Arena } from '@render';
@@ -29,6 +30,7 @@ import {
 import { createGameStore, type GameStore } from '../store/game-store';
 import { errorText } from '../model/error-text';
 import { formatPower, partyPowerOf } from '../model/power';
+import { skillNews } from '../model/skill-news';
 import { startLoop } from './game-loop';
 import { loadGame } from './load-game';
 import { spendCoins } from './spend-coins';
@@ -160,10 +162,14 @@ export class GameSession {
     if (!game) return;
     const party = change(game.party);
     const next = withProgress(game, game.battle, party, Date.now());
+    const level = heroLevel(party, heroId) ?? 1;
+    const hero = heroById(this.roster, heroId);
+    const news = skillNews(CONTENT, hero, heroLevel(game.party, heroId) ?? 0, level);
 
     replaceGame(this.store, next);
     this.#arena?.show(next.battle, next.party);
-    this.#arena?.celebrate(heroId, heroLevel(party, heroId) ?? 1);
+    this.#arena?.celebrate(heroId, level);
+    if (news) showNotice(this.store, news);
     this.#guard('Saving a purchase', () => this.save());
   }
 

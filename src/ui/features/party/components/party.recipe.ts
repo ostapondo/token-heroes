@@ -12,7 +12,7 @@ export const partyListStyle = css({
 });
 
 export const rowRecipe = sva({
-  slots: ['root', 'body', 'header', 'name', 'level', 'note', 'action'],
+  slots: ['root', 'body', 'header', 'name', 'skills', 'level', 'note', 'action'],
   base: {
     root: {
       display: 'flex',
@@ -22,9 +22,10 @@ export const rowRecipe = sva({
       paddingBlock: '1.5',
     },
     body: { flex: 1, display: 'grid', gap: '1' },
-    header: { display: 'flex', justifyContent: 'space-between' },
+    header: { display: 'flex', alignItems: 'center', gap: '1.5', minHeight: '28px' },
     name: { textStyle: 'label' },
-    level: { textStyle: 'label', color: 'coin' },
+    skills: { display: 'inline-flex', gap: '1' },
+    level: { textStyle: 'label', color: 'coin', marginLeft: 'auto' },
     note: { textStyle: 'caption', color: 'textMuted' },
     action: {},
   },

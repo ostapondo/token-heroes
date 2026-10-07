@@ -1,5 +1,5 @@
 import { CONTENT, toRoster } from '@content';
-import { healerWeight, heroById, heroDamage, heroHp, heroMend, HeroRole } from '@engine';
+import { healerWeight, heroById, heroAttack, heroHp, heroMend, HeroRole } from '@engine';
 import { describe, expect, it } from 'vitest';
 import { roleAction } from './role-action';
 
@@ -20,7 +20,7 @@ describe('roleAction', () => {
   it('shows the hit of a striker or a tank at its level', () => {
     const shieldbearer = heroById(roster, 'shieldbearer');
 
-    expect(roleAction(shieldbearer, 101, party).amount).toBe(heroDamage(shieldbearer, 101));
+    expect(roleAction(shieldbearer, 101, party).amount).toBe(heroAttack(shieldbearer, 101));
     expect(roleAction(shieldbearer, 101, party).role).toBe(HeroRole.Tank);
   });
 
@@ -29,7 +29,7 @@ describe('roleAction', () => {
     const plain = roleAction(archer, 40, party);
     const ascended = roleAction(archer, 40, party, 2.6);
 
-    expect(ascended.amount).toBe(Math.round(heroDamage(archer, 40) * 2.6));
+    expect(ascended.amount).toBe(Math.round(heroAttack(archer, 40) * 2.6));
     expect(ascended.hp).toBeGreaterThan(plain.hp);
   });
 });

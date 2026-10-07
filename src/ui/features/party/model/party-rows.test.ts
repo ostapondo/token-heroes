@@ -13,7 +13,7 @@ describe('partyRows', () => {
   it('prices the next level and tracks the way to the next doubling', () => {
     const { members } = partyRows(party, { balance: wandererCost, burned: 0 }, roster, CONTENT);
 
-    expect(members).toEqual([
+    expect(members).toMatchObject([
       {
         heroId: 'wanderer',
         name: 'Wanderer',

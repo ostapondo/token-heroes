@@ -56,10 +56,19 @@ export const panel = defineRecipe({
 
 export const meter = defineSlotRecipe({
   className: 'meter',
-  slots: ['track', 'fill'],
+  slots: ['track', 'fill', 'mark'],
   base: {
-    track: { background: 'void', overflow: 'hidden' },
+    track: { position: 'relative', background: 'void' },
     fill: { height: '100%', background: 'var(--meter-color)' },
+    // A place along the bar where something arrives, standing out above and below it.
+    mark: {
+      position: 'absolute',
+      top: '-3px',
+      bottom: '-3px',
+      width: '2px',
+      transform: 'translateX(-1px)',
+      background: 'var(--mark-color)',
+    },
   },
   variants: {
     tone: {
@@ -67,6 +76,12 @@ export const meter = defineSlotRecipe({
       ultimate: { track: { '--meter-color': '{colors.ultimate}' } },
       heal: { track: { '--meter-color': '{colors.heal}' } },
       accent: {},
+    },
+    marked: {
+      evolves: {
+        mark: { width: '4px', transform: 'translateX(-2px)', boxShadow: '0 0 0 1px {colors.void}' },
+      },
+      plain: {},
     },
     size: {
       thin: { track: { height: '6px' } },
