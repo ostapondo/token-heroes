@@ -1,3 +1,5 @@
+import type { Point } from './geometry';
+
 export const MotionCue = {
   Flash: 'flash',
   Dash: 'dash',
@@ -24,17 +26,28 @@ const DURATION: Readonly<Record<MotionCue, number>> = {
 const REACH = { dash: 64, lunge: 70, hop: 8, knockback: 5, enterDrop: 120 } as const;
 const BOB_PERIOD = 1;
 const SWING_PEAK = 0.4;
+const WALK = { seconds: 0.45, stride: 0.11 } as const;
 
 export class Motion {
   readonly #left = new Map<MotionCue, number>();
   #time = Math.random() * BOB_PERIOD;
+  #walkFrom: Point = { x: 0, y: 0 };
+  #walkLeft = 0;
 
   cue(cue: MotionCue): void {
     this.#left.set(cue, DURATION[cue]);
   }
 
+  // Walks from an offset back to the actor's place, after an optional wait.
+  walk(from: Point, wait = 0): void {
+    if (from.x === 0 && from.y === 0) return;
+    this.#walkFrom = from;
+    this.#walkLeft = WALK.seconds + wait;
+  }
+
   update(dt: number): void {
     this.#time += dt;
+    this.#walkLeft = Math.max(0, this.#walkLeft - dt);
     for (const [cue, left] of this.#left) {
       if (left <= dt) this.#left.delete(cue);
       else this.#left.set(cue, left - dt);
@@ -50,8 +63,9 @@ export class Motion {
         this.#fraction(MotionCue.Flash) * REACH.knockback) *
       facing;
     const y = bob - this.#fraction(MotionCue.Entering) * REACH.enterDrop;
+    const walk = this.#walking();
 
-    return { x: Math.round(x), y: Math.round(y) };
+    return { x: Math.round(x + walk.x), y: Math.round(y + walk.y) };
   }
 
   get flashing(): boolean {
@@ -68,6 +82,16 @@ export class Motion {
 
   get fade(): number {
     return this.#left.has(MotionCue.Dying) ? this.#fraction(MotionCue.Dying) : 1;
+  }
+
+  #walking(): Point {
+    const left = Math.min(this.#walkLeft / WALK.seconds, 1);
+
+    if (left <= 0) return { x: 0, y: 0 };
+    const eased = left * left * (3 - 2 * left);
+    const hop = left < 1 && Math.floor(this.#walkLeft / WALK.stride) % 2 === 1 ? -1 : 0;
+
+    return { x: this.#walkFrom.x * eased, y: this.#walkFrom.y * eased + hop };
   }
 
   #fraction(cue: MotionCue): number {

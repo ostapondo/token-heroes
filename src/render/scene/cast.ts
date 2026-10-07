@@ -12,7 +12,8 @@ import {
 import type { BattleState, PartyState } from '@engine';
 import { spriteSize } from '../sprites/pixels';
 import type { SpriteCache } from '../sprites/sprite-cache';
-import { SPRITE_SCALE, type Box } from './geometry';
+import { CAMERAS, CameraId, PULLBACK, pulledBack, type Camera } from './camera';
+import type { Box, Point } from './geometry';
 import { partyFormation } from './formation';
 import { bossSlot, packSlot } from './layout';
 import { Motion } from './motion';
@@ -29,11 +30,34 @@ export interface Actor {
   readonly motion: Motion;
 }
 
+export interface Pullback {
+  readonly heroes: readonly Actor[];
+  readonly foes: readonly Actor[];
+  readonly ratio: number;
+}
+
+interface Arrival {
+  readonly ratio: number;
+  readonly wait: number;
+}
+
+const NOWHERE: Box = { x: 0, y: 0, width: 0, height: 0 };
+const ENTRY_GAP = 4;
+
 const scaled = (sprite: SpriteDef, scale: number) => {
   const { width, height } = spriteSize(sprite);
 
   return { width: width * scale, height: height * scale };
 };
+
+// A newcomer walks in from the left edge; anyone else walks from where they stood, shrunk with
+// the scene when the camera pulled back.
+function walkFrom(box: Box, previous: Box | undefined, ratio: number): Point {
+  if (!previous) return { x: -(box.x + box.width + ENTRY_GAP), y: 0 };
+  const start = pulledBack({ x: previous.x, y: previous.y + previous.height }, ratio);
+
+  return { x: start.x - box.x, y: start.y - (box.y + box.height) };
+}
 
 export class Cast {
   readonly #content: Content;
@@ -42,6 +66,8 @@ export class Cast {
   #foes: Actor[] = [];
   #heroKey = '';
   #foeKey = '';
+  #camera: Camera = CAMERAS[CameraId.Close];
+  #pullback: Pullback | undefined;
 
   constructor(content: Content, sprites: SpriteCache) {
     this.#content = content;
@@ -64,24 +90,29 @@ export class Cast {
     return this.#heroes.find((actor) => actor.id === id);
   }
 
+  takePullback(): Pullback | undefined {
+    const pullback = this.#pullback;
+
+    this.#pullback = undefined;
+
+    return pullback;
+  }
+
   sync(battle: BattleState, party: PartyState, element: ElementDef): void {
     const heroKey = party.heroes.map((slot) => slot.heroId).join('|');
 
     if (heroKey !== this.#heroKey) {
-      this.#heroKey = heroKey;
-      const heroes = party.heroes.map((slot) => heroDefById(this.#content, slot.heroId));
-      const boxes = partyFormation(
-        heroes.map((hero) => ({
-          attack: hero.attack,
-          size: scaled(hero.sprite, SPRITE_SCALE.hero),
-        })),
-      );
+      const joining = this.#heroKey !== '';
 
-      this.#heroes = heroes.map((hero, index) =>
-        this.#heroActor(hero.id, boxes[index] ?? { x: 0, y: 0, width: 0, height: 0 }),
-      );
+      this.#heroKey = heroKey;
+      this.#placeHeroes(party, joining);
     }
-    const foeKey = [battle.stage, element.id, ...battle.foes.map((foe) => foe.id)].join('|');
+    const foeKey = [
+      this.#camera.id,
+      battle.stage,
+      element.id,
+      ...battle.foes.map((foe) => foe.id),
+    ].join('|');
 
     if (foeKey !== this.#foeKey) {
       this.#foeKey = foeKey;
@@ -91,8 +122,37 @@ export class Cast {
     }
   }
 
-  #heroActor(heroId: string, box: Box): Actor {
+  #placeHeroes(party: PartyState, joining: boolean): void {
+    const heroes = party.heroes.map((slot) => heroDefById(this.#content, slot.heroId));
+    const formation = partyFormation(
+      heroes.map((hero) => ({
+        role: hero.role,
+        attack: hero.attack,
+        sprite: spriteSize(hero.sprite),
+      })),
+    );
+    const ratio = formation.camera.scale.hero / this.#camera.scale.hero;
+    const pulling = joining && formation.camera.id !== this.#camera.id;
+
+    if (pulling) {
+      const still = (actor: Actor): Actor => ({ ...actor, motion: new Motion() });
+
+      this.#pullback = { heroes: this.#heroes.map(still), foes: this.#foes, ratio };
+    }
+    this.#camera = formation.camera;
+    const arrival = joining ? { ratio, wait: pulling ? PULLBACK.seconds : 0 } : undefined;
+
+    this.#heroes = heroes.map((hero, index) =>
+      this.#heroActor(hero.id, formation.boxes[index] ?? NOWHERE, arrival),
+    );
+  }
+
+  #heroActor(heroId: string, box: Box, arrival: Arrival | undefined): Actor {
     const sprite = heroDefById(this.#content, heroId).sprite;
+    const previous = this.hero(heroId);
+    const motion = previous?.motion ?? new Motion();
+
+    if (arrival) motion.walk(walkFrom(box, previous?.box, arrival.ratio), arrival.wait);
 
     return {
       id: heroId,
@@ -102,8 +162,8 @@ export class Cast {
       sprite,
       palette: undefined,
       box,
-      pixel: SPRITE_SCALE.hero,
-      motion: this.hero(heroId)?.motion ?? new Motion(),
+      pixel: this.#camera.scale.hero,
+      motion,
     };
   }
 
@@ -119,8 +179,8 @@ export class Cast {
       key: `boss:${boss.creature}:${element.id}`,
       sprite,
       palette: element.palette,
-      box: bossSlot(scaled(sprite, SPRITE_SCALE.boss)),
-      pixel: SPRITE_SCALE.boss,
+      box: bossSlot(scaled(sprite, this.#camera.scale.boss)),
+      pixel: this.#camera.scale.boss,
       motion: new Motion(),
     };
   }
@@ -135,8 +195,8 @@ export class Cast {
       key: `enemy:${enemyId}:${element.id}`,
       sprite,
       palette: element.palette,
-      box: packSlot(index, scaled(sprite, SPRITE_SCALE.enemy)),
-      pixel: SPRITE_SCALE.enemy,
+      box: packSlot(index, scaled(sprite, this.#camera.scale.enemy), this.#camera),
+      pixel: this.#camera.scale.enemy,
       motion: new Motion(),
     };
   }
