@@ -15,9 +15,6 @@ export type AttackStyle = ValueOf<typeof AttackStyle>;
 export const BattlePhase = { Fighting: 'fighting', Wiped: 'wiped', Cleared: 'cleared' } as const;
 export type BattlePhase = ValueOf<typeof BattlePhase>;
 
-export const WipeReason = { Defeat: 'defeat', Timeout: 'timeout' } as const;
-export type WipeReason = ValueOf<typeof WipeReason>;
-
 export const BattleEventType = {
   Hit: 'hit',
   Strike: 'strike',
@@ -87,7 +84,6 @@ export interface BattleState {
   readonly foes: readonly Foe[];
   readonly partyHp: number;
   readonly cooldowns: Readonly<Record<string, number>>;
-  readonly bossTimeLeft: number;
   readonly strikeReadyIn: number;
   readonly ultimate: number;
   readonly seed: number;
@@ -108,7 +104,7 @@ export type BattleEvent =
   | Event<typeof BattleEventType.FoeDefeated, { foe: number; boss: boolean }>
   | Event<typeof BattleEventType.StageCleared, { stage: number }>
   | Event<typeof BattleEventType.StageStarted, { stage: number }>
-  | Event<typeof BattleEventType.Wiped, { reason: WipeReason }>
+  | Event<typeof BattleEventType.Wiped>
   | Event<typeof BattleEventType.Respawned, { stage: number }>;
 
 export interface BattleStep {

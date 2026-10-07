@@ -18,7 +18,7 @@ for (const finding of report.pace.findings) {
 
 for (const verdict of report.verdicts) {
   const stuck = verdict.run.frontier
-    ? `stuck at stage ${verdict.run.frontier.stage} (${verdict.run.frontier.stuckBy})`
+    ? `stuck at stage ${verdict.run.frontier.stage} after ${verdict.run.frontier.secondsSurvived} s`
     : 'never stuck';
 
   console.log(`\n${verdict.scenario}: ${stuck}`);

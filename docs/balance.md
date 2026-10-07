@@ -20,7 +20,7 @@ starts it with the same command over stdio.
 | ---------------- | -------------------------------------------------------------------------- |
 | `balance_rules`  | every rule, why it exists and its threshold                                |
 | `hero_sheets`    | hit, mend, HP, damage per second and next level cost at a level            |
-| `stage_sheet`    | a stage's foes: HP, hit, interval, damage per second and the boss timer    |
+| `stage_sheet`    | a stage's foes: HP, hit, interval and damage per second                    |
 | `simulate_party` | runs a party until it is stuck and judges it at the stage that stopped it  |
 | `check_balance`  | judges the standard parties, from 3 heroes at level 10 to all at level 150 |
 
@@ -33,10 +33,13 @@ hero, boss or tweak keeps the game in shape without hand-tuned stats.
   an optional `focus` between offence and toughness. `designHero` turns its `order` in the
   roster into strength, hire price and unlock: every hero is 12% stronger per coin than the one
   before it, costs more to hire and unlocks later. A hero added at the end slots in on its own.
-- **Foes grow alike in health and damage**, 7% a stage. The time a party needs to kill a boss
-  times the time the boss needs to kill the party is then the same at every stage. It is set so
-  both walls meet near the 30-second timer: sturdy bosses test damage, savage bosses test tanks
-  and healers.
+- **A boss has no timer; it fights until it or the party falls.** The party wins when it kills the
+  boss before the boss kills it, so its damage times its toughness has to beat the boss's health
+  times the boss's damage. Damage and health count alike: a stronger hit ends the fight before
+  the party runs out of health.
+- **Foes grow alike in health and damage**, 7% a stage, so that product grows by the same factor
+  every stage and the fight at the wall lasts about as long at stage 300 as at stage 30: half a
+  minute to a minute and a half.
 - **Levels cost 7% more each, and every 25th level multiplies a hero's power by 4.** Together
   with the foes' growth this keeps each stage only a little dearer than the last, forever.
 - **Ascension starts the game over for power.** From stage 100 every hero may go back to level 1
@@ -82,15 +85,16 @@ the current set.
 | `ascension-pays-back`           | after ascending at the wall, half the tokens it took win it back |
 | `ascension-pays-off`            | ten times the tokens later, an ascended party is 5+ stages ahead |
 
-| Party rule                   | The party passes when                                     |
-| ---------------------------- | --------------------------------------------------------- |
-| `healers-keep-up`            | its healing undoes at least 20% of the foes' damage       |
-| `bosses-still-threaten`      | its healing undoes at most 60% of the foes' damage        |
-| `party-outlasts-the-opening` | its health lasts 40% of the frontier boss timer or longer |
-| `bosses-are-the-wall`        | it gets stuck on a boss, never on a pack                  |
-| `strikers-pull-weight`       | every striker deals at least 5% of the party's damage     |
-| `tanks-hold-the-line`        | every tank holds at least 15% of the party's health       |
-| `no-wipes-before-the-wall`   | it wipes at most once on the stages it goes on to clear   |
+| Party rule                 | The party passes when                                   |
+| -------------------------- | ------------------------------------------------------- |
+| `healers-keep-up`          | its healing undoes at least 20% of the foes' damage     |
+| `bosses-still-threaten`    | its healing undoes at most 60% of the foes' damage      |
+| `wall-fights-take-time`    | the fight that stops it lasts 15 seconds or longer      |
+| `wall-fights-end`          | the fight that stops it lasts at most 3 minutes         |
+| `bosses-are-the-wall`      | it gets stuck on a boss, never on a pack                |
+| `strikers-pull-weight`     | every striker deals at least 5% of the party's damage   |
+| `tanks-hold-the-line`      | every tank holds at least 15% of the party's health     |
+| `no-wipes-before-the-wall` | it wipes at most once on the stages it goes on to clear |
 
 A test adds three made-up heroes after the last one and checks every pace rule still passes, so
 the model is known to hold as the roster grows.

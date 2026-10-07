@@ -12,7 +12,6 @@ import {
   HeroRole,
   type PartyState,
   type Roster,
-  WipeReason,
 } from '../types';
 import {
   damageFront,
@@ -23,7 +22,6 @@ import {
   wipe,
   type BattleDraft,
 } from './draft';
-import { isBossStage } from './stages';
 import { startStage } from './start';
 
 export function stepBattle(
@@ -60,20 +58,11 @@ function fight(battle: BattleState, dt: number, party: PartyState, roster: Roste
 
   draft.strikeReadyIn = Math.max(0, draft.strikeReadyIn - dt);
 
-  if (isBossStage(draft.stage)) {
-    draft.bossTimeLeft -= dt;
-    if (draft.bossTimeLeft <= 0) {
-      wipe(draft, WipeReason.Timeout, events);
-
-      return { battle: draft, events };
-    }
-  }
-
   heroesAct(draft, dt, party, roster, events);
   if (settleClear(draft, events)) return { battle: draft, events };
 
   foesAct(draft, dt, events);
-  if (draft.partyHp <= 0) wipe(draft, WipeReason.Defeat, events);
+  if (draft.partyHp <= 0) wipe(draft, events);
 
   return { battle: draft, events };
 }

@@ -11,8 +11,8 @@ import {
 } from '@engine';
 
 // The player's own reckoning of how far a party gets, not a game rule: the stage where the boss
-// outlasts the timer, or the stage where the boss outlasts the party, whichever comes first.
-// Foes grow alike in health and damage, so both reduce to powers of the foe growth.
+// outlasts the party. The party wins when its damage times its toughness beats the boss's health
+// times its damage, and foes grow alike in both, so that product grows by the growth squared.
 function reach(party: PartyState, roster: Roster): number {
   const vitals = partyVitals(party, roster);
   const damage = party.heroes.reduce((sum, slot) => {
@@ -24,11 +24,7 @@ function reach(party: PartyState, roster: Roster): number {
   const bossHp = BALANCE.enemyHpBase * BALANCE.bossHpMultiplier;
   const bossDamage = BALANCE.bossDamageBase / BALANCE.bossAttackInterval;
 
-  const growth = Math.log(BALANCE.foeGrowth);
-  const beforeTimer = Math.log((damage * BALANCE.bossTimeLimit) / bossHp) / growth;
-  const beforeDefeat = Math.log((damage * toughness) / (bossHp * bossDamage)) / (2 * growth);
-
-  return Math.min(beforeTimer, beforeDefeat);
+  return Math.log((damage * toughness) / (bossHp * bossDamage)) / (2 * Math.log(BALANCE.foeGrowth));
 }
 
 interface Purchase {

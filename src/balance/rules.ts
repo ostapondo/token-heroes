@@ -1,5 +1,5 @@
 import { HeroRole } from '@engine';
-import { compact, percent } from './numbers';
+import { percent } from './numbers';
 import type { HeroSheet, StageSheet } from './sheets';
 import type { RunReport } from './simulate';
 
@@ -84,20 +84,34 @@ export const RULES: readonly Rule[] = [
     },
   },
   {
-    id: 'party-outlasts-the-opening',
-    statement: 'At the boss that stops the party, its health lasts 40% of the timer or longer.',
-    why: 'A damage-heavy boss may cut a fight short to test toughness, never one-shot it.',
-    threshold: 0.4,
-    judge({ heroes, frontier }) {
-      if (!frontier?.boss || frontier.timeLimit === null) return null;
-      const hp = sum(heroes, (sheet) => sheet.hp);
-      const net = frontier.damagePerSecond * (1 - sum(heroes, (sheet) => sheet.mend));
-      const lasts = hp / net;
+    id: 'wall-fights-take-time',
+    statement: 'The fight that stops the party lasts 15 seconds or longer.',
+    why: 'A boss may test toughness by hitting hard, never by ending the fight before it starts.',
+    threshold: 15,
+    judge({ run }) {
+      if (!run.frontier) return null;
+      const measured = run.frontier.secondsSurvived;
 
       return {
-        passed: lasts / frontier.timeLimit >= this.threshold,
-        measured: lasts / frontier.timeLimit,
-        detail: `${compact(hp)} HP lasts ${lasts.toFixed(1)} s of a ${frontier.timeLimit} s timer`,
+        passed: measured >= this.threshold,
+        measured,
+        detail: `the party lasts ${measured.toFixed(1)} s at stage ${run.frontier.stage}`,
+      };
+    },
+  },
+  {
+    id: 'wall-fights-end',
+    statement: 'The fight that stops the party lasts at most 3 minutes.',
+    why: 'With no timer, a boss that neither falls nor wins makes the screen stand still.',
+    threshold: 180,
+    judge({ run }) {
+      if (!run.frontier) return null;
+      const measured = run.frontier.secondsSurvived;
+
+      return {
+        passed: measured <= this.threshold,
+        measured,
+        detail: `the party lasts ${measured.toFixed(1)} s at stage ${run.frontier.stage}`,
       };
     },
   },

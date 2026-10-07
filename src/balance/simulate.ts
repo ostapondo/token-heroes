@@ -8,7 +8,6 @@ import {
   type BattleState,
   type PartyState,
   type Roster,
-  type WipeReason,
 } from '@engine';
 
 export interface RunOptions {
@@ -19,7 +18,6 @@ export interface RunOptions {
 
 interface Frontier {
   readonly stage: number;
-  readonly stuckBy: WipeReason;
   readonly foeHpLeft: number;
   readonly secondsSurvived: number;
 }
@@ -120,7 +118,6 @@ export function runParty(party: PartyState, roster: Roster, options: RunOptions 
         if (failures >= ATTEMPTS_BEFORE_STUCK) {
           frontier = {
             stage,
-            stuckBy: event.reason,
             foeHpLeft: foeHpLeft(step.battle),
             secondsSurvived: inFight,
           };

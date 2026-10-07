@@ -43,5 +43,4 @@ export {
   type HeroStats,
   type PartyState,
   type Roster,
-  WipeReason,
 } from './types';

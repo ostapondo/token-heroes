@@ -20,12 +20,7 @@ export function selectBossStatus(state: GameState): BossStatus | null {
 
   if (!battle || !foe?.boss) return null;
 
-  return {
-    bossId: foe.id,
-    hp: foe.hp,
-    maxHp: foe.maxHp,
-    secondsLeft: Math.ceil(battle.bossTimeLeft),
-  };
+  return { bossId: foe.id, hp: foe.hp, maxHp: foe.maxHp };
 }
 
 export function selectWipeStatus(state: GameState): WipeStatus {

@@ -5,7 +5,6 @@ import {
   BattlePhase,
   type BattleState,
   type Foe,
-  type WipeReason,
 } from '../types';
 
 type Mutable<T> = { -readonly [K in keyof T]: T[K] };
@@ -60,9 +59,9 @@ export function foesDamagePerSecond(draft: BattleDraft): number {
   );
 }
 
-export function wipe(draft: BattleDraft, reason: WipeReason, events: BattleEvent[]): void {
+export function wipe(draft: BattleDraft, events: BattleEvent[]): void {
   draft.phase = BattlePhase.Wiped;
   draft.phaseLeft = BALANCE.respawnDelay;
   draft.partyHp = 0;
-  events.push({ type: BattleEventType.Wiped, reason });
+  events.push({ type: BattleEventType.Wiped });
 }

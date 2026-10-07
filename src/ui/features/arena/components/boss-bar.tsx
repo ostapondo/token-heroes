@@ -18,9 +18,7 @@ export function BossBar() {
 
   return (
     <div className={classes.root} style={accent}>
-      <span className={classes.tag}>
-        {t('arena.bossTimer', { element: element.name.toUpperCase(), seconds: status.secondsLeft })}
-      </span>
+      <span className={classes.tag}>{element.name.toUpperCase()}</span>
       <div className={classes.panel}>
         <span className={classes.name}>{boss.name}</span>
         <Meter
