@@ -18,6 +18,15 @@ export const tokens = defineTokens({
     strike: { value: '#6fe3ff' },
     wound: { value: '#ff5b4a' },
     void: { value: '#000000' },
+    // One fixed hue per agent, checked for colour-blind separation and contrast on the panel.
+    agent: {
+      codex: { value: '#3987e5' },
+      claudeCode: { value: '#d95926' },
+      geminiCli: { value: '#199e70' },
+      qwenCode: { value: '#c98500' },
+      openCode: { value: '#d55181' },
+      kiloCode: { value: '#008300' },
+    },
   },
   fonts: {
     display: { value: "'Jersey 10', monospace" },
@@ -39,6 +48,8 @@ export const tokens = defineTokens({
     touch: { value: '44px' },
     button: { value: '84px' },
     bossPanel: { value: '200px' },
+    menuButton: { value: '34px' },
+    topBar: { value: '72px' },
     partyPanel: { value: '132px' },
   },
 });

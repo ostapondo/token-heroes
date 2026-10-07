@@ -101,13 +101,14 @@ summoning ring for blood.
 
 ## Your tokens stay yours
 
-- The host reads only the `usage` numbers in each transcript line. Your prompts and code are never
-  stored or shown.
+- The host reads only the `usage` numbers in each transcript line, the model's name and the name
+  of the folder the agent ran in. Your prompts and code are never stored or shown.
 - Nothing leaves your machine. The app has no network client, and its content security policy
   allows only the local Tauri bridge.
 - Everything the game keeps sits in `~/.token-heroes/`: `ledger.json` (coins burned and spent,
   saved together with how far each transcript has been read, so a crash never credits a token
-  twice), `save.json` (the party and the stage), `settings.json` and `logs/`. The game saves after every purchase and whenever the window hides.
+  twice, and the hourly totals by agent, folder and model that the menu's Stats tab shows),
+  `save.json` (the party and the stage), `settings.json` and `logs/`. The game saves after every purchase and whenever the window hides.
 - Only the host can add coins. The window can spend them, and the host refuses any spend above
   your balance.
 
@@ -118,8 +119,8 @@ build is a 3.6 MB app (a 1.75 MB `.dmg`), and it idles in the tray at about 58 M
 ## Run it
 
 There are no prebuilt releases yet, so you build from source. Once releases ship, the game
-offers each new version in its footer and installs it in one click. **Report a bug** in the
-footer or the tray menu opens an issue with your version filled in. You need:
+offers each new version in the menu's About tab and installs it in one click. **Report a bug**
+in the same tab or in the tray menu opens an issue with your version filled in. You need:
 
 - [Node.js](https://nodejs.org) 22 or newer and [pnpm](https://pnpm.io) 10
   (`corepack enable` picks the pinned version)

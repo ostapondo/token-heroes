@@ -1,8 +1,16 @@
+import { getVersion } from '@tauri-apps/api/app';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { LogLevel, SpendRefusal, type Host, type SpendResult, type Wallet } from './host';
 import { lastResort } from './last-resort';
-import { updateOfferFromWire, walletChangeFromWire, walletFromWire } from './wire';
+import {
+  burnHistoryFromWire,
+  settingsFromWire,
+  updateOfferFromWire,
+  walletChangeFromWire,
+  walletFromWire,
+  watchedAgentsFromWire,
+} from './wire';
 
 const HostCommand = {
   Wallet: 'wallet',
@@ -13,6 +21,10 @@ const HostCommand = {
   CheckUpdate: 'check_update',
   InstallUpdate: 'install_update',
   ReportBug: 'report_bug',
+  BurnHistory: 'burn_history',
+  Settings: 'settings',
+  ChangeSetting: 'change_setting',
+  WatchedAgents: 'watched_agents',
 } as const;
 
 const HostEvent = { WalletChanged: 'wallet-changed' } as const;
@@ -106,6 +118,30 @@ export function tauriHost(): Host {
         return true;
       } catch {
         return false;
+      }
+    },
+
+    async burnHistory() {
+      return burnHistoryFromWire(await invoke(HostCommand.BurnHistory));
+    },
+
+    async settings() {
+      return settingsFromWire(await invoke(HostCommand.Settings));
+    },
+
+    async changeSetting(setting, on) {
+      return settingsFromWire(await invoke(HostCommand.ChangeSetting, { setting, on }));
+    },
+
+    async watchedAgents() {
+      return watchedAgentsFromWire(await invoke(HostCommand.WatchedAgents));
+    },
+
+    async version() {
+      try {
+        return await getVersion();
+      } catch {
+        return null;
       }
     },
   };

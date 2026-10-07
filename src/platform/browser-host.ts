@@ -1,4 +1,12 @@
-import { SpendRefusal, type Host, type Wallet, type WalletListener } from './host';
+import { recordBurn, SAMPLE_AGENTS, sampleHistory } from './browser-menu';
+import {
+  SpendRefusal,
+  type BurnHistory,
+  type Host,
+  type Settings,
+  type Wallet,
+  type WalletListener,
+} from './host';
 import { lastResort } from './last-resort';
 
 const SAVE_KEY = 'token-heroes.save';
@@ -25,6 +33,8 @@ export function browserHost(): Host {
     balance: FAKE_AGENT.startBurned,
   };
   const listeners = new Set<WalletListener>();
+  let history: BurnHistory = sampleHistory(Date.now());
+  let settings: Settings = { showBalance: true, startAtLogin: true, closeOnBlur: true };
 
   setInterval(() => {
     const burnedNow = Math.round(
@@ -32,6 +42,7 @@ export function browserHost(): Host {
     );
 
     wallet = { ...wallet, burned: wallet.burned + burnedNow, balance: wallet.balance + burnedNow };
+    history = recordBurn(history, burnedNow, Date.now());
     for (const listener of listeners) listener(wallet, burnedNow);
   }, FAKE_AGENT.everyMs);
 
@@ -78,5 +89,19 @@ export function browserHost(): Host {
 
       return Promise.resolve(true);
     },
+
+    burnHistory: () => Promise.resolve(history),
+
+    settings: () => Promise.resolve(settings),
+
+    changeSetting(setting, on) {
+      settings = { ...settings, [setting]: on };
+
+      return Promise.resolve(settings);
+    },
+
+    watchedAgents: () => Promise.resolve(SAMPLE_AGENTS),
+
+    version: () => Promise.resolve(null),
   };
 }

@@ -16,6 +16,11 @@ function hostWith(offer: UpdateOffer | null, installUpdate: () => Promise<boolea
     checkForUpdate: () => Promise.resolve(offer),
     installUpdate,
     reportBug: () => Promise.resolve(true),
+    burnHistory: () => Promise.resolve(null),
+    settings: () => Promise.resolve(null),
+    changeSetting: () => Promise.resolve(null),
+    watchedAgents: () => Promise.resolve([]),
+    version: () => Promise.resolve(null),
   };
 
   return host;

@@ -21,6 +21,52 @@ export interface UpdateOffer {
 
 export type WalletListener = (wallet: Wallet, burnedNow: number) => void;
 
+export const Agent = {
+  ClaudeCode: 'claude-code',
+  Codex: 'codex',
+  GeminiCli: 'gemini-cli',
+  QwenCode: 'qwen-code',
+  OpenCode: 'open-code',
+  KiloCode: 'kilo-code',
+} as const;
+export type Agent = (typeof Agent)[keyof typeof Agent];
+
+export interface TokenKinds {
+  readonly input: number;
+  readonly output: number;
+  readonly cacheWrites: number;
+  readonly cacheReads: number;
+}
+
+export interface BurnTally {
+  readonly agents: Readonly<Partial<Record<Agent, TokenKinds>>>;
+  readonly projects: Readonly<Record<string, number>>;
+  readonly models: Readonly<Record<string, number>>;
+}
+
+// What the host has counted by agent since it began to: each UTC hour of the last two weeks,
+// keyed by unix seconds over 3600, and everything together.
+export interface BurnHistory {
+  readonly since: number | null;
+  readonly hours: Readonly<Record<string, BurnTally>>;
+  readonly total: BurnTally;
+}
+
+export const Setting = {
+  ShowBalance: 'showBalance',
+  StartAtLogin: 'startAtLogin',
+  CloseOnBlur: 'closeOnBlur',
+} as const;
+export type Setting = (typeof Setting)[keyof typeof Setting];
+export type Settings = Readonly<Record<Setting, boolean>>;
+
+export interface WatchedAgent {
+  readonly agent: Agent;
+  readonly path: string;
+  readonly found: boolean;
+  readonly transcripts: number | null;
+}
+
 export interface Host {
   wallet(): Promise<Wallet>;
   onWallet(listener: WalletListener): () => void;
@@ -31,4 +77,9 @@ export interface Host {
   checkForUpdate(): Promise<UpdateOffer | null>;
   installUpdate(): Promise<boolean>;
   reportBug(): Promise<boolean>;
+  burnHistory(): Promise<BurnHistory | null>;
+  settings(): Promise<Settings | null>;
+  changeSetting(setting: Setting, on: boolean): Promise<Settings | null>;
+  watchedAgents(): Promise<readonly WatchedAgent[]>;
+  version(): Promise<string | null>;
 }

@@ -1,5 +1,6 @@
 import type { Host } from '@platform';
 import { useSession } from '../entities/game';
+import { HostContext } from '../entities/host';
 import { NoticeToast } from '../features/notices';
 import { ErrorBoundary } from '../shared/ui';
 import { FightScreen } from '../widgets/fight-screen';
@@ -25,10 +26,12 @@ function Shell() {
 
 export function App({ host }: { readonly host: Host }) {
   return (
-    <SessionProvider host={host}>
-      <ReleaseProvider host={host}>
-        <Shell />
-      </ReleaseProvider>
-    </SessionProvider>
+    <HostContext value={host}>
+      <SessionProvider host={host}>
+        <ReleaseProvider host={host}>
+          <Shell />
+        </ReleaseProvider>
+      </SessionProvider>
+    </HostContext>
   );
 }
