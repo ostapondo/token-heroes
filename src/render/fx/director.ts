@@ -60,6 +60,8 @@ export class Director {
         return this.#twists.react(event, stage);
       case BattleEventType.StageCleared:
       case BattleEventType.Wiped:
+      case BattleEventType.Skill:
+      case BattleEventType.SkillTick:
         return NONE;
       default:
         return unhandled(event);

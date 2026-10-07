@@ -1,8 +1,11 @@
 import { BALANCE } from '../balance';
-import { heroDamage, heroHeal, safeAmount } from '../formulas';
+import { healShare, heroAttack, heroHeal, safeAmount } from '../formulas';
 import { partyVitals, renownPower } from '../party';
 import { nextRandom } from '../random';
 import { heroById } from '../roster';
+import { statusesAct } from '../skills/status';
+import { absorb, guard } from '../skills/guard';
+import { afterHeroHit, holdsAttack, skillsAct } from '../skills/tick';
 import {
   type BattleEvent,
   BattleEventType,
@@ -58,10 +61,14 @@ function fight(battle: BattleState, dt: number, party: PartyState, roster: Roste
 
   draft.strikeReadyIn = Math.max(0, draft.strikeReadyIn - dt);
 
-  if (!throttled(draft, dt, events)) heroesAct(draft, dt, party, roster, events);
+  if (!throttled(draft, dt, events)) {
+    heroesAct(draft, dt, party, roster, events);
+    skillsAct(draft, dt, { party, roster, events });
+  }
+  statusesAct(draft, dt, events);
   if (settleClear(draft, events)) return { battle: draft, events };
 
-  foesAct(draft, dt, events);
+  foesAct(draft, dt, { party, roster, events });
   if (draft.partyHp <= 0) wipe(draft, events);
 
   return { battle: draft, events };
@@ -81,9 +88,17 @@ function heroesAct(
     const hero = heroById(roster, slot.heroId);
     let cooldown = (draft.cooldowns[hero.id] ?? 0) - dt;
 
+    if (holdsAttack(draft, hero, slot.level)) {
+      draft.cooldowns[hero.id] = Math.max(cooldown, 0);
+      continue;
+    }
+
     while (cooldown <= 0 && frontFoe(draft) !== -1) {
       if (hero.role === HeroRole.Healer) {
-        const amount = heroHeal(hero, slot.level, vitals, foesDamagePerSecond(draft));
+        const amount = safeAmount(
+          heroHeal(hero, slot.level, vitals, foesDamagePerSecond(draft)) *
+            healShare(hero, slot.level),
+        );
 
         draft.partyHp = Math.min(vitals.hp, draft.partyHp + amount);
         events.push({ type: BattleEventType.Heal, source: hero.id, amount });
@@ -91,9 +106,12 @@ function heroesAct(
         const [roll, seed] = nextRandom(draft.seed);
 
         draft.seed = seed;
-        const power = safeAmount(heroDamage(hero, slot.level) * renown);
+        const power = safeAmount(heroAttack(hero, slot.level) * renown);
 
-        heroHit(draft, hero.id, power, roll < BALANCE.critChance, events);
+        heroHit(draft, power, roll < BALANCE.critChance, events, (foe, amount, crit) =>
+          events.push({ type: BattleEventType.Hit, source: hero.id, foe, amount, crit }),
+        );
+        afterHeroHit(draft, hero.id, { party, roster, events });
       }
       cooldown += hero.attackInterval;
     }
@@ -101,15 +119,34 @@ function heroesAct(
   }
 }
 
-function foesAct(draft: BattleDraft, dt: number, events: BattleEvent[]): void {
+interface FightContext {
+  readonly party: PartyState;
+  readonly roster: Roster;
+  readonly events: BattleEvent[];
+}
+
+// A foe's blow may miss on a hero's guard; a party shield takes what it can of the rest.
+function foesAct(draft: BattleDraft, dt: number, context: FightContext): void {
+  const { events } = context;
+
   draft.foes.forEach((foe, index) => {
     if (foe.hp <= 0) return;
     foe.attackIn -= dt;
-    while (foe.attackIn <= 0) {
-      draft.partyHp -= foe.damage;
-      events.push({ type: BattleEventType.PartyHit, foe: index, amount: foe.damage });
-      stealContext(draft, foe, index, events);
+    while (foe.attackIn <= 0 && foe.hp > 0) {
       foe.attackIn += foe.attackInterval;
+      const guarded = guard(draft, index, foe.damage, context);
+
+      if (guarded >= foe.damage) continue;
+      const blocked = guarded + absorb(draft, foe.damage - guarded);
+
+      draft.partyHp -= foe.damage - blocked;
+      events.push({
+        type: BattleEventType.PartyHit,
+        foe: index,
+        amount: foe.damage - blocked,
+        ...(blocked > 0 ? { blocked } : {}),
+      });
+      stealContext(draft, foe, index, events);
     }
   });
 }
