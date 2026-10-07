@@ -2,7 +2,7 @@ import { WeatherKind, type WeatherDef } from '@content';
 import { Fog, Glow, Pulse } from './ambience';
 import { Particles } from './particles';
 import { GhostFlames, Lightning } from './spirits';
-import { FrostEdges, LavaFloor, SummoningRing } from './terrain';
+import { FrostEdges, SummoningRing } from './terrain';
 import type { Weather } from './weather';
 
 function unknownWeather(def: never): never {
@@ -19,8 +19,6 @@ export function createWeather(def: WeatherDef): Weather {
       return new Fog(def.color);
     case WeatherKind.Pulse:
       return new Pulse(def.color);
-    case WeatherKind.LavaFloor:
-      return new LavaFloor();
     case WeatherKind.FrostEdges:
       return new FrostEdges();
     case WeatherKind.Lightning:

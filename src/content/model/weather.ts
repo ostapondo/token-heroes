@@ -16,7 +16,6 @@ export const WeatherKind = {
   Glow: 'glow',
   Fog: 'fog',
   Pulse: 'pulse',
-  LavaFloor: 'lava-floor',
   FrostEdges: 'frost-edges',
   Lightning: 'lightning',
   SummoningRing: 'summoning-ring',
@@ -33,7 +32,6 @@ export type WeatherDef =
   | ({ readonly kind: typeof WeatherKind.Glow } & Tinted)
   | ({ readonly kind: typeof WeatherKind.Fog } & Tinted)
   | ({ readonly kind: typeof WeatherKind.Pulse } & Tinted)
-  | { readonly kind: typeof WeatherKind.LavaFloor }
   | { readonly kind: typeof WeatherKind.FrostEdges }
   | { readonly kind: typeof WeatherKind.Lightning }
   | { readonly kind: typeof WeatherKind.SummoningRing }

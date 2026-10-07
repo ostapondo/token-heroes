@@ -1,5 +1,6 @@
 import type { AttackStyle, HeroRole } from '@engine';
 import type { CreatureId, ElementId } from './ids';
+import type { BackdropDef } from './scenery';
 import type { Palette, SpriteDef } from './sprite';
 import type { WeatherDef } from './weather';
 
@@ -8,9 +9,8 @@ export interface ElementDef {
   readonly name: string;
   readonly status: string;
   readonly palette: Palette;
-  readonly sky: string;
-  readonly floor: string;
   readonly accent: string;
+  readonly backdrop: BackdropDef;
   readonly weather: readonly WeatherDef[];
 }
 

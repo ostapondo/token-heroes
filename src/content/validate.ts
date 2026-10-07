@@ -54,13 +54,30 @@ function spriteProblems(owner: string, sprite: SpriteDef, recolored: boolean): s
   return problems;
 }
 
+const NAMING_KEYS = new Set(['kind', 'shape']);
+
+// Every string in a backdrop is a colour, apart from the names of its pieces.
+function colorsIn(value: unknown, path: string): (readonly [string, string])[] {
+  if (typeof value === 'string') return [[path, value]];
+  if (Array.isArray(value))
+    return value.flatMap((item, index) => colorsIn(item, `${path}.${index}`));
+  if (typeof value !== 'object' || value === null) return [];
+
+  return Object.entries(value)
+    .filter(([key]) => !NAMING_KEYS.has(key))
+    .flatMap(([key, item]) => colorsIn(item, `${path}.${key}`));
+}
+
 function elementProblems(element: ElementDef): string[] {
   const owner = `element ${element.id}`;
-  const { sky, floor, accent } = element;
+  const { sky, ground } = element.backdrop;
 
   return [
     ...colorProblems(`${owner} palette`, element.palette),
-    ...colorProblems(owner, { sky, floor, accent }),
+    ...colorProblems(owner, { accent: element.accent }),
+    ...colorProblems(owner, Object.fromEntries(colorsIn(element.backdrop, 'backdrop'))),
+    ...(sky.length < 2 ? [`${owner} sky needs at least two bands`] : []),
+    ...(ground.length < 2 ? [`${owner} ground needs at least two bands`] : []),
   ];
 }
 

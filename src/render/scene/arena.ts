@@ -6,6 +6,7 @@ import {
   type PartyState,
   type Roster,
 } from '@engine';
+import { Backdrop } from '../backdrop/backdrop';
 import { Director } from '../fx/director';
 import type { Reaction } from '../fx/reaction';
 import type { Effect } from '../fx/effect';
@@ -15,7 +16,7 @@ import { createWeather, WeatherLayer, type Weather } from '../weather';
 import { PULLBACK } from './camera';
 import { Cast, type Pullback } from './cast';
 import { ARENA, center } from './geometry';
-import { paintBackdrop, paintCast, paintPullback } from './painter';
+import { paintCast, paintPullback } from './painter';
 
 export interface ArenaOptions {
   readonly canvas: HTMLCanvasElement;
@@ -33,12 +34,14 @@ export class Arena {
   readonly #context: CanvasRenderingContext2D;
   readonly #cast: Cast;
   readonly #director: Director;
+  readonly #backdrop = new Backdrop();
   #element: ElementDef | undefined;
   #weather: Weather[] = [];
   #effects: Effect[] = [];
   #snapshot: { battle: BattleState; party: PartyState } | undefined;
   #pullback: { scene: Pullback; left: number } | undefined;
   #shake = 0;
+  #clock = 0;
   #stop: (() => void) | undefined;
 
   constructor(options: ArenaOptions) {
@@ -116,6 +119,7 @@ export class Arena {
       y: ARENA.height - FOCUS_RISE,
     };
 
+    this.#clock += dt;
     for (const actor of actors) actor.motion.update(dt);
     this.#weather = this.#weather.filter((effect) =>
       this.#survives('weather', () => effect.update?.(dt)),
@@ -131,7 +135,7 @@ export class Arena {
     const jitter = () => Math.round((Math.random() - 0.5) * this.#shake);
 
     context.translate(jitter(), jitter());
-    paintBackdrop(context, element);
+    this.#backdrop.paint(context, element, this.#clock);
     this.#drawWeather(WeatherLayer.Back, { focus });
     if (this.#pullback) {
       const progress = 1 - this.#pullback.left / PULLBACK.seconds;
