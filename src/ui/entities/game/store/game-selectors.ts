@@ -11,6 +11,12 @@ export const selectStage = (state: GameState): number => state.game?.battle.stag
 export const selectParty = (state: GameState): PartyState | undefined => state.game?.party;
 export const selectPartyHp = (state: GameState): number => state.game?.battle.partyHp ?? 0;
 
+// Seconds until a skill fires, or null for a skill that waits on a proc or has not opened.
+export const selectSkillReadyIn =
+  (skillId: string) =>
+  (state: GameState): number | null =>
+    state.game?.battle.skills?.[skillId]?.readyIn ?? null;
+
 export const selectUltimatePercent = (state: GameState): number =>
   Math.floor((state.game?.battle.ultimate ?? 0) * 100);
 

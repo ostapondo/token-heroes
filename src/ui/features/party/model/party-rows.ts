@@ -12,6 +12,7 @@ import {
 } from '@engine';
 import { RECRUITS_SHOWN } from '../constants';
 import { roleAction } from './role-action';
+import { nextSkillGoal, skillChips, skillMarks } from './skill-chips';
 import type { PartyRows } from '../types';
 
 interface Wealth {
@@ -31,6 +32,7 @@ export function partyRows(
     const hero = heroById(roster, slot.heroId);
     const cost = levelCost(slot.level);
     const remaining = levelsToMilestone(slot.level);
+    const skills = skillChips(hero, slot.level, content, power);
 
     return {
       heroId: slot.heroId,
@@ -41,6 +43,9 @@ export function partyRows(
       levelsToMilestone: remaining,
       milestoneProgress: (BALANCE.milestoneEvery - remaining) / BALANCE.milestoneEvery,
       action: roleAction(hero, slot.level, vitals, power),
+      skills,
+      goal: nextSkillGoal(skills, slot.level),
+      marks: skillMarks(skills, slot.level),
     };
   });
   const owned = new Set(party.heroes.map((slot) => slot.heroId));
@@ -58,6 +63,7 @@ export function partyRows(
         unlocked: isUnlocked(stats, wealth.burned),
         affordable: wealth.balance >= stats.hireCost,
         action: roleAction(stats, 1, vitals, power),
+        skills: skillChips(stats, 1, content, power),
       };
     });
 
