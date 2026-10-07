@@ -1,3 +1,4 @@
+use std::io;
 use std::sync::{Mutex, MutexGuard, PoisonError};
 
 use super::book::Book;
@@ -103,6 +104,13 @@ impl AppState {
         }
 
         true
+    }
+
+    // The window saves from the thread pool, and two saves at once would share one temporary file.
+    pub fn write_save(&self, bytes: &[u8]) -> io::Result<()> {
+        let _writing = locked(&self.disk);
+
+        storage::write_atomic(&self.paths.save(), bytes)
     }
 
     pub fn settings(&self) -> Settings {

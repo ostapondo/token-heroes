@@ -39,7 +39,8 @@ pub struct WatchedAgent {
     transcripts: Option<usize>,
 }
 
-#[tauri::command]
+// The history is a clone of up to 360 hourly tallies, made off the main thread.
+#[tauri::command(async)]
 pub fn burn_history(state: State<'_, AppState>) -> History {
     state.history()
 }
