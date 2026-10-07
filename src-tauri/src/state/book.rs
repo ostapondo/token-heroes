@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+use super::history::History;
 use crate::economy::ledger::Ledger;
 use crate::tokens::memory::Reading;
 
@@ -11,6 +12,8 @@ pub struct Book {
     pub ledger: Ledger,
     #[serde(default)]
     pub reading: Reading,
+    #[serde(default)]
+    pub history: History,
 }
 
 #[cfg(test)]

@@ -87,7 +87,7 @@ impl Crediting {
         let batch = self.collector.scan(&mut self.reading, now);
 
         self.last_scan = Instant::now();
-        self.commit(batch, now);
+        self.commit(&batch, now);
     }
 
     fn tick(&mut self) {
@@ -108,7 +108,7 @@ impl Crediting {
             .collector
             .read_changed(&pending, &mut self.reading, now);
 
-        self.commit(batch, now);
+        self.commit(&batch, now);
         if self.last_scan.elapsed() >= self.rescan_every {
             self.scan();
         }
@@ -118,17 +118,17 @@ impl Crediting {
         }
     }
 
-    fn commit(&mut self, batch: Batch, now: u64) {
+    fn commit(&mut self, batch: &Batch, now: u64) {
         if !batch.advanced {
             return;
         }
         self.reading
             .seen
             .forget_before(now.saturating_sub(REMEMBER_IDS_FOR_SECONDS));
-        let credited = self
-            .app
-            .state::<AppState>()
-            .credit(batch.tokens, self.reading.clone());
+        let credited =
+            self.app
+                .state::<AppState>()
+                .credit(&batch.spending, self.reading.clone(), now);
 
         if let Some(wallet) = credited {
             events::wallet_changed(&self.app, wallet, batch.tokens);

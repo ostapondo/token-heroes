@@ -1,6 +1,7 @@
 use super::AppState;
 use crate::economy::ledger::InsufficientCoins;
 use crate::persistence::paths::Paths;
+use crate::tokens::burn::{Agent, Burn, Kinds, Spending};
 use crate::tokens::memory::{FileCursor, Reading};
 use std::path::{Path, PathBuf};
 
@@ -11,10 +12,21 @@ fn read_up_to(offset: u64) -> Reading {
         PathBuf::from("session.jsonl"),
         FileCursor {
             offset,
-            running_total: None,
+            ..FileCursor::default()
         },
     );
     reading
+}
+
+fn burned(tokens: u64) -> Spending {
+    let mut spending = Spending::default();
+    let usage = Kinds {
+        input: tokens,
+        ..Kinds::default()
+    };
+
+    spending.add(Agent::ClaudeCode, Burn::credited(usage, tokens));
+    spending
 }
 
 fn reopen(home: &Path) -> AppState {
@@ -26,9 +38,9 @@ fn a_crash_rolls_coins_and_positions_back_together() -> std::io::Result<()> {
     let home = tempfile::tempdir()?;
     let state = reopen(home.path());
 
-    state.credit(100, read_up_to(10));
+    state.credit(&burned(100), read_up_to(10), 0);
     assert!(state.save());
-    state.credit(50, read_up_to(15));
+    state.credit(&burned(50), read_up_to(15), 0);
     drop(state);
 
     let state = reopen(home.path());
@@ -43,7 +55,7 @@ fn a_spend_is_saved_at_once_with_everything_credited_before_it() -> std::io::Res
     let home = tempfile::tempdir()?;
     let state = reopen(home.path());
 
-    state.credit(100, read_up_to(10));
+    state.credit(&burned(100), read_up_to(10), 0);
     assert!(state.spend(40).is_ok());
     assert_eq!(state.spend(61), Err(InsufficientCoins));
     drop(state);
@@ -64,7 +76,7 @@ fn a_restart_keeps_the_coins_the_start_and_the_positions() -> std::io::Result<()
         ..read_up_to(10)
     };
 
-    state.credit(100, started.clone());
+    state.credit(&burned(100), started.clone(), 0);
     assert!(state.spend(30).is_ok());
     drop(state);
 

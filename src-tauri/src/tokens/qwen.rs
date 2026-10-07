@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
 
+use super::burn::{Agent, Burn, Kinds};
 use super::memory::LineMemory;
 use super::source::TokenSource;
 
@@ -29,6 +30,8 @@ struct Record {
     #[serde(rename = "type")]
     kind: Option<String>,
     forked_from: Option<serde_json::Value>,
+    model: Option<String>,
+    cwd: Option<String>,
     usage_metadata: Option<Usage>,
 }
 
@@ -40,6 +43,8 @@ struct Usage {
     candidates: u64,
     #[serde(default, rename = "totalTokenCount")]
     total: u64,
+    #[serde(default, rename = "cachedContentTokenCount")]
+    cached: u64,
 }
 
 impl Usage {
@@ -50,27 +55,43 @@ impl Usage {
 
         self.prompt.saturating_add(self.candidates)
     }
+
+    const fn kinds(&self) -> Kinds {
+        Kinds {
+            input: self.prompt.saturating_sub(self.cached),
+            output: self.candidates,
+            cache_writes: 0,
+            cache_reads: self.cached,
+        }
+    }
 }
 
 impl TokenSource for QwenCode {
+    fn agent(&self) -> Agent {
+        Agent::QwenCode
+    }
+
     fn root(&self) -> &Path {
         &self.root
     }
 
-    fn tokens_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<u64, serde_json::Error> {
+    fn burn_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<Burn, serde_json::Error> {
         if !line.contains(USAGE_MARKER) {
-            return Ok(0);
+            return Ok(Burn::default());
         }
         let record: Record = serde_json::from_str(line)?;
         let reply = record.kind.as_deref() == Some(REPLY) && record.forked_from.is_none();
         let Some(usage) = record.usage_metadata.filter(|_| reply) else {
-            return Ok(0);
+            return Ok(Burn::default());
         };
         let burned = usage.burned();
-
-        Ok(record
+        let credited = record
             .uuid
-            .map_or(burned, |id| memory.message_growth(&id, burned)))
+            .map_or(burned, |id| memory.message_growth(&id, burned));
+
+        Ok(Burn::credited(usage.kinds(), credited)
+            .by(record.model)
+            .in_folder(record.cwd.as_deref()))
     }
 }
 
@@ -88,7 +109,9 @@ mod tests {
         let source = QwenCode::new(PathBuf::new());
 
         assert_eq!(
-            source.tokens_in(REPLY, &mut Memory::default().at(0))?,
+            source
+                .burn_in(REPLY, &mut Memory::default().at(0))?
+                .tokens(),
             15_646
         );
         Ok(())
@@ -104,8 +127,8 @@ mod tests {
         );
         let telemetry = r#"{"uuid":"t1","type":"system","subtype":"ui_telemetry","usageMetadata":{"totalTokenCount":9}}"#;
 
-        assert_eq!(source.tokens_in(&copy, &mut memory.at(0))?, 0);
-        assert_eq!(source.tokens_in(telemetry, &mut memory.at(0))?, 0);
+        assert_eq!(source.burn_in(&copy, &mut memory.at(0))?.tokens(), 0);
+        assert_eq!(source.burn_in(telemetry, &mut memory.at(0))?.tokens(), 0);
         Ok(())
     }
 }

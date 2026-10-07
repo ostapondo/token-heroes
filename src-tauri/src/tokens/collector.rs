@@ -3,25 +3,42 @@ use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Seek, SeekFrom};
 use std::path::{Path, PathBuf};
 
+use super::burn::Spending;
 use super::discovery;
 use super::memory::{FileCursor, LineMemory, Reading};
 use super::source::TokenSource;
 use super::store::{StoreSource, read_store};
 use crate::support::logging;
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Batch {
     pub tokens: u64,
     pub advanced: bool,
+    pub spending: Spending,
 }
 
 impl Batch {
-    pub const fn and(self, other: Self) -> Self {
+    #[must_use]
+    pub fn and(self, other: Self) -> Self {
         Self {
             tokens: self.tokens.saturating_add(other.tokens),
             advanced: self.advanced || other.advanced,
+            spending: self.spending.merged(other.spending),
         }
     }
+
+    const fn moved(advanced: bool) -> Self {
+        Self {
+            tokens: 0,
+            advanced,
+            spending: Spending::empty(),
+        }
+    }
+}
+
+// How many transcripts an agent has under its root, for the menu's list of agents.
+pub fn transcripts_in(root: &Path) -> usize {
+    discovery::transcripts_under(root).len()
 }
 
 pub struct Collector {
@@ -58,10 +75,7 @@ impl Collector {
         *reading = Reading::starting_at(now);
         self.read_all(reading, now);
 
-        Batch {
-            tokens: 0,
-            advanced: true,
-        }
+        Batch::moved(true)
     }
 
     fn read_all(&self, reading: &mut Reading, now: u64) -> Batch {
@@ -122,10 +136,7 @@ impl Collector {
             .files
             .retain(|path, _| path.exists() || !present.iter().any(|root| path.starts_with(root)));
 
-        Batch {
-            tokens: 0,
-            advanced: reading.files.len() != before,
-        }
+        Batch::moved(reading.files.len() != before)
     }
 }
 
@@ -151,15 +162,12 @@ fn read_appended(
         *cursor = FileCursor::default();
     }
     if length == cursor.offset {
-        return Ok(Batch {
-            tokens: 0,
-            advanced: cursor.offset != started_at,
-        });
+        return Ok(Batch::moved(cursor.offset != started_at));
     }
     let mut reader = BufReader::new(File::open(path)?);
     let mut memory = LineMemory { cursor, seen, now };
     let mut line = Vec::new();
-    let mut tokens = 0_u64;
+    let mut spending = Spending::default();
     let mut unreadable = 0_usize;
 
     reader.seek(SeekFrom::Start(memory.cursor.offset))?;
@@ -174,8 +182,8 @@ fn read_appended(
             .cursor
             .offset
             .saturating_add(u64::try_from(read).map_err(io::Error::other)?);
-        match source.tokens_in(&String::from_utf8_lossy(&line), &mut memory) {
-            Ok(found) => tokens = tokens.saturating_add(found),
+        match source.burn_in(&String::from_utf8_lossy(&line), &mut memory) {
+            Ok(burn) => spending.add(source.agent(), burn),
             Err(_) => unreadable += 1,
         }
     }
@@ -187,8 +195,9 @@ fn read_appended(
     }
 
     Ok(Batch {
-        tokens,
+        tokens: spending.tokens(),
         advanced: memory.cursor.offset != started_at,
+        spending,
     })
 }
 

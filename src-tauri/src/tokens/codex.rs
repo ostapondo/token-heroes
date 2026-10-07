@@ -2,11 +2,14 @@ use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
 
+use super::burn::{Agent, Burn, Kinds, folder_name};
 use super::memory::LineMemory;
 use super::source::TokenSource;
 
 const TOKEN_COUNT: &str = "token_count";
 const TOKEN_COUNT_MARKER: &str = "\"token_count\"";
+const CONTEXTS: [&str; 2] = ["session_meta", "turn_context"];
+const CONTEXT_MARKERS: [&str; 2] = ["\"session_meta\"", "\"turn_context\""];
 
 pub struct Codex {
     root: PathBuf,
@@ -20,6 +23,8 @@ impl Codex {
 
 #[derive(Deserialize)]
 struct Event {
+    #[serde(rename = "type")]
+    kind: Option<String>,
     payload: Option<Payload>,
 }
 
@@ -28,6 +33,8 @@ struct Payload {
     #[serde(rename = "type")]
     kind: Option<String>,
     info: Option<Info>,
+    cwd: Option<String>,
+    model: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -42,6 +49,8 @@ struct Usage {
     input: u64,
     #[serde(default, rename = "output_tokens")]
     output: u64,
+    #[serde(default, rename = "cached_input_tokens")]
+    cached: u64,
 }
 
 // The input holds the cached input and the output holds the reasoning. An imported session
@@ -50,9 +59,22 @@ impl Usage {
     const fn burned(&self) -> u64 {
         self.input.saturating_add(self.output)
     }
+
+    const fn kinds(&self) -> Kinds {
+        Kinds {
+            input: self.input.saturating_sub(self.cached),
+            output: self.output,
+            cache_writes: 0,
+            cache_reads: self.cached,
+        }
+    }
 }
 
 impl TokenSource for Codex {
+    fn agent(&self) -> Agent {
+        Agent::Codex
+    }
+
     fn root(&self) -> &Path {
         &self.root
     }
@@ -60,9 +82,27 @@ impl TokenSource for Codex {
     // Codex logs a running total. It can start from a parent thread's total, and it starts
     // again from zero when a task restarts in the same file; in both cases the request's own
     // usage is what was burned.
-    fn tokens_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<u64, serde_json::Error> {
+    // The session names its folder and model in context lines, which the cursor keeps for the
+    // token counts that follow.
+    fn burn_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<Burn, serde_json::Error> {
+        if CONTEXT_MARKERS.iter().any(|marker| line.contains(marker)) {
+            let event: Event = serde_json::from_str(line)?;
+
+            if let Some(payload) = event
+                .payload
+                .filter(|_| CONTEXTS.contains(&event.kind.as_deref().unwrap_or_default()))
+            {
+                if let Some(project) = payload.cwd.as_deref().and_then(folder_name) {
+                    memory.cursor.project = Some(project);
+                }
+                if payload.model.is_some() {
+                    memory.cursor.model = payload.model;
+                }
+                return Ok(Burn::default());
+            }
+        }
         if !line.contains(TOKEN_COUNT_MARKER) {
-            return Ok(0);
+            return Ok(Burn::default());
         }
         let event: Event = serde_json::from_str(line)?;
         let Some(info) = event
@@ -70,20 +110,26 @@ impl TokenSource for Codex {
             .filter(|payload| payload.kind.as_deref() == Some(TOKEN_COUNT))
             .and_then(|payload| payload.info)
         else {
-            return Ok(0);
+            return Ok(Burn::default());
         };
         let Some(total) = info.total_token_usage.as_ref().map(Usage::burned) else {
-            return Ok(0);
+            return Ok(Burn::default());
         };
-        let request = info.last_token_usage.as_ref().map(Usage::burned);
+        let request = info.last_token_usage.as_ref();
         let burned = match memory.cursor.running_total {
             Some(previous) if total >= previous => total - previous,
-            _ => request.unwrap_or(total),
+            _ => request.map_or(total, Usage::burned),
         };
+        let kinds = request
+            .or(info.total_token_usage.as_ref())
+            .map(Usage::kinds)
+            .unwrap_or_default();
 
         memory.cursor.running_total = Some(total);
 
-        Ok(burned)
+        Ok(Burn::credited(kinds, burned)
+            .by(memory.cursor.model.clone())
+            .in_project(memory.cursor.project.clone()))
     }
 }
 
@@ -114,7 +160,11 @@ mod tests {
 
         lines
             .iter()
-            .map(|line| source.tokens_in(line, &mut memory.at(0)))
+            .map(|line| {
+                source
+                    .burn_in(line, &mut memory.at(0))
+                    .map(|burn| burn.tokens())
+            })
             .collect()
     }
 
@@ -162,7 +212,9 @@ mod tests {
         );
 
         assert_eq!(
-            source.tokens_in(&line, &mut Memory::default().at(0))?,
+            source
+                .burn_in(&line, &mut Memory::default().at(0))?
+                .tokens(),
             1_100
         );
         Ok(())
@@ -185,7 +237,30 @@ mod tests {
         let source = Codex::new(PathBuf::new());
         let line = r#"{"type":"event_msg","payload":{"type":"token_count","info":null}}"#;
 
-        assert_eq!(source.tokens_in(line, &mut Memory::default().at(0))?, 0);
+        assert_eq!(
+            source.burn_in(line, &mut Memory::default().at(0))?.tokens(),
+            0
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn credits_the_session_folder_model_and_cached_input() -> Result<(), serde_json::Error> {
+        let source = Codex::new(PathBuf::new());
+        let mut memory = Memory::default();
+        let context =
+            r#"{"type":"turn_context","payload":{"cwd":"/code/heroes","model":"gpt-6-sol"}}"#;
+        let request = r#"{"type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":1000,"cached_input_tokens":800,"output_tokens":50},"last_token_usage":{"input_tokens":1000,"cached_input_tokens":800,"output_tokens":50}}}}"#;
+
+        assert_eq!(source.burn_in(context, &mut memory.at(0))?.tokens(), 0);
+        let burn = source.burn_in(request, &mut memory.at(0))?;
+
+        assert_eq!(burn.project.as_deref(), Some("heroes"));
+        assert_eq!(burn.model.as_deref(), Some("gpt-6-sol"));
+        assert_eq!(
+            (burn.kinds.input, burn.kinds.cache_reads, burn.kinds.output),
+            (200, 800, 50)
+        );
         Ok(())
     }
 }

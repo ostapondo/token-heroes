@@ -1,4 +1,5 @@
 use super::StoreSource;
+use crate::tokens::burn::{Agent, Burn};
 use crate::tokens::collector::Collector;
 use crate::tokens::memory::{Reading, StoreCursor};
 use std::collections::HashSet;
@@ -15,6 +16,10 @@ impl StoreSource for CountingStore {
         "counting"
     }
 
+    fn agent(&self) -> Agent {
+        Agent::OpenCode
+    }
+
     fn root(&self) -> &Path {
         Path::new("/store")
     }
@@ -23,8 +28,10 @@ impl StoreSource for CountingStore {
         path.starts_with("/store/db")
     }
 
-    fn read_new(&self, _cursor: &mut StoreCursor, _now: u64) -> Result<u64, String> {
-        Ok(self.reads.fetch_add(1, Ordering::Relaxed) + 1)
+    fn read_new(&self, _cursor: &mut StoreCursor, _now: u64) -> Result<Vec<Burn>, String> {
+        self.reads.fetch_add(1, Ordering::Relaxed);
+
+        Ok(Vec::new())
     }
 }
 

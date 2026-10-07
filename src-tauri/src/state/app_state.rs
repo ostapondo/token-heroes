@@ -1,11 +1,13 @@
 use std::sync::{Mutex, MutexGuard, PoisonError};
 
 use super::book::Book;
+use super::history::History;
 use crate::economy::ledger::{InsufficientCoins, Wallet};
 use crate::persistence::paths::Paths;
 use crate::persistence::storage;
 use crate::preferences::settings::Settings;
 use crate::support::logging;
+use crate::tokens::burn::Spending;
 use crate::tokens::memory::Reading;
 
 struct Journal {
@@ -48,11 +50,18 @@ impl AppState {
         locked(&self.journal).book.reading.clone()
     }
 
-    pub fn credit(&self, tokens: u64, reading: Reading) -> Option<Wallet> {
+    pub fn history(&self) -> History {
+        locked(&self.journal).book.history.clone()
+    }
+
+    // Coins, positions and the history of who burned them change as one record.
+    pub fn credit(&self, spending: &Spending, reading: Reading, now: u64) -> Option<Wallet> {
+        let tokens = spending.tokens();
         let wallet = {
             let mut journal = locked(&self.journal);
 
             journal.book.ledger.burn(tokens);
+            journal.book.history.record(spending, now);
             journal.book.reading = reading;
             journal.unsaved = true;
             journal.book.ledger.wallet()
