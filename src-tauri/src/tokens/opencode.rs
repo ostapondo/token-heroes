@@ -62,7 +62,10 @@ impl StoreSource for OpenCode {
         self.database.parent().unwrap_or(&self.database)
     }
 
-    // Matched by name, not by folder: the watcher reports real paths behind a symlink.
+    // Matched by name, not by folder: the watcher reports real paths behind a symlink. Only
+    // the database and its write-ahead log hold messages; SQLite rewrites the shared-memory
+    // index whenever anyone opens the database, this reader included, so owning that file
+    // would read the database again every second.
     fn owns(&self, path: &Path) -> bool {
         let named = |path: &Path| {
             path.file_name()
@@ -71,7 +74,9 @@ impl StoreSource for OpenCode {
 
         named(path)
             .zip(named(&self.database))
-            .is_some_and(|(changed, database)| changed.starts_with(&database))
+            .is_some_and(|(changed, database)| {
+                changed == database || changed == format!("{database}-wal")
+            })
     }
 
     fn read_new(&self, cursor: &mut StoreCursor, now: u64) -> Result<Vec<Burn>, String> {
