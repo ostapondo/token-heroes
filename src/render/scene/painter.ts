@@ -1,24 +1,13 @@
-import type { ElementDef } from '@content';
 import { BattlePhase, type BattleState } from '@engine';
 import { FX_COLOR } from '../fx/colors';
 import { SPRITE_OUTLINE, type SpriteCache } from '../sprites/sprite-cache';
 import { PULLBACK } from './camera';
 import type { Actor, Pullback } from './cast';
-import { ARENA, floorTop } from './geometry';
 
 const TINT = { flash: FX_COLOR.steel, hurt: FX_COLOR.wound, glow: FX_COLOR.gold } as const;
 const FALLEN_ALPHA = 0.45;
 const HP_BAR = { height: 2, gap: 3, empty: '#000000' } as const;
 const SHADOW = { color: 'rgba(0, 0, 0, 0.42)', spread: 0.55, depth: 2, bossDepth: 3 } as const;
-
-export function paintBackdrop(context: CanvasRenderingContext2D, element: ElementDef): void {
-  context.fillStyle = element.sky;
-  context.fillRect(0, 0, ARENA.width, ARENA.height);
-  context.fillStyle = element.floor;
-  context.fillRect(0, floorTop(), ARENA.width, ARENA.floorHeight);
-  context.fillStyle = FX_COLOR.shadow;
-  context.fillRect(0, floorTop(), ARENA.width, 1);
-}
 
 const bottom = (actor: Actor): number => actor.box.y + actor.box.height;
 

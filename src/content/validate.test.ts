@@ -48,6 +48,20 @@ describe('validateContent', () => {
     ]);
   });
 
+  it('reports a backdrop colour that is not #rrggbb and a sky of one band', () => {
+    const [first, ...rest] = CONTENT.elements;
+
+    if (!first) throw new Error('The content has no elements');
+    const backdrop = { ...first.backdrop, sky: ['#123'], ground: ['#000000', 'red'] };
+    const content: Content = { ...CONTENT, elements: [{ ...first, backdrop }, ...rest] };
+
+    expect(validateContent(content)).toEqual([
+      `element ${first.id} backdrop.sky.0 is #123, not a lowercase #rrggbb colour`,
+      `element ${first.id} backdrop.ground.1 is red, not a lowercase #rrggbb colour`,
+      `element ${first.id} sky needs at least two bands`,
+    ]);
+  });
+
   it('reports an element constant without a definition and everything that names it', () => {
     const content: Content = {
       ...CONTENT,

@@ -1,44 +1,5 @@
-import { ARENA, floorTop } from '../scene/geometry';
+import { ARENA } from '../scene/geometry';
 import { type Weather, WeatherLayer, type WeatherScene } from './weather';
-
-const LAVA = { surface: '#e0451a', rim: '#ffb02e', crust: '#3a1408', bubble: '#ffd36a' } as const;
-const CRUSTS = [
-  [6, 12, 20, 4],
-  [70, 22, 30, 5],
-  [140, 10, 18, 4],
-] as const;
-const BUBBLES = [18, 52, 96, 128, 166] as const;
-const BUBBLE_CYCLE = 1.6;
-
-export class LavaFloor implements Weather {
-  readonly layer = WeatherLayer.Back;
-  #time = 0;
-
-  update(dt: number): void {
-    this.#time += dt;
-  }
-
-  draw(context: CanvasRenderingContext2D): void {
-    const top = floorTop();
-
-    context.fillStyle = LAVA.surface;
-    context.fillRect(0, top, ARENA.width, ARENA.floorHeight);
-    context.fillStyle = LAVA.rim;
-    context.fillRect(0, top, ARENA.width, 1);
-    context.fillStyle = LAVA.crust;
-    for (const [x, depth, width, height] of CRUSTS) context.fillRect(x, top + depth, width, height);
-
-    context.fillStyle = LAVA.bubble;
-    BUBBLES.forEach((x, index) => {
-      const phase = ((this.#time + index * 0.37) % BUBBLE_CYCLE) / BUBBLE_CYCLE;
-
-      if (phase > 0.6) return;
-      const size = Math.ceil(phase * 5);
-
-      context.fillRect(x, top + 6 + (index % 3) * 7 - size, size, size);
-    });
-  }
-}
 
 const ICICLES = [
   [0, 9],
