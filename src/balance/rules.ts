@@ -1,5 +1,5 @@
 import { HeroRole } from '@engine';
-import { percent } from './numbers';
+import { percent, times } from './numbers';
 import type { HeroSheet, StageSheet } from './sheets';
 import type { RunReport } from './simulate';
 
@@ -34,6 +34,7 @@ function weakest(
   members: readonly HeroSheet[],
   share: (sheet: HeroSheet) => number,
   threshold: number,
+  format: (share: number) => string = percent,
 ) {
   const shares = members.map((sheet) => ({ sheet, share: share(sheet) }));
   const measured = Math.min(...shares.map((entry) => entry.share));
@@ -42,7 +43,7 @@ function weakest(
   return {
     passed: behind.length === 0,
     measured,
-    behind: behind.map((entry) => `${entry.sheet.heroId} ${percent(entry.share)}`).join(', '),
+    behind: behind.map((entry) => `${entry.sheet.heroId} ${format(entry.share)}`).join(', '),
   };
 }
 
@@ -147,15 +148,18 @@ export const RULES: readonly Rule[] = [
   },
   {
     id: 'tanks-hold-the-line',
-    statement: "Every tank holds at least 15% of the party's health.",
-    why: 'A tank gives up damage for health; it must bring a real share of it.',
-    threshold: 0.15,
+    statement: 'Every tank holds at least twice the health of an average striker or healer.',
+    why:
+      'A tank gives up damage for health; it must be far tougher than the heroes it shields. ' +
+      'It is measured against them, not the whole party, so other tanks do not count against it.',
+    threshold: 2,
     judge({ heroes }) {
       const tanks = ofRole(heroes, HeroRole.Tank);
-      const total = sum(heroes, (sheet) => sheet.hp);
+      const shielded = heroes.filter((sheet) => sheet.role !== HeroRole.Tank);
 
-      if (tanks.length === 0) return null;
-      const result = weakest(tanks, (sheet) => sheet.hp / total, this.threshold);
+      if (tanks.length === 0 || shielded.length === 0) return null;
+      const average = sum(shielded, (sheet) => sheet.hp) / shielded.length;
+      const result = weakest(tanks, (sheet) => sheet.hp / average, this.threshold, times);
 
       return { ...result, detail: result.behind || 'every tank holds its share' };
     },
