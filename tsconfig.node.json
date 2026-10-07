@@ -22,6 +22,7 @@
     "vite.config.ts",
     "vite.balance.config.ts",
     "vite.site.config.ts",
+    "vite.demo.config.ts",
     "panda.config.ts",
     "postcss.config.js",
     "src/ui/shared/theme",

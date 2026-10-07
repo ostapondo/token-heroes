@@ -3,14 +3,7 @@ name: Pages
 on:
   push:
     branches: [main]
-    paths: &site
-      - site/**
-      - docs/readme/**
-      - public/cursors/**
-      - vite.site.config.ts
-      - .github/workflows/pages.yml
   pull_request:
-    paths: *site
   workflow_dispatch:
 
 concurrency:
