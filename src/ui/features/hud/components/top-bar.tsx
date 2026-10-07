@@ -7,12 +7,18 @@ import {
   selectStage,
   useGame,
 } from '../../../entities/game';
-import { CoinIcon } from '../../../shared/ui';
+import { selectOffer, useReleaseState } from '../../../entities/release';
+import { CoinIcon, IconButton } from '../../../shared/ui';
 import { Ascension } from './ascension';
 import { topBarRecipe } from './top-bar.recipe';
 
-export function TopBar() {
+interface Props {
+  readonly onOpenMenu: () => void;
+}
+
+export function TopBar({ onOpenMenu }: Props) {
   const stage = useGame(selectStage);
+  const offer = useReleaseState(selectOffer);
   const balance = useGame(selectBalance);
   const burned = useGame(selectBurned);
   const income = useGame(selectIncome);
@@ -36,6 +42,7 @@ export function TopBar() {
         </span>
         <span className={classes.burned}>{t('hud.burned', { burned: compactNumber(burned) })}</span>
       </div>
+      <IconButton glyph="menu" label={t('menu.open')} onClick={onOpenMenu} badge={offer !== null} />
     </header>
   );
 }

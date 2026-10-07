@@ -1,1 +1,1 @@
-export { SupportLinks } from './components/support-links';
+export { AboutPanel } from './components/about-panel';
