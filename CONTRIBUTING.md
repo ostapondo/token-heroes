@@ -59,13 +59,15 @@ coding agents.
 **Layers.** TypeScript in `src/` is split into layers, each reached only through its alias.
 The linter fails on any crossing.
 
-| Layer          | Alias       | May import            |
-| -------------- | ----------- | --------------------- |
-| `src/engine`   | `@engine`   | nothing               |
-| `src/content`  | `@content`  | `@engine`             |
-| `src/render`   | `@render`   | `@engine`, `@content` |
-| `src/platform` | `@platform` | `@engine`             |
-| `src/ui`       | none        | every alias           |
+| Layer          | Alias       | May import                     |
+| -------------- | ----------- | ------------------------------ |
+| `src/engine`   | `@engine`   | nothing                        |
+| `src/content`  | `@content`  | `@engine`                      |
+| `src/render`   | `@render`   | `@engine`, `@content`, `@i18n` |
+| `src/platform` | `@platform` | `@engine`                      |
+| `src/i18n`     | `@i18n`     | nothing                        |
+| `src/balance`  | `@balance`  | `@engine`, `@content`          |
+| `src/ui`       | none        | every alias but `@balance`     |
 
 Game rules stay in TypeScript. The Rust host watches transcripts, owns the coin ledger, stores
 saves and draws the tray, and nothing more.
@@ -119,17 +121,15 @@ A boss is a creature drawn in an element. It needs no sprite of its own.
 
 ### Add an enemy
 
-Enemies make up the packs between bosses. Each has its own small sprite, recoloured by its
-element.
+Enemies make up the packs between bosses. Each has its own small sprite, painted in the element
+of the stage it appears on.
 
 ```ts
 import { defineEnemy } from '../model/definitions';
-import { ElementId } from '../model/ids';
 
 export default defineEnemy({
   id: 'goblin',
   name: 'Goblin',
-  element: ElementId.Venom,
   hpScale: 1.0,
   damageScale: 1.0,
   sprite: {
@@ -160,12 +160,23 @@ attack style and attack interval, and may lean its `focus` towards offence (up t
 toughness (down to `-0.5`). It never sets damage, health or prices: `designHero` derives them
 from its `order`, so a hero with the next `order` is automatically stronger per coin, dearer to
 hire and unlocked later than the last one. Hero sprites use `fixed` colours only, since no
-element recolours them. Run `pnpm balance` before you open the pull request, and open an issue
-first to describe the role the hero fills.
+element recolours them.
+
+Every hero needs a skill in `src/content/skills/`; a second skill takes `slot: 2`. A skill names
+its `hero`, its `trigger` (`Cooldown` with a `cooldown`, or `OnHit` or `OnGuard` with a `chance`)
+and its `effects`, whose `share`s add up to 1. Like the hero, it sets no strength of its own: it
+spends a share of the hero's output, more with every rank. It also names its rank-five form in
+`evolved`, a `look` from `SkillLook` that `src/render` draws, a `color` and a 12×12 `icon` in
+fixed colours.
+
+Run `pnpm balance` before you open the pull request, and open an issue first to describe the
+role the hero fills.
 
 ### Add an element
 
-An element supplies a palette, the sky, floor and accent colours and a list of weather effects.
+An element supplies a palette, an accent colour, a backdrop (sky and ground bands plus scenery
+pieces), a list of weather effects and the `death` that fells a party in it.
+`src/render/backdrop/readability.test.ts` checks that sprites stay readable against the backdrop.
 
 1. Add its id to `ElementId` in `src/content/model/ids.ts`.
 2. Create `src/content/elements/<id>.ts` with `defineElement`. Every colour is a lowercase
@@ -183,18 +194,21 @@ A token source teaches the host to read another agent's transcripts. It lives in
 
 ```rust
 pub trait TokenSource: Send {
+    fn agent(&self) -> Agent;
     fn root(&self) -> &Path;
-    fn tokens_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<u64, serde_json::Error>;
+    fn burn_in(&self, line: &str, memory: &mut LineMemory<'_>) -> Result<Burn, serde_json::Error>;
 }
 ```
 
+- `agent` names the agent in the menu's Stats tab. Add it to `Agent` in `burn.rs`.
 - `root` is the folder to watch. The collector reads every `.jsonl` file below it, a line at a
   time, and remembers how far it got.
-- `tokens_in` returns the tokens burned by one line. Skip lines without usage cheaply, before
-  parsing JSON. `LineMemory` helps with agents that write one message on several lines or in
-  several files (`message_growth`) and with agents that log a running total
+- `burn_in` returns what one line burned: its input, output, cache writes and cache reads, and
+  the model and project folder when the line names them. Skip lines without usage cheaply,
+  before parsing JSON. `LineMemory` helps with agents that write one message on several lines or
+  in several files (`message_growth`) and with agents that log a running total
   (`cursor.running_total`).
-- Count only tokens the agent truly spent. Cache reads, for example, are not counted.
+- Count every token the agent sends or receives, cache reads included.
 - Resolve the root in `src-tauri/src/persistence/paths.rs`, honouring the agent's own home
   variable if it has one, and register the source in `src-tauri/src/app/crediting.rs`.
 - Add unit tests with real transcript lines, like those in `claude.rs` and `codex.rs`. Strip any
@@ -232,7 +246,8 @@ one strong accent per element, chunky readable silhouettes.
   should not.
 - Write commit messages in the style of the history:
   `feat(content): add the thunder golem`, `fix(engine): …`, `docs: …`.
-  The scopes are `engine`, `content`, `render`, `platform`, `ui`, `i18n` and `host`.
+  The scopes are `engine`, `content`, `render`, `platform`, `ui`, `i18n`, `balance`, `site` and
+  `host`.
 - Add a screenshot or a short clip for anything you can see.
 - Make sure `pnpm check` passes, and `pnpm lint:rust` if you touched `src-tauri`.
 - Coding agents are welcome. Review what yours wrote as if you wrote it yourself.
@@ -241,13 +256,14 @@ By contributing you agree that your work is released under the [MIT License](LIC
 
 ## Releasing
 
-Maintainers ship a release from a tag, and every installed copy offers it in the footer.
+Maintainers ship a release from a tag, and every installed copy offers it in the menu's About tab.
 
 1. Raise the version in `package.json`, `src-tauri/Cargo.toml` and `src-tauri/tauri.conf.json`.
 2. Tag the commit `v<version>` and push the tag. The release workflow builds macOS and Windows
    installers, signs the update bundles and drafts a GitHub release with `latest.json`.
 3. Read the draft, then publish it. The game checks
-   `releases/latest/download/latest.json` at launch and every six hours.
+   `releases/latest/download/latest.json` when its window opens and every six hours while it
+   stays open.
 
 The workflow needs two repository secrets: `TAURI_SIGNING_PRIVATE_KEY` and
 `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`. The matching public key is in `tauri.conf.json`. An update
