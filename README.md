@@ -35,7 +35,7 @@ per token. You spend those coins on levels and hires.
 The fight never pays you. When the party is stuck on a boss, the answer is to ship more work.
 
 <p align="center">
-  <img src="docs/readme/demo.gif" alt="The game window: the party fights the Plague Brute on stage 25 while burned tokens arrive as coins and buy levels and a Cleric" width="393">
+  <img src="docs/readme/demo.gif" alt="The game window: on stage 185 the party fights the Miser Wraith with its skills while coins buy levels for the Wanderer and the Shieldbearer" width="400">
 </p>
 
 | Agent       | Where it reads                                                  | What counts as burned                                   |
@@ -62,18 +62,22 @@ cache on every request, since that is what the agent burns.
 ## The fight
 
 - **Endless stages.** Packs of 3 enemies grow by one every 10 stages, up to 6. Every 5th stage is
-  a boss that fights until it or the party falls.
+  a boss that fights until it or the party falls, and every 50th a
+  [super boss](#eight-super-bosses).
 - **Auto battle.** Heroes attack on their own. Crits land 10% of the time for 2.5× damage.
 - **Tap to strike.** Click the arena to hit the front foe for half your party's power.
 - **Ultimate.** About an hour of agent work (a million burned tokens) charges one ultimate worth
-  roughly ten seconds of your party's damage.
+  seven seconds of your party's damage.
 - **Milestones.** Every 25 levels a hero's damage and health grow fourfold.
+- **Skills.** At level 10 every hero learns a skill, the Archer two. A skill ranks up every 10
+  levels, and each rank makes its hero 4% stronger and hands the skill more of the hero's damage.
+  At rank 5 it evolves: Backstab becomes Shadow Dance.
 - **Wipes are gentle.** If the party falls, it is back in 10 seconds. Levels and coins stay.
 - **Offline progress.** Close the window and the party keeps fighting for up to 8 hours.
 - **Ascension.** From stage 100 the party may ascend: every hero goes back to level 1 and the
-  party to stage 1, but with lasting power, the deepest stage over 50, squared (stage 130 →
-  ×6.8). Levels are not refunded; the power wins them back with about a quarter of the tokens
-  they took. The next ascension opens a quarter deeper. You confirm first and see the change.
+  party to stage 1, but with lasting power, the deepest stage divided by 50, squared (stage 130 →
+  ×6.8). Levels are not refunded; the power wins them back with about a third of the tokens they
+  took. The next ascension opens a quarter deeper. You confirm first and see the change.
 
 All of these numbers live in one file, [`src/engine/balance.ts`](src/engine/balance.ts).
 
@@ -92,35 +96,72 @@ burned 12.8 billion tokens.
 <img src="docs/readme/bosses.svg" alt="A grid of seventy-two pixel bosses: eight creatures down, nine elements across" width="100%">
 
 Every one of the 8 creatures comes in every one of the 9 elements, one boss per pairing. The
-creature brings the attack: dragons breathe fire, golems and slimes slam, wraiths swing a scythe,
-spiders spit, and demons and knights lunge. The element brings the palette and the weather: lava
-floors and embers for fire, frosted edges and snow for ice, lightning and rain for storms, a
-summoning ring for blood.
+creature brings the attack: dragons breathe fire, golems, slimes and zombie brutes slam, wraiths
+swing a scythe, spiders spit, and demons and knights lunge. The element brings the palette and
+the weather: lava floors and embers for fire, frosted edges and snow for ice, lightning and rain
+for storms, a summoning ring for blood. It also decides how a wiped party falls: fire leaves ash,
+ice a block, gold a statue.
+
+Between the bosses come packs drawn from 24 kinds of enemy, painted in the element of their stage.
 
 <img src="docs/readme/pack.svg" alt="Twelve pack enemies marching across" width="100%">
+
+### Eight super bosses
+
+Every 50th stage holds a super boss and every 100th an ultra boss, each in a lair of its own and
+with a twist of its own.
+
+| Boss                | First met | Twist                                                       |
+| ------------------- | --------- | ----------------------------------------------------------- |
+| Context Stealer     | stage 50  | every blow drains a tenth of your ultimate's charge         |
+| Rate Limiter        | stage 100 | every 8 seconds, a 429 holds your party back for 1.5 s      |
+| Hallucinator        | stage 150 | a quarter of your heroes' hits land on nothing              |
+| Infinite Loop       | stage 200 | at a quarter of its health, it loops back to half, once     |
+| Prompt Injector     | stage 250 | an eighth of your heroes' hits heal it instead              |
+| Shoggoth            | stage 300 | at half health its mask comes off and it hits 1.5× harder   |
+| Sycophant           | stage 350 | "You're absolutely right!" turns your crits into plain hits |
+| Paperclip Maximizer | stage 400 | a fifth of every hit becomes paperclips                     |
 
 ## Your tokens stay yours
 
 - The host reads only the `usage` numbers in each transcript line, the model's name and the name
   of the folder the agent ran in. Your prompts and code are never stored or shown.
-- Nothing leaves your machine. The app has no network client, and its content security policy
+- Nothing about your work leaves your machine. The one request the app makes is the update
+  check: when the game window opens, and every six hours while it stays open, it fetches
+  `latest.json` from this repository's GitHub releases. The window's content security policy
   allows only the local Tauri bridge.
 - Everything the game keeps sits in `~/.token-heroes/`: `ledger.json` (coins burned and spent,
   saved together with how far each transcript has been read, so a crash never credits a token
   twice, and the hourly totals by agent, folder and model that the menu's Stats tab shows),
-  `save.json` (the party and the stage), `settings.json` and `logs/`. The game saves after every purchase and whenever the window hides.
+  `save.json` (the party and the stage), `settings.json` and `logs/`. The game saves every 10
+  seconds, after every purchase and whenever the window closes.
 - Only the host can add coins. The window can spend them, and the host refuses any spend above
   your balance.
 
-It is light, too. New tokens reach your wallet within a second. On Apple Silicon the release
-build is a 3.6 MB app (a 1.75 MB `.dmg`), and it idles in the tray at about 58 MB of memory and
-0% CPU.
+It is light, too. New tokens reach your wallet within a second. The macOS download is a 6.7 MB
+universal `.dmg`, the Windows installer is 2.7 MB, and the game idles in the tray at about 58 MB
+of memory and 0% CPU.
 
 ## Run it
 
-There are no prebuilt releases yet, so you build from source. Once releases ship, the game
-offers each new version in the menu's About tab and installs it in one click. **Report a bug**
-in the same tab or in the tray menu opens an issue with your version filled in. You need:
+Download the installer for your system from the
+[latest release](https://github.com/ostapondo/token-heroes/releases/latest): a universal `.dmg`
+for macOS, an `.exe` or `.msi` for Windows. A Linux build is
+[not ready yet](https://github.com/ostapondo/token-heroes/issues/13). Want a look first?
+[Play it in your browser](https://ostapondo.github.io/token-heroes/play/), where a pretend agent
+burns the tokens.
+
+> [!NOTE]
+> The installers are not signed yet. On macOS, move the app to Applications and run
+> `xattr -dr com.apple.quarantine "/Applications/Token Heroes.app"` once, or macOS will refuse to
+> open it. On Windows, click **More info** and then **Run anyway** when SmartScreen warns.
+
+The game offers each new version in the menu's About tab and installs it in one click. **Report a
+bug** in the same tab or in the tray menu opens an issue with your version filled in.
+
+### Build from source
+
+You need:
 
 - [Node.js](https://nodejs.org) 22 or newer and [pnpm](https://pnpm.io) 10
   (`corepack enable` picks the pinned version)
@@ -180,27 +221,32 @@ flowchart LR
     content["@content<br/>heroes, bosses, elements"]
     render["@render<br/>canvas and weather"]
     platform["@platform<br/>host bridge"]
+    i18n["@i18n<br/>English catalogue"]
+    balance["@balance<br/>balance checks"]
     ui["ui<br/>React screens"]
     content --> engine
-    render --> engine & content
+    render --> engine & content & i18n
     platform --> engine
-    ui --> engine & content & render & platform
+    balance --> engine & content
+    ui --> engine & content & render & platform & i18n
   end
   platform <-- "commands and events" --> host
 ```
 
 Arrows point at what a layer may import. Each layer is reached only through its alias, and the
-linter fails on any crossing. Game rules stay in TypeScript and never move into Rust. The engine
+linter fails on any crossing. `@balance` runs only in `pnpm balance` and the MCP server; the game
+never imports it. Game rules stay in TypeScript and never move into Rust. The engine
 is deterministic: all randomness comes from a seeded generator in its state, so a battle can be
 replayed and offline progress can be fast-forwarded.
 
 ```text
 src/
   engine/     stages, battle, levels, offline progress, balance.ts
-  content/    one file per element, creature, boss, enemy and hero
+  content/    one file per element, lair, creature, boss, super boss, enemy, hero and skill
   render/     canvas scene, sprite cache, weather, combat effects
   platform/   the host contract, with Tauri and browser hosts
   i18n/       the typed English catalogue
+  balance/    balance sheets, battle runs and rules for pnpm balance and the MCP server
   ui/         React screens and the HUD (zustand, Panda CSS)
 src-tauri/    tray, transcript watcher, coin ledger, saves
 docs/         concept boards and the art in this README
@@ -208,10 +254,11 @@ docs/         concept boards and the art in this README
 
 ## Roadmap
 
-The game runs end to end today: the watcher, the ledger, the battle, fourteen heroes, all 72
-bosses and the saves. Next up:
+The game runs end to end today: the watcher, the ledger, the battle, fourteen heroes and their
+skills, all 72 bosses and 8 super bosses, the saves, and installers for macOS and Windows that
+update themselves. Next up:
 
-- [ ] Prebuilt installers for macOS, Windows and Linux
+- [ ] A Linux build
 - [ ] More agents as token sources: Copilot CLI, Goose, Cline, Roo Code, Amp
 - [ ] A second language
 
