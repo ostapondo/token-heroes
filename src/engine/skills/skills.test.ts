@@ -4,7 +4,7 @@ import { startStage } from '../battle/start';
 import { stepBattle } from '../battle/step';
 import { designHero } from '../design';
 import { heroDamage } from '../formulas';
-import { partyOf, testRoster } from '../testing';
+import { partyOf, testRoster, unbreakable } from '../testing';
 import {
   AttackStyle,
   type BattleEvent,
@@ -64,7 +64,7 @@ function run(battle: BattleState, roster: Roster, seconds: number, dt = 0.1) {
   const events: BattleEvent[] = [];
 
   for (let elapsed = 0; elapsed < seconds - 1e-9; elapsed += dt) {
-    const step = stepBattle({ ...current, partyHp: HUGE }, dt, party, roster);
+    const step = stepBattle(unbreakable(current, HUGE), dt, party, roster);
 
     current = step.battle;
     events.push(...step.events);

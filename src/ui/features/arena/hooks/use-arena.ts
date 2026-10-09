@@ -15,6 +15,7 @@ export function useArena(canvasRef: RefObject<HTMLCanvasElement | null>): void {
       content: CONTENT,
       roster: session.roster,
       onError: (error, where) => session.reportError(error, `Arena ${where}`),
+      onStrike: (foe) => session.strike(foe),
     });
     const resize = () => arena.resize(canvas.clientWidth, window.devicePixelRatio);
     const observer = new ResizeObserver(resize);

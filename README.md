@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/readme/banner.svg" alt="Token Heroes: four pixel heroes fight the Cinder Dragon on a lava floor while coins tick up" width="100%">
+<img src="docs/readme/banner.png" alt="Token Heroes: four heroes fight the Cinder Dragon on a lava floor while coins tick up" width="100%">
 
 ### The coins are the tokens your coding agents burn.
 
@@ -25,7 +25,7 @@ and every token they spend becomes a coin you can put into your heroes.
 
 ## How it works
 
-<img src="docs/readme/flow.svg" alt="Three panels: an agent session burns tokens, the host turns each token into one coin, the coins level up the Wanderer" width="100%">
+<img src="docs/readme/flow.png" alt="Three panels: an agent session burns tokens, the host turns each token into one coin, the coins level up the Wanderer" width="100%">
 
 Token Heroes sits next to your clock as a pixel sword. On macOS your coin balance shows beside it.
 Click the sword and a small window opens on an arena where your party fights forever. You never grind. Instead, the Rust host watches the session logs
@@ -35,7 +35,7 @@ per token. You spend those coins on levels and hires.
 The fight never pays you. When the party is stuck on a boss, the answer is to ship more work.
 
 <p align="center">
-  <img src="docs/readme/demo.gif" alt="The game window: on stage 185 the party fights the Miser Wraith with its skills while coins buy levels for the Wanderer and the Shieldbearer" width="400">
+  <img src="docs/readme/demo.gif" alt="The game window: on stage 185 the party brawls with the Miser Wraith until it falls in a blast" width="400">
 </p>
 
 | Agent       | Where it reads                                                  | What counts as burned                                   |
@@ -65,7 +65,13 @@ cache on every request, since that is what the agent burns.
   a boss that fights until it or the party falls, and every 50th a
   [super boss](#eight-super-bosses).
 - **Auto battle.** Heroes attack on their own. Crits land 10% of the time for 2.5× damage.
-- **Tap to strike.** Click the arena to hit the front foe for half your party's power.
+- **A brawl, not a line.** Heroes and foes are ragdoll models that mix on the floor. A killing
+  blow throws the body as far as the blow outdid it, and a boss's blow knocks heroes over.
+- **Health of their own.** Every hero has its own health. A blow lands on the healthiest hero,
+  a pack spreads its blows over the party and a boss's blow reaches up to four heroes. A hero at
+  zero is down until the next stage; the party wipes when all are down.
+- **Tap to strike.** Click a foe to hit it for half your party's power. A fallen body can be
+  picked up and thrown.
 - **Ultimate.** About an hour of agent work (a million burned tokens) charges one ultimate worth
   seven seconds of your party's damage.
 - **Milestones.** Every 25 levels a hero's damage and health grow fourfold.
@@ -83,9 +89,9 @@ All of these numbers live in one file, [`src/engine/balance.ts`](src/engine/bala
 
 ### Fourteen heroes
 
-<img src="docs/readme/heroes.svg" alt="Fourteen hero cards: Wanderer, Archer, Shieldbearer, Cleric, Fire Mage, Rogue, Barbarian, Frost Witch, Necromancer, Paladin, Monk, Templar, Sentinel, Druid" width="100%">
+<img src="docs/readme/heroes.png" alt="Fourteen hero cards: Wanderer, Archer, Shieldbearer, Cleric, Fire Mage, Rogue, Barbarian, Frost Witch, Necromancer, Paladin, Monk, Templar, Sentinel, Druid" width="100%">
 
-You start with the Wanderer. Strikers deal damage, tanks hold the party's health and healers
+You start with the Wanderer. Strikers deal damage, tanks carry the most health and healers
 undo a share of the foes' damage. Strikers and tanks each come with all four attacks: slash,
 arrow, bash and spell. Every later hero is stronger per coin than the one before; the rare ones
 appear only once your lifetime burn passes their threshold. Anyone who reaches the Druid has
@@ -93,7 +99,7 @@ burned 12.8 billion tokens.
 
 ### Seventy-two bosses
 
-<img src="docs/readme/bosses.svg" alt="A grid of seventy-two pixel bosses: eight creatures down, nine elements across" width="100%">
+<img src="docs/readme/bosses.png" alt="A grid of seventy-two bosses: eight creatures down, nine elements across" width="100%">
 
 Every one of the 8 creatures comes in every one of the 9 elements, one boss per pairing. The
 creature brings the attack: dragons breathe fire, golems, slimes and zombie brutes slam, wraiths
@@ -104,7 +110,7 @@ ice a block, gold a statue.
 
 Between the bosses come packs drawn from 24 kinds of enemy, painted in the element of their stage.
 
-<img src="docs/readme/pack.svg" alt="Twelve pack enemies marching across" width="100%">
+<img src="docs/readme/pack.png" alt="Twelve pack enemies marching across" width="100%">
 
 ### Eight super bosses
 
@@ -186,7 +192,7 @@ host. It starts you on 17.9M burned tokens and burns a few thousand more every 2
 
 ## Come build it with us
 
-<img src="docs/readme/slot.svg" alt="A golem cycling through all nine elements next to the eight lines of code for one of its bosses" width="100%">
+<img src="docs/readme/slot.png" alt="A thunder golem next to the eight lines of code for its boss" width="100%">
 
 Token Heroes is young, and it is open to contributors. You can make a real difference in an
 evening, and **you don't need to know Rust or React to start**. The game's content is plain data,
@@ -194,7 +200,7 @@ one entity per file, and the registry finds new files on its own.
 
 | If you like…       | You could                                                                    |
 | ------------------ | ---------------------------------------------------------------------------- |
-| Pixel art          | draw a new creature, which brings nine bosses, or a new enemy                |
+| Character design   | describe a new creature's look, which brings nine bosses, or a new enemy     |
 | Game design        | tune `balance.ts`, design a hero's role, propose a new mechanic              |
 | Canvas and effects | add a weather kind, a particle preset or a combat effect in `src/render`     |
 | Rust               | teach the host a new agent, such as Copilot CLI, Goose, Cline or Amp         |
@@ -219,7 +225,7 @@ flowchart LR
   subgraph web["src · TypeScript"]
     engine["@engine<br/>game rules"]
     content["@content<br/>heroes, bosses, elements"]
-    render["@render<br/>canvas and weather"]
+    render["@render<br/>ragdolls and weather"]
     platform["@platform<br/>host bridge"]
     i18n["@i18n<br/>English catalogue"]
     balance["@balance<br/>balance checks"]
@@ -243,7 +249,7 @@ replayed and offline progress can be fast-forwarded.
 src/
   engine/     stages, battle, levels, offline progress, balance.ts
   content/    one file per element, lair, creature, boss, super boss, enemy, hero and skill
-  render/     canvas scene, sprite cache, weather, combat effects
+  render/     ragdoll bodies, painters, camera, weather, combat effects
   platform/   the host contract, with Tauri and browser hosts
   i18n/       the typed English catalogue
   balance/    balance sheets, battle runs and rules for pnpm balance and the MCP server
@@ -268,8 +274,8 @@ Have an idea? [Open an issue](../../issues/new/choose). We read every one.
 
 <div align="center">
 
-<img src="docs/readme/pack.svg" alt="" width="100%">
+<img src="docs/readme/pack.png" alt="" width="100%">
 
-[MIT](LICENSE) · The art in this README is drawn from the game's own sprite files.
+[MIT](LICENSE) · The art in this README is drawn by the game's own renderer.
 
 </div>

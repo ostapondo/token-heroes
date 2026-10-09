@@ -3,7 +3,7 @@ import { BALANCE } from '../balance';
 import { startStage } from '../battle/start';
 import { stepBattle } from '../battle/step';
 import { designHero } from '../design';
-import { partyOf, testRoster } from '../testing';
+import { partyOf, testRoster, unbreakable } from '../testing';
 import { AttackStyle, BattleEventType, HeroRole, type Roster } from '../types';
 import { SkillEffectKind, SkillTrigger } from './types';
 
@@ -31,7 +31,7 @@ describe('skill timing', () => {
 
     battle = { ...battle, skills: { shot: { readyIn: 1, pool: 0, misses: 0 } } };
     for (let tick = 0; tick < 50; tick += 1) {
-      const step = stepBattle({ ...battle, partyHp: 1e12 }, 0.1, party, roster);
+      const step = stepBattle(unbreakable(battle), 0.1, party, roster);
 
       battle = step.battle;
       hits += step.events.filter((event) => event.type === BattleEventType.Hit).length;

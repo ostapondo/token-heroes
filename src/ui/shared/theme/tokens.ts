@@ -50,7 +50,7 @@ export const tokens = defineTokens({
     bossPanel: { value: '200px' },
     menuButton: { value: '34px' },
     topBar: { value: '72px' },
-    partyPanel: { value: '132px' },
+    heroStrip: { value: '200px' },
   },
 });
 

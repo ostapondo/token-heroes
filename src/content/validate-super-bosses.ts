@@ -7,8 +7,8 @@ import {
   missingReference,
   ordersOf,
   sequenceProblems,
-  spriteProblems,
 } from './checks';
+import { lookProblems } from './validate-looks';
 import { LairId } from './model/ids';
 import type { Content } from './registry';
 
@@ -65,7 +65,7 @@ function artProblems(content: Content): string[] {
     ...content.lairs.flatMap(elementProblems),
     ...content.superBosses.flatMap((boss) => [
       ...colorProblems(`super boss ${boss.id} palette`, boss.palette),
-      ...spriteProblems(`super boss ${boss.id}`, boss.sprite, true),
+      ...lookProblems(`super boss ${boss.id}`, boss.look, true),
     ]),
   ];
 }

@@ -26,6 +26,7 @@ import {
 } from './draft';
 import { heroHit, stealContext, throttled } from './mechanics';
 import { startStage } from './start';
+import { isUp, joinVitals, mendWeakest, partyDown, victims, wound } from './vitals';
 
 export function stepBattle(
   battle: BattleState,
@@ -60,6 +61,7 @@ function fight(battle: BattleState, dt: number, party: PartyState, roster: Roste
   const events: BattleEvent[] = [];
 
   draft.strikeReadyIn = Math.max(0, draft.strikeReadyIn - dt);
+  joinVitals(draft, party, roster);
 
   if (!throttled(draft, dt, events)) {
     heroesAct(draft, dt, party, roster, events);
@@ -69,7 +71,7 @@ function fight(battle: BattleState, dt: number, party: PartyState, roster: Roste
   if (settleClear(draft, events)) return { battle: draft, events };
 
   foesAct(draft, dt, { party, roster, events });
-  if (draft.partyHp <= 0) wipe(draft, events);
+  if (partyDown(draft, party)) wipe(draft, events);
 
   return { battle: draft, events };
 }
@@ -88,7 +90,8 @@ function heroesAct(
     const hero = heroById(roster, slot.heroId);
     let cooldown = (draft.cooldowns[hero.id] ?? 0) - dt;
 
-    if (holdsAttack(draft, hero, slot.level)) {
+    // A hero who is down neither strikes nor heals until it stands again.
+    if (!isUp(draft, hero.id) || holdsAttack(draft, hero, slot.level)) {
       draft.cooldowns[hero.id] = Math.max(cooldown, 0);
       continue;
     }
@@ -100,8 +103,14 @@ function heroesAct(
             healShare(hero, slot.level),
         );
 
-        draft.partyHp = Math.min(vitals.hp, draft.partyHp + amount);
-        events.push({ type: BattleEventType.Heal, source: hero.id, amount });
+        const target = mendWeakest(draft, party, roster, amount);
+
+        events.push({
+          type: BattleEventType.Heal,
+          source: hero.id,
+          amount,
+          ...(target ? { hero: target } : {}),
+        });
       } else {
         const [roll, seed] = nextRandom(draft.seed);
 
@@ -125,9 +134,10 @@ interface FightContext {
   readonly events: BattleEvent[];
 }
 
-// A foe's blow may miss on a hero's guard; a party shield takes what it can of the rest.
+// A foe's blow may miss on a hero's guard; a party shield takes what it can of the rest, and what
+// gets through is shared between the heroes the blow reaches.
 function foesAct(draft: BattleDraft, dt: number, context: FightContext): void {
-  const { events } = context;
+  const { events, party } = context;
 
   draft.foes.forEach((foe, index) => {
     if (foe.hp <= 0) return;
@@ -138,14 +148,19 @@ function foesAct(draft: BattleDraft, dt: number, context: FightContext): void {
 
       if (guarded >= foe.damage) continue;
       const blocked = guarded + absorb(draft, foe.damage - guarded);
+      const struck = victims(draft, party, index, foe);
+      const part = 1 / Math.max(1, struck.length);
 
-      draft.partyHp -= foe.damage - blocked;
-      events.push({
-        type: BattleEventType.PartyHit,
-        foe: index,
-        amount: foe.damage - blocked,
-        ...(blocked > 0 ? { blocked } : {}),
-      });
+      for (const hero of struck) {
+        events.push({
+          type: BattleEventType.PartyHit,
+          foe: index,
+          hero,
+          amount: (foe.damage - blocked) * part,
+          ...(blocked > 0 ? { blocked: blocked * part } : {}),
+        });
+        wound(draft, hero, (foe.damage - blocked) * part, index, events);
+      }
       stealContext(draft, foe, index, events);
     }
   });

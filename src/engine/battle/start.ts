@@ -1,9 +1,9 @@
 import { BALANCE } from '../balance';
-import { partyMaxHp } from '../party';
 import { heroById } from '../roster';
 import { freshSkills } from '../skills/tick';
 import { BattlePhase, type BattleState, type PartyState, type Roster } from '../types';
 import { foesForStage, isBossStage } from './stages';
+import { freshVitals } from './vitals';
 
 export function startStage(
   stage: number,
@@ -16,7 +16,7 @@ export function startStage(
     phase: BattlePhase.Fighting,
     phaseLeft: 0,
     foes: foesForStage(roster, stage),
-    partyHp: partyMaxHp(party, roster),
+    vitals: freshVitals(party, roster),
     cooldowns: Object.fromEntries(
       party.heroes.map((slot, order) => [
         slot.heroId,

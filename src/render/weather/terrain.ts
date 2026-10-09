@@ -1,4 +1,4 @@
-import { ARENA } from '../scene/geometry';
+import { ARENA } from '../geometry';
 import { type Weather, WeatherLayer, type WeatherScene } from './weather';
 
 const ICICLES = [

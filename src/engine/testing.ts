@@ -53,6 +53,12 @@ export function partyOf(
   return { heroes: slots.map(([heroId, level]) => ({ heroId, level })) };
 }
 
+// Heroes that no blow can fell, for tests about something other than survival.
+export const unbreakable = (battle: BattleState, hp = 1e15): BattleState => ({
+  ...battle,
+  vitals: Object.fromEntries(Object.keys(battle.vitals).map((id) => [id, { hp }])),
+});
+
 export function runFor(
   battle: BattleState,
   seconds: number,

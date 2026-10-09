@@ -72,6 +72,7 @@ export function foesForStage(roster: Roster, stage: number): Foe[] {
         damage: foeDamage(stage + lead.damageLead, stats.damageScale, true),
         attackInterval: BALANCE.bossAttackInterval,
         attackIn: BALANCE.bossAttackInterval,
+        attack: stats.attack,
         mechanic: stats.mechanic,
       },
     ];

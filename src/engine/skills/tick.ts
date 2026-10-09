@@ -2,7 +2,16 @@ import { BALANCE } from '../balance';
 import { type BattleDraft, foesDamagePerSecond, frontFoe } from '../battle/draft';
 import type { BattleState, HeroStats, PartyState, Roster } from '../types';
 import { heldRate, skillRate } from './budget';
-import { charging, type Context, fire, isLive, membersOf, rolled, stateOf } from './firing';
+import {
+  charging,
+  type Context,
+  fire,
+  isLive,
+  membersOf,
+  rolled,
+  standingMembers,
+  stateOf,
+} from './firing';
 import { skillRank } from './ranks';
 import { type SkillState, SkillTrigger } from './types';
 
@@ -47,7 +56,7 @@ export const holdsAttack = (draft: BattleDraft, hero: HeroStats, level: number):
 export function skillsAct(draft: BattleDraft, dt: number, context: Context): void {
   const foesDamage = foesDamagePerSecond(draft);
 
-  for (const member of membersOf(context.party, context.roster)) {
+  for (const member of standingMembers(draft, context)) {
     for (const skill of member.hero.skills) {
       if (skillRank(member.level, skill.lag) === 0) continue;
       const state = stateOf(draft, skill);
@@ -76,7 +85,7 @@ export function skillsAct(draft: BattleDraft, dt: number, context: Context): voi
 
 // A hero's hit may set off one of its skills.
 export function afterHeroHit(draft: BattleDraft, heroId: string, context: Context): void {
-  const member = membersOf(context.party, context.roster).find((each) => each.hero.id === heroId);
+  const member = standingMembers(draft, context).find((each) => each.hero.id === heroId);
 
   if (!member) return;
   for (const skill of member.hero.skills) {

@@ -14,6 +14,8 @@ import { SkillIcon } from './skill-icon';
 
 interface Props {
   readonly row: HeroRowModel;
+  readonly watched: boolean;
+  readonly onWatch: (heroId: string) => void;
   readonly onLevelUp: (heroId: string) => void;
 }
 
@@ -26,7 +28,7 @@ function goalText(goal: SkillGoal, level: number): string {
   });
 }
 
-export function HeroRow({ row, onLevelUp }: Props) {
+export function HeroRow({ row, watched, onWatch, onLevelUp }: Props) {
   const classes = rowRecipe();
   const [open, setOpen] = useState<string | null>(null);
   const cost = compactNumber(row.cost);
@@ -46,7 +48,16 @@ export function HeroRow({ row, onLevelUp }: Props) {
     <li className={cx(panel(), classes.root)}>
       <div className={classes.body}>
         <div className={classes.header}>
-          <span className={classes.name}>{row.name}</span>
+          <button
+            type="button"
+            aria-pressed={watched}
+            aria-label={t('party.watchLabel', { name: row.name })}
+            className={classes.name}
+            style={watched ? { color: row.tint } : undefined}
+            onClick={() => onWatch(row.heroId)}
+          >
+            {row.name}
+          </button>
           <span className={classes.skills}>
             {row.skills.map((chip) => (
               <SkillIcon key={chip.id} chip={chip} open={chip.id === open} onToggle={toggle} />

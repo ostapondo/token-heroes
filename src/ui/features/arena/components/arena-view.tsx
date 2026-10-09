@@ -19,16 +19,20 @@ export function ArenaView() {
 
   return (
     <div className={classes.root}>
-      <canvas ref={canvasRef} className={classes.canvas} style={ASPECT_RATIO} />
+      <canvas
+        ref={canvasRef}
+        role="button"
+        tabIndex={0}
+        aria-label={t('arena.strike')}
+        className={classes.canvas}
+        style={ASPECT_RATIO}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') session.strike();
+        }}
+      />
       <BossBar />
       <PartyBar />
       <WipeOverlay />
-      <button
-        type="button"
-        aria-label={t('arena.strike')}
-        className={classes.strike}
-        onClick={session.strike}
-      />
     </div>
   );
 }

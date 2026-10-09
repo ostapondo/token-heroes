@@ -137,10 +137,7 @@ function apply(
       break;
     }
     case SkillEffectKind.Heal: {
-      const amount = safeAmount(asProtection(damage, cast.rates));
-
-      draft.partyHp += amount;
-      outcome.heal = amount;
+      outcome.heal = safeAmount(asProtection(damage, cast.rates));
       break;
     }
   }
@@ -152,13 +149,13 @@ export function castSkill(
   draft: BattleDraft,
   cast: Cast,
   events: BattleEvent[],
-  maxHp: number,
+  mend: (amount: number) => void,
 ): void {
   const outcome: Outcome = { hits: [] };
   const after: BattleEvent[] = [];
 
   for (const effect of cast.skill.effects) apply(draft, cast, effect, outcome, after);
-  draft.partyHp = Math.min(maxHp, draft.partyHp);
+  if (outcome.heal) mend(outcome.heal);
   events.push({
     type: BattleEventType.Skill,
     source: cast.source,

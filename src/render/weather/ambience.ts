@@ -1,5 +1,5 @@
 import { withAlpha } from '../color';
-import { ARENA, floorTop } from '../scene/geometry';
+import { ARENA, floorTop } from '../geometry';
 import { type Weather, WeatherLayer, type WeatherScene } from './weather';
 
 export class Glow implements Weather {

@@ -77,6 +77,7 @@ const superBossesOf = (content: Content, tier: SuperBossTier): BossStats[] =>
     .map((boss) => ({
       id: boss.id,
       element: boss.lair,
+      attack: boss.attack,
       mechanic: boss.mechanic,
       hpScale: boss.hpScale,
       damageScale: boss.damageScale,
@@ -91,6 +92,7 @@ export function toRoster(content: Content): Roster {
       return {
         id: boss.id,
         element: boss.element,
+        attack: creature.attack,
         hpScale: creature.hpScale,
         damageScale: creature.damageScale,
       };

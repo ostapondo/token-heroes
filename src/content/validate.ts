@@ -6,11 +6,11 @@ import {
   missingReference,
   ordersOf,
   sequenceProblems,
-  spriteProblems,
 } from './checks';
 import type { BossDef, HeroDef } from './model/definitions';
 import { CreatureId, ElementId } from './model/ids';
 import type { Content } from './registry';
+import { lookProblems } from './validate-looks';
 import { skillProblems } from './validate-skills';
 import { superBossProblems } from './validate-super-bosses';
 
@@ -54,10 +54,10 @@ function artProblems(content: Content): string[] {
   return [
     ...content.elements.flatMap(elementProblems),
     ...content.creatures.flatMap((creature) =>
-      spriteProblems(`creature ${creature.id}`, creature.sprite, true),
+      lookProblems(`creature ${creature.id}`, creature.look, true),
     ),
-    ...content.enemies.flatMap((enemy) => spriteProblems(`enemy ${enemy.id}`, enemy.sprite, true)),
-    ...content.heroes.flatMap((hero) => spriteProblems(`hero ${hero.id}`, hero.sprite, false)),
+    ...content.enemies.flatMap((enemy) => lookProblems(`enemy ${enemy.id}`, enemy.look, true)),
+    ...content.heroes.flatMap((hero) => lookProblems(`hero ${hero.id}`, hero.look, false)),
   ];
 }
 

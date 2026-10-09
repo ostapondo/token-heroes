@@ -16,6 +16,7 @@ export {
   selectStage,
   selectStatus,
   selectUltimatePercent,
+  selectVitals,
   selectWipeStatus,
 } from './store/game-selectors';
 export type { Notice } from './types';

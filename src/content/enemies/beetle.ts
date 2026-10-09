@@ -1,19 +1,10 @@
 import { defineEnemy } from '../model/definitions';
+import { BeastForm } from '../model/look';
 
 export default defineEnemy({
   id: 'beetle',
   name: 'Beetle',
   hpScale: 1.6,
   damageScale: 0.6,
-  sprite: {
-    rows: [
-      'h.........',
-      'hh..aaa...',
-      '.h.acccab.',
-      'xxaaacaaab',
-      'exaaaaaaab',
-      '.xbbbbbbb.',
-      '..x.x.x.x.',
-    ],
-  },
+  look: { rig: 'beast', form: BeastForm.Beetle, mass: 1.3 },
 });

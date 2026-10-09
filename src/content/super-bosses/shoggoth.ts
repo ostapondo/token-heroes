@@ -1,6 +1,7 @@
 import { BossMechanic, SuperBossTier } from '@engine';
 import { CreatureAttack, defineSuperBoss } from '../model/definitions';
 import { LairId } from '../model/ids';
+import { BeastForm } from '../model/look';
 
 export default defineSuperBoss({
   id: 'shoggoth',
@@ -13,37 +14,5 @@ export default defineSuperBoss({
   hpScale: 1.1,
   damageScale: 1.1,
   palette: { a: '#2e4a34', b: '#1a2a1e', c: '#5f8a5a', e: '#f2f0c8', h: '#c86aa0', x: '#050805' },
-  sprite: {
-    rows: [
-      '..cc..........cc....',
-      '.aa..........aa..c..',
-      '.aa...cc.....aa..aa.',
-      '..aa..aa.....aa..aa.',
-      '...aa.aa....aa..aa..',
-      '...aaaaa...aaa.aa...',
-      '....acaabaaacaaba...',
-      '...accaaaaabaaaab...',
-      '..accaeeaaaaaeeaab..',
-      '..acaaxeaaaaaxeaab..',
-      '.acaaaaaaaeeaaaaaab.',
-      '.aaaeeaaaaxeaaaeeab.',
-      '.yyyyxeaaaaaaaaxeabb',
-      'ykyykyaaaeeeeaaaaabb',
-      'yyyyyyaaexxeeeaaaabb',
-      'ykyykyaaexxeeeaacabb',
-      'yykkyyaaaeeeeaaccabb',
-      '.yyyy.aaaaaaaaaaaaab',
-      '.aacaaaaaaaaaaeeaaab',
-      'accaeeaammmmmaxeaaab',
-      'acaxeeaemememaaaaaab',
-      'aaaaaaaabbaaaaaaaabb',
-      'aaaaeeabbbaaaaeeaabb',
-      'abaaxeaaaaaaaaxeabbb',
-      'abbaaaaabbaaaaaaabbb',
-      'abbbaaabbbbaaaabbbb.',
-      '.abbbbbbbbbbbbbbbbb.',
-      '..b.bb..bbb..bb.b...',
-    ],
-    fixed: { y: '#ffd84a', k: '#3a2600', p: '#b83a6a', m: '#4a0a20' },
-  },
+  look: { rig: 'beast', form: BeastForm.Shoggoth, mass: 7, scale: 8.8 },
 });

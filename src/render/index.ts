@@ -1,4 +1,4 @@
 export { compactNumber, rankNumeral } from './format';
-export { ARENA } from './scene/geometry';
-export { Arena } from './scene/arena';
+export { Arena } from './brawl/arena';
+export { FIELD as ARENA } from './brawl/stage/field';
 export { skillIcon } from './sprites/skill-icon';

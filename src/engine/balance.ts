@@ -40,6 +40,9 @@ export const BALANCE = {
     maximize: { kept: 0.8 },
   },
   bossDamageBase: 1.2,
+  // Every hero has its own health and is down at zero until the next stage. A boss's blow is shared
+  // between as many heroes as its attack reaches, so its damage per blow stays what it was.
+  bossReach: { breath: 4, slam: 3, scythe: 2, lunge: 1, spit: 1 },
   enemyAttackInterval: 1.6,
   bossAttackInterval: 2.5,
 

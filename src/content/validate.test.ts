@@ -2,6 +2,7 @@ import { SuperBossTier } from '@engine';
 import { describe, expect, it } from 'vitest';
 import { defineBoss, defineEnemy } from './model/definitions';
 import { CreatureId, ElementId } from './model/ids';
+import { BeastForm } from './model/look';
 import { CONTENT, type Content } from './registry';
 import { validateContent } from './validate';
 
@@ -54,19 +55,33 @@ describe('validateContent', () => {
     expect(CONTENT.heroes).toHaveLength(14);
   });
 
-  it('reports a ragged sprite and an unknown pixel', () => {
+  it('reports a look colour that is no colour and a size that is not positive', () => {
     const broken = defineEnemy({
       id: 'broken',
       name: 'Broken',
       hpScale: 1,
       damageScale: 1,
-      sprite: { rows: ['aa', 'a', 'aq'] },
+      look: { rig: 'beast', form: BeastForm.Slime, mass: 0, crown: '#FFD36A' },
     });
     const content: Content = { ...CONTENT, enemies: [...CONTENT.enemies, broken] };
 
     expect(validateContent(content)).toEqual([
-      'enemy broken sprite row 1 is not 2 wide',
-      'enemy broken sprite row 2 uses unknown pixel "q"',
+      'enemy broken look.mass must be a positive number',
+      'enemy broken look.crown "#FFD36A" is not a #rrggbb colour',
+    ]);
+  });
+
+  it('reports a ragged skill icon and an unknown pixel', () => {
+    const [first, ...rest] = CONTENT.skills;
+
+    if (!first) throw new Error('The content has no skills');
+    const icon = { rows: ['yy', 'y', 'yq'], fixed: { y: '#ffd36a' } };
+    const content: Content = { ...CONTENT, skills: [{ ...first, icon }, ...rest] };
+
+    expect(validateContent(content)).toEqual([
+      `skill ${first.id} icon sprite row 1 is not 2 wide`,
+      `skill ${first.id} icon sprite row 2 uses unknown pixel "q"`,
+      `skill ${first.id} icon is not 12x12`,
     ]);
   });
 

@@ -1,6 +1,7 @@
 import { type BattleDraft, foesDamagePerSecond } from '../battle/draft';
+import { isUp, mendAll } from '../battle/vitals';
 import { partyMend } from '../formulas';
-import { partyMaxHp, partyVitals } from '../party';
+import { partyVitals } from '../party';
 import { heroById } from '../roster';
 import { type BattleEvent, HeroRole, type HeroStats, type PartyState, type Roster } from '../types';
 import { type FightRates, partyDamagePerSecond } from './budget';
@@ -22,6 +23,10 @@ export interface Context {
 
 export const membersOf = (party: PartyState, roster: Roster): Member[] =>
   party.heroes.map((slot) => ({ hero: heroById(roster, slot.heroId), level: slot.level }));
+
+// Only heroes on their feet gather, cast and guard.
+export const standingMembers = (draft: BattleDraft, context: Context): Member[] =>
+  membersOf(context.party, context.roster).filter((member) => isUp(draft, member.hero.id));
 
 export const fightRates = (draft: BattleDraft, party: PartyState, roster: Roster): FightRates => ({
   partyDamage: partyDamagePerSecond(party, roster),
@@ -77,6 +82,6 @@ export function fire(draft: BattleDraft, firing: Firing, context: Context): void
       ...(firing.deflected === undefined ? {} : { deflected: firing.deflected }),
     },
     context.events,
-    partyMaxHp(context.party, context.roster),
+    (amount) => mendAll(draft, context.party, context.roster, amount),
   );
 }
