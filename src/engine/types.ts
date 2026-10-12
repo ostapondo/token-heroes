@@ -37,6 +37,16 @@ export const BossMechanic = {
 } as const;
 export type BossMechanic = ValueOf<typeof BossMechanic>;
 
+// How a boss's blow travels; it decides how many heroes one blow reaches.
+export const FoeAttack = {
+  Breath: 'breath',
+  Lunge: 'lunge',
+  Slam: 'slam',
+  Scythe: 'scythe',
+  Spit: 'spit',
+} as const;
+export type FoeAttack = ValueOf<typeof FoeAttack>;
+
 export const BattlePhase = { Fighting: 'fighting', Wiped: 'wiped', Cleared: 'cleared' } as const;
 export type BattlePhase = ValueOf<typeof BattlePhase>;
 
@@ -46,6 +56,7 @@ export const BattleEventType = {
   Ultimate: 'ultimate',
   Heal: 'heal',
   PartyHit: 'partyHit',
+  HeroDown: 'heroDown',
   FoeDefeated: 'foeDefeated',
   StageCleared: 'stageCleared',
   StageStarted: 'stageStarted',
@@ -78,6 +89,7 @@ export interface FoeStats {
 
 export interface BossStats extends FoeStats {
   readonly element: string;
+  readonly attack?: FoeAttack | undefined;
   readonly mechanic?: BossMechanic | undefined;
 }
 
@@ -106,6 +118,7 @@ export interface Foe {
   readonly damage: number;
   readonly attackInterval: number;
   readonly attackIn: number;
+  readonly attack?: FoeAttack | undefined;
   readonly mechanic?: BossMechanic | undefined;
   // Seconds the foe has fought, for a mechanic that comes round on a timer.
   readonly clock?: number | undefined;
@@ -117,12 +130,18 @@ export interface Foe {
   readonly mark?: FoeMark | undefined;
 }
 
+// A hero's own health in the fight; at zero it is down until the next stage.
+export interface HeroVitals {
+  readonly hp: number;
+}
+
 export interface BattleState {
   readonly stage: number;
   readonly phase: BattlePhase;
   readonly phaseLeft: number;
   readonly foes: readonly Foe[];
-  readonly partyHp: number;
+  // Keyed by hero id.
+  readonly vitals: Readonly<Record<string, HeroVitals>>;
   readonly cooldowns: Readonly<Record<string, number>>;
   readonly strikeReadyIn: number;
   readonly ultimate: number;
@@ -142,8 +161,9 @@ export type BattleEvent =
   | Event<typeof BattleEventType.Hit, FoeAmount & { source: string; crit: boolean }>
   | Event<typeof BattleEventType.Strike, FoeAmount>
   | Event<typeof BattleEventType.Ultimate, FoeAmount>
-  | Event<typeof BattleEventType.Heal, { source: string; amount: number }>
-  | Event<typeof BattleEventType.PartyHit, FoeAmount & { blocked?: number }>
+  | Event<typeof BattleEventType.Heal, { source: string; amount: number; hero?: string }>
+  | Event<typeof BattleEventType.PartyHit, FoeAmount & { hero: string; blocked?: number }>
+  | Event<typeof BattleEventType.HeroDown, { hero: string; foe: number }>
   | Event<typeof BattleEventType.FoeDefeated, { foe: number; boss: boolean }>
   | Event<typeof BattleEventType.StageCleared, { stage: number }>
   | Event<typeof BattleEventType.StageStarted, { stage: number }>

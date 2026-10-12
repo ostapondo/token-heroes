@@ -1,7 +1,7 @@
 import { sva } from '@styled/css';
 
 export const arenaViewRecipe = sva({
-  slots: ['root', 'canvas', 'strike'],
+  slots: ['root', 'canvas'],
   base: {
     root: {
       position: 'relative',
@@ -9,12 +9,10 @@ export const arenaViewRecipe = sva({
       border: '2px solid {colors.border}',
       overflow: 'hidden',
     },
-    canvas: { display: 'block', width: '100%', imageRendering: 'pixelated' },
-    strike: {
-      position: 'absolute',
-      inset: 0,
-      background: 'transparent',
-      border: 'none',
+    canvas: {
+      display: 'block',
+      width: '100%',
+      touchAction: 'none',
       cursor: 'url(/cursors/sword.svg) 2 2, crosshair',
       _active: { cursor: 'url(/cursors/sword-strike.svg) 2 2, crosshair' },
       _focusVisible: { outline: '2px solid {colors.ink}', outlineOffset: '-4px' },

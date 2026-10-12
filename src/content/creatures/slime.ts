@@ -1,5 +1,6 @@
 import { CreatureAttack, defineCreature } from '../model/definitions';
 import { CreatureId } from '../model/ids';
+import { BeastForm } from '../model/look';
 
 export default defineCreature({
   id: CreatureId.Slime,
@@ -7,25 +8,5 @@ export default defineCreature({
   attack: CreatureAttack.Slam,
   hpScale: 1.4,
   damageScale: 0.7,
-  sprite: {
-    rows: [
-      '................',
-      '.....m.mm.m.....',
-      '.....mmrrmm.....',
-      '.....mmmmmm.....',
-      '.....aaaaaa.....',
-      '....aaaaaaaa....',
-      '...aaccaaaaaa...',
-      '...acaaaaaaaa...',
-      '...aaaaaaaaaa...',
-      '..aaakxaakxaaa..',
-      '..aaaxxaaxxaaa..',
-      '..baaaaaaaaaaa..',
-      '..baaaaxxaaaaa..',
-      '..bbbbbbbbbbbb..',
-      '................',
-      '................',
-    ],
-    fixed: { k: '#ffffff', m: '#dfe3e8', r: '#c2361a' },
-  },
+  look: { rig: 'beast', form: BeastForm.Slime, mass: 6, scale: 5.2, crown: 'h' },
 });

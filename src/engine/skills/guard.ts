@@ -2,7 +2,7 @@ import type { BattleDraft } from '../battle/draft';
 import { safeAmount } from '../formulas';
 import { BattleEventType } from '../types';
 import { asDamage, asProtection } from './budget';
-import { type Context, fightRates, fire, isLive, membersOf, rolled, stateOf } from './firing';
+import { type Context, fightRates, fire, isLive, rolled, standingMembers, stateOf } from './firing';
 import { skillRank } from './ranks';
 import { SkillTrigger } from './types';
 
@@ -10,7 +10,7 @@ import { SkillTrigger } from './types';
 // covers the blow, the blow misses and the rest answers it; otherwise it softens the blow.
 // Returns the part of the blow the guard took.
 export function guard(draft: BattleDraft, foe: number, damage: number, context: Context): number {
-  for (const member of membersOf(context.party, context.roster)) {
+  for (const member of standingMembers(draft, context)) {
     for (const skill of member.hero.skills) {
       if (!isLive(member, skill, SkillTrigger.OnGuard) || stateOf(draft, skill).pool <= 0) continue;
       const { fired, state } = rolled(draft, skill);

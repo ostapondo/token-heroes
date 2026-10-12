@@ -7,7 +7,7 @@ land in an evening. This guide gets you from a fresh clone to a merged change.
 - [Set up](#set-up)
 - [House rules](#house-rules)
 - [Recipes](#recipes): a boss, an enemy, a hero, an element, a token source
-- [Sprites](#sprites)
+- [Looks](#looks)
 - [Pull requests](#pull-requests)
 
 Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
@@ -94,7 +94,7 @@ declined, however fun it is. The game exists to turn real work into progress.
 
 ### Add a boss
 
-A boss is a creature drawn in an element. It needs no sprite of its own.
+A boss is a creature drawn in an element. It needs no look of its own.
 
 1. Pick a creature and an element that no boss in `src/content/bosses` uses yet. Each pairing
    appears once, and the content check fails on a repeat. All 72 pairings are taken, so a new
@@ -121,31 +121,27 @@ A boss is a creature drawn in an element. It needs no sprite of its own.
 
 ### Add an enemy
 
-Enemies make up the packs between bosses. Each has its own small sprite, painted in the element
-of the stage it appears on.
+Enemies make up the packs between bosses. Each has its own look, painted in the element of the
+stage it appears on.
 
 ```ts
 import { defineEnemy } from '../model/definitions';
+import { Stance } from '../model/look';
 
 export default defineEnemy({
   id: 'goblin',
   name: 'Goblin',
   hpScale: 1.0,
   damageScale: 1.0,
-  sprite: {
-    rows: [
-      '...aaaa...',
-      '..aeaeaa..',
-      '...aaaa...',
-      '.s.bbbb...',
-      '.sabbbba..',
-      '.sabbbba..',
-      '...bbbb...',
-      '...x..x...',
-      '...x..x...',
-      '...x..x...',
-    ],
-    fixed: { s: '#c9d1d9' },
+  look: {
+    rig: 'biped',
+    mass: 0.7,
+    stance: Stance.Stalker,
+    build: { scale: 0.8, head: 8.2 },
+    colors: { upper: 'a', fore: 'a', hand: 'a', thigh: 'x', shin: 'a', boot: 'x', torso: 'x' },
+    head: { form: 'face', skin: 'a', eyes: 'e', ears: 'a', nose: 'a' },
+    details: [{ kind: 'belt', color: 'c' }],
+    weapon: { kind: 'dagger', color: ['#c9d1d9', '#6f7782'] },
   },
 });
 ```
@@ -159,8 +155,9 @@ Heroes live in `src/content/heroes/`. A hero names its role (`Striker`, `Tank` o
 attack style and attack interval, and may lean its `focus` towards offence (up to `0.5`) or
 toughness (down to `-0.5`). It never sets damage, health or prices: `designHero` derives them
 from its `order`, so a hero with the next `order` is automatically stronger per coin, dearer to
-hire and unlocked later than the last one. Hero sprites use `fixed` colours only, since no
-element recolours them.
+hire and unlocked later than the last one. A hero's look uses `#rrggbb` colours only, since no
+element recolours it, and its `tint` colours its health bar and the gear it earns every 25
+levels.
 
 Every hero needs a skill in `src/content/skills/`; a second skill takes `slot: 2`. A skill names
 its `hero`, its `trigger` (`Cooldown` with a `cooldown`, or `OnHit` or `OnGuard` with a `chance`)
@@ -176,7 +173,8 @@ role the hero fills.
 
 An element supplies a palette, an accent colour, a backdrop (sky and ground bands plus scenery
 pieces), a list of weather effects and the `death` that fells a party in it.
-`src/render/backdrop/readability.test.ts` checks that sprites stay readable against the backdrop.
+`src/render/backdrop/readability.test.ts` checks that a model's outline stays readable anywhere on
+the floor.
 
 1. Add its id to `ElementId` in `src/content/model/ids.ts`.
 2. Create `src/content/elements/<id>.ts` with `defineElement`. Every colour is a lowercase
@@ -219,11 +217,24 @@ An agent that keeps its sessions in a database instead implements `StoreSource`,
 watermark. A reply that grows while it streams is credited only for its growth, through the
 cursor's `seen` messages. Register it with `with_stores` in `src-tauri/src/app/crediting.rs`.
 
-## Sprites
+## Looks
 
-A sprite is a list of equal-width strings, one character per pixel.
+A look describes a model, not pixels: the arena builds the body from it, poses it, swings it and
+throws it as a ragdoll.
 
-| Char | Meaning       |
+- `rig: 'biped'` is a two-legged body. It names a `stance` (how it holds its arms and swings),
+  a colour per part (`upper`, `fore`, `hand`, `thigh`, `shin`, `boot`, `torso`), a `head`, and
+  optional `details`, `weapon`, `offhand`, `robe`, `quiver`, `wings` and `cloth`. A `build`
+  changes its proportions; a boss is a biped with a large `scale`.
+- `rig: 'beast'` is one of the `BeastForm` bodies: four legs, many legs, a serpent, a flyer, a
+  floater or a blob, with an optional `scale`.
+- `mass` decides how far a blow throws the body: a goblin weighs 0.7, a hero about 1, a boss 5
+  to 7. `metal: true` makes it shed sparks when struck.
+
+Every colour is a `Paint`: a palette slot, one `#rrggbb` (its shade is worked out), or a
+`[lit, shade]` pair.
+
+| Slot | Meaning       |
 | ---- | ------------- |
 | `a`  | body          |
 | `b`  | shade         |
@@ -231,11 +242,12 @@ A sprite is a list of equal-width strings, one character per pixel.
 | `e`  | eyes          |
 | `h`  | horns or bone |
 | `x`  | darkest       |
-| `.`  | transparent   |
 
-The element's palette fills those slots, so one creature looks different in every element. Any
-other letter is a fixed colour that you declare in the sprite's `fixed` map. The renderer adds the
-black outline, so don't draw one.
+The element's palette fills those slots, so one creature looks different in every element.
+Heroes use `#rrggbb` colours only. The renderer adds the dark outline and the cel shading.
+
+Skill icons are still 12×12 sprites: equal-width strings, one character per pixel, `.` for
+transparent and every other letter a colour declared in the icon's `fixed` map.
 
 The concept boards in [`docs/concepts`](docs/concepts) are the visual reference: muted grounds,
 one strong accent per element, chunky readable silhouettes.

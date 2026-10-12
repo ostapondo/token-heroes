@@ -1,5 +1,5 @@
 import type { BackdropDef, SceneryDef, SceneryKind } from '@content';
-import { ARENA, floorTop } from '../scene/geometry';
+import { ARENA, floorTop } from '../geometry';
 import type { Pixels } from './pixels';
 import { rampAt } from './tone';
 

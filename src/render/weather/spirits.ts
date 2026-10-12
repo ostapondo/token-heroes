@@ -1,5 +1,5 @@
 import { withAlpha } from '../color';
-import { ARENA } from '../scene/geometry';
+import { ARENA } from '../geometry';
 import { type Weather, WeatherLayer, type WeatherScene, randomBetween } from './weather';
 
 const STRIKE_GAP: readonly [number, number] = [2.5, 4.5];

@@ -6,16 +6,21 @@ import {
   BattlePhase,
   type BattleState,
   type Foe,
+  type HeroVitals,
 } from '../types';
 
 type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 
 export type FoeDraft = Mutable<Foe>;
 
-export interface BattleDraft extends Omit<Mutable<BattleState>, 'foes' | 'cooldowns' | 'skills'> {
+export interface BattleDraft extends Omit<
+  Mutable<BattleState>,
+  'foes' | 'cooldowns' | 'skills' | 'vitals'
+> {
   foes: FoeDraft[];
   cooldowns: Record<string, number>;
   skills: Record<string, SkillState>;
+  vitals: Record<string, HeroVitals>;
 }
 
 export function draftOf(battle: BattleState): BattleDraft {
@@ -24,6 +29,7 @@ export function draftOf(battle: BattleState): BattleDraft {
     foes: battle.foes.map((foe) => ({ ...foe })),
     cooldowns: { ...battle.cooldowns },
     skills: { ...battle.skills },
+    vitals: { ...battle.vitals },
   };
 }
 
@@ -50,6 +56,5 @@ export function foesDamagePerSecond(draft: BattleDraft): number {
 export function wipe(draft: BattleDraft, events: BattleEvent[]): void {
   draft.phase = BattlePhase.Wiped;
   draft.phaseLeft = BALANCE.respawnDelay;
-  draft.partyHp = 0;
   events.push({ type: BattleEventType.Wiped });
 }

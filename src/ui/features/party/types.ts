@@ -45,6 +45,7 @@ export interface SkillMark {
 export interface HeroRowModel {
   readonly heroId: string;
   readonly name: string;
+  readonly tint: string;
   readonly level: number;
   readonly cost: number;
   readonly affordable: boolean;

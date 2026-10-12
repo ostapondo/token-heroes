@@ -18,6 +18,12 @@ export function partyMaxHp(party: PartyState, roster: Roster): number {
   return safeAmount(total * renownPower(party.renown ?? 0));
 }
 
+export function heroMaxHp(party: PartyState, roster: Roster, heroId: string): number {
+  const level = party.heroes.find((slot) => slot.heroId === heroId)?.level ?? 1;
+
+  return safeAmount(heroHp(heroById(roster, heroId), level) * renownPower(party.renown ?? 0));
+}
+
 export function partyVitals(party: PartyState, roster: Roster): PartyVitals {
   const levels = party.heroes.reduce((sum, slot) => sum + slot.level, 0);
   const level = party.heroes.length > 0 ? levels / party.heroes.length : 1;

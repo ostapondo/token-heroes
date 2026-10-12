@@ -33,10 +33,12 @@ export function partyRows(
     const cost = levelCost(slot.level);
     const remaining = levelsToMilestone(slot.level);
     const skills = skillChips(hero, slot.level, content, power);
+    const { name, tint } = heroDefById(content, slot.heroId);
 
     return {
       heroId: slot.heroId,
-      name: heroDefById(content, slot.heroId).name,
+      name,
+      tint,
       level: slot.level,
       cost,
       affordable: wealth.balance >= cost,

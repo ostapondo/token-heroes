@@ -1,5 +1,5 @@
 import { ParticlePreset } from '@content';
-import { ARENA } from '../scene/geometry';
+import { ARENA } from '../geometry';
 import { type Weather, WeatherLayer, randomBetween } from './weather';
 
 const Edge = { Top: 'top', Bottom: 'bottom' } as const;

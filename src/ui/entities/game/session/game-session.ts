@@ -45,6 +45,7 @@ export class GameSession {
   // latest start may run the loop.
   #starts = 0;
   #arena: Arena | null = null;
+  #watched: string | null = null;
 
   constructor(host: Host, roster: Roster, starterHeroId: string) {
     this.#host = host;
@@ -52,8 +53,9 @@ export class GameSession {
     this.#starterHeroId = starterHeroId;
   }
 
-  readonly strike = (): void => {
-    this.#play((game) => strike(game.battle, game.party, this.roster));
+  // A tap on a foe aims the strike at it; without one it lands on the front foe.
+  readonly strike = (foe?: number): void => {
+    this.#play((game) => strike(game.battle, game.party, this.roster, foe));
   };
 
   readonly unleashUltimate = (): void => {
@@ -97,6 +99,12 @@ export class GameSession {
     this.#guard('Saving the ascension', () => this.save());
   };
 
+  // The arena's camera leans in on this hero; null lets it go.
+  readonly watch = (heroId: string | null): void => {
+    this.#watched = heroId;
+    this.#arena?.select(heroId);
+  };
+
   reportError(error: unknown, where: string): void {
     this.#host.log(LogLevel.Error, `${where}: ${errorText(error)}`);
   }
@@ -106,6 +114,7 @@ export class GameSession {
     const game = this.#game();
 
     if (arena && game) arena.show(game.battle, game.party);
+    arena?.select(this.#watched);
   }
 
   async start(): Promise<void> {

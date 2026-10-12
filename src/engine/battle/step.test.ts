@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { partyMaxHp } from '../party';
+import { heroMaxHp } from '../party';
 import { partyOf, runFor, testRoster } from '../testing';
 import { startStage } from './start';
 import { BattleEventType } from '../types';
@@ -35,12 +35,15 @@ describe('stepBattle', () => {
     expect(events.some((event) => event.type === BattleEventType.Wiped)).toBe(false);
   });
 
-  it('never heals the party above its maximum', () => {
+  it('never heals a hero above its maximum', () => {
     const party = partyOf(['cleric', 40], ['guard', 20]);
     const result = runFor(startStage(3, party, testRoster, fresh), 10, party);
 
     expect(result.events.some((event) => event.type === BattleEventType.Heal)).toBe(true);
-    expect(result.battle.partyHp).toBeLessThanOrEqual(partyMaxHp(party, testRoster));
+    for (const { heroId } of party.heroes)
+      expect(result.battle.vitals[heroId]?.hp).toBeLessThanOrEqual(
+        heroMaxHp(party, testRoster, heroId),
+      );
   });
 
   it('plays out the same way for the same seed', () => {

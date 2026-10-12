@@ -12,7 +12,22 @@ export {
   toRoster,
 } from './lookup';
 export { DeathKind } from './model/death';
-export { CreatureAttack, type ElementDef } from './model/definitions';
+export type { ElementDef } from './model/definitions';
+export {
+  BeastForm,
+  Stance,
+  type BeastLook,
+  type BipedLook,
+  type Build,
+  type Cloth,
+  type Detail,
+  type Hat,
+  type Head,
+  type Look,
+  type Offhand,
+  type Paint,
+  type Weapon,
+} from './model/look';
 export { SkillLook } from './model/skill';
 export {
   LitterShape,

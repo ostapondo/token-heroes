@@ -1,4 +1,11 @@
-import { ascensionOffer, BattlePhase, type AscensionOffer, type PartyState } from '@engine';
+import {
+  ascensionOffer,
+  BattlePhase,
+  partyHealth,
+  type AscensionOffer,
+  type BattleState,
+  type PartyState,
+} from '@engine';
 import type { GameStatus } from '../constants';
 import type { BossStatus, GameState, Income, Notice, WipeStatus } from '../types';
 
@@ -9,7 +16,11 @@ export const selectBalance = (state: GameState): number => state.wallet.balance;
 export const selectBurned = (state: GameState): number => state.wallet.burned;
 export const selectStage = (state: GameState): number => state.game?.battle.stage ?? 1;
 export const selectParty = (state: GameState): PartyState | undefined => state.game?.party;
-export const selectPartyHp = (state: GameState): number => state.game?.battle.partyHp ?? 0;
+export const selectPartyHp = (state: GameState): number =>
+  state.game ? partyHealth(state.game.battle) : 0;
+// Keyed by hero id; the record is the battle's own, so a selector re-renders only when it changes.
+export const selectVitals = (state: GameState): BattleState['vitals'] | undefined =>
+  state.game?.battle.vitals;
 
 // Seconds until a skill fires, or null for a skill that waits on a proc or has not opened.
 export const selectSkillReadyIn =

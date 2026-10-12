@@ -1,6 +1,7 @@
 import { BossMechanic, SuperBossTier } from '@engine';
 import { CreatureAttack, defineSuperBoss } from '../model/definitions';
 import { LairId } from '../model/ids';
+import { BeastForm } from '../model/look';
 
 export default defineSuperBoss({
   id: 'infinite-loop',
@@ -12,34 +13,6 @@ export default defineSuperBoss({
   mechanic: BossMechanic.Loop,
   hpScale: 1.2,
   damageScale: 1.0,
-  palette: { a: '#3ad06a', b: '#1f8a40', c: '#a8ffb8', e: '#ffe14a', h: '#eef4ee', x: '#08200f' },
-  sprite: {
-    rows: [
-      '....baaab...........',
-      '..baaaaaaab.........',
-      '.baeeaaaaaaaaa......',
-      'baaaaaacaaaaaaaa....',
-      'hhxxxxaaaaaaaaaaa...',
-      '.hcxxbaaaa...aaaaa..',
-      '..cahbaa......aaaaa.',
-      '..caa..........aaaa.',
-      '..caa..........abaa.',
-      '.caaa..........aaaa.',
-      '.caa.....eee...aaba.',
-      '.caa....e...e..aaaa.',
-      'caaa...e.....e.aaaab',
-      'caa....e.....e..abab',
-      'caa....e....eee.aaab',
-      'caaa...e.....e.aaaab',
-      '.caa....e.......abab',
-      '.caa.....eee...aaab.',
-      '.caaa.........aaaab.',
-      '.caaa.........abaab.',
-      '..caaa.......aaaab..',
-      '..cbaaaa...aaaaabb..',
-      '...bbaaaaaaaaaabb...',
-      '....bbbaaaaaabbb....',
-      '......bbbbbbbb......',
-    ],
-  },
+  palette: { a: '#f2b134', b: '#a8641a', c: '#ffe9a0', e: '#3ad06a', h: '#fff6d6', x: '#2a1606' },
+  look: { rig: 'beast', form: BeastForm.Serpent, mass: 6, scale: 4.45, marks: 'e' },
 });

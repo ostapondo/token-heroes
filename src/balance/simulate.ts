@@ -90,6 +90,7 @@ function count(tally: Tally, event: BattleEvent): void {
       break;
     case BattleEventType.FoeDefeated:
     case BattleEventType.Mechanic:
+    case BattleEventType.HeroDown:
       break;
   }
 }

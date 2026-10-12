@@ -1,5 +1,6 @@
 import { CreatureAttack, defineCreature } from '../model/definitions';
 import { CreatureId } from '../model/ids';
+import { BeastForm } from '../model/look';
 
 export default defineCreature({
   id: CreatureId.Wraith,
@@ -7,25 +8,5 @@ export default defineCreature({
   attack: CreatureAttack.Scythe,
   hpScale: 0.8,
   damageScale: 1.4,
-  sprite: {
-    rows: [
-      '................',
-      '.ssssbbbbbb.....',
-      '.w...bbbbbb.....',
-      '.w..abvvvvbb....',
-      '.w..abevvebb....',
-      '.w..abvvvvbb....',
-      '.w.aabbbbbbbb...',
-      '.whhabbbbbbbb...',
-      '.w.aabbbbbbbb...',
-      '.w.aabbbbbbbb...',
-      '.w.aabbbbbbbb...',
-      '.w.aabbbbbbbb...',
-      '.w.bb.bb.bb.b...',
-      '.w.bb.bb.bb.b...',
-      '.w....bb....b...',
-      '................',
-    ],
-    fixed: { s: '#c9d1d9', v: '#050808', w: '#6b4a2e' },
-  },
+  look: { rig: 'beast', form: BeastForm.Wraith, mass: 5, scale: 2.35 },
 });

@@ -10,7 +10,7 @@ import {
   union,
 } from 'zod';
 import { startStage } from '../battle/start';
-import { BattlePhase, BossMechanic, type Roster } from '../types';
+import { BattlePhase, BossMechanic, FoeAttack, type Roster } from '../types';
 import { LEGACY_SAVE_VERSION, SAVE_VERSION, type StoredSave } from './save';
 
 const foeWire = object({
@@ -21,6 +21,7 @@ const foeWire = object({
   damage: number().nonnegative(),
   attackInterval: number().positive(),
   attackIn: number(),
+  attack: enumOf(FoeAttack).optional(),
   mechanic: enumOf(BossMechanic).optional(),
   clock: number().nonnegative().optional(),
   spent: boolean().optional(),
@@ -46,7 +47,8 @@ const battleWire = object({
   phase: enumOf(BattlePhase),
   phaseLeft: number(),
   foes: array(foeWire),
-  partyHp: number(),
+  // Saves from before heroes had their own health carry none; their stage starts over.
+  vitals: record(string(), object({ hp: number().nonnegative() })).optional(),
   cooldowns: record(string(), number()),
   strikeReadyIn: number().nonnegative(),
   ultimate: number().min(0).max(1),
@@ -90,8 +92,11 @@ export function saveFromWire(value: unknown, roster: Roster): StoredSave | null 
   if (!save.party.heroes.every((slot) => known.has(slot.heroId))) return null;
   const foes = foeIds(roster);
 
-  // A foe the content no longer has starts its stage over, so the save keeps its progress.
-  return save.battle.foes.every((foe) => foes.has(foe.id))
-    ? save
+  const { vitals } = save.battle;
+
+  // A foe the content no longer has, or a battle from before heroes had their own health, starts
+  // its stage over, so the save keeps its progress.
+  return vitals && save.battle.foes.every((foe) => foes.has(foe.id))
+    ? { ...save, battle: { ...save.battle, vitals } }
     : { ...save, battle: startStage(save.battle.stage, save.party, roster, save.battle) };
 }

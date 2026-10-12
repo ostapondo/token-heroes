@@ -1,4 +1,4 @@
-import type { Point } from '../scene/geometry';
+import type { Point } from '../geometry';
 
 export const WeatherLayer = { Back: 'back', Front: 'front' } as const;
 export type WeatherLayer = (typeof WeatherLayer)[keyof typeof WeatherLayer];

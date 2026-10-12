@@ -3,6 +3,7 @@ export { chargeUltimate, strike, unleashUltimate } from './battle/actions';
 export { foesForStage, isBossStage, upcomingBoss } from './battle/stages';
 export { startStage } from './battle/start';
 export { stepBattle } from './battle/step';
+export { partyHealth, victims } from './battle/vitals';
 export { designHero } from './design';
 export { formTier, levelOfRank, rankedSkills, skillRank, skillShare, tiered } from './skills/ranks';
 export { skillHitPerCast } from './skills/budget';
@@ -27,6 +28,7 @@ export {
 } from './formulas';
 export {
   heroLevel,
+  heroMaxHp,
   hire,
   isUnlocked,
   levelUp,
@@ -46,12 +48,14 @@ export {
   BattleEventType,
   BossMechanic,
   BattlePhase,
+  FoeAttack,
   HeroRole,
   SuperBossTier,
   type BattleEvent,
   type BattleState,
   type BattleStep,
   type BossStats,
+  type Foe,
   type HeroStats,
   type PartyState,
   type Roster,
